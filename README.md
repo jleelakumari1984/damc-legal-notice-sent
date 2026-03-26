@@ -1,0 +1,1 @@
+# damc-legal-notice-sent
