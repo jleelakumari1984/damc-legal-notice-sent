@@ -1,0 +1,23 @@
+<div class="container d-flex align-items-center justify-content-center py-5">
+  <div class="card page-card p-4" style="width: 100%; max-width: 460px;">
+    <h3 class="brand-title mb-4 text-center">DAMC Legal Notice Portal</h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" formControlName="username" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" formControlName="password" />
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger py-2">{{ errorMessage }}</div>
+
+      <button type="submit" class="btn btn-brand w-100" [disabled]="isLoading">
+        {{ isLoading ? 'Signing in...' : 'Login' }}
+      </button>
+    </form>
+  </div>
+</div>

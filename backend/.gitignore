@@ -1,0 +1,26 @@
+target/
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ / Eclipse / VS Code
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local env files
+.env
+.env.*
+
+# Runtime storage (generated uploads/extracts)
+data/

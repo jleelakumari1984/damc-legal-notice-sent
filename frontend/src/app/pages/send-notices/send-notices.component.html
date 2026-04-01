@@ -1,0 +1,81 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="brand-title mb-0">Send Legal Notices</h3>
+  </div>
+
+  <div class="card page-card p-4 mb-4">
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Notice Type</label>
+          <select class="form-select" formControlName="processSno">
+            <option value="">Select Notice Type</option>
+            <option *ngFor="let type of noticeTypes" [value]="type.id">{{ type.name }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Upload ZIP (Excel + PDFs)</label>
+          <input type="file" class="form-control" accept=".zip" (change)="onFileChange($event)" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control datepicker" formControlName="scheduleDate" placeholder="YYYY-MM-DD" />
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center gap-4 pt-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="sms" formControlName="sendSms" />
+            <label class="form-check-label" for="sms">Send SMS</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="whatsapp" formControlName="sendWhatsapp" />
+            <label class="form-check-label" for="whatsapp">Send WhatsApp</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 text-md-end">
+          <button type="submit" class="btn btn-brand px-4" [disabled]="loading">
+            {{ loading ? 'Uploading...' : 'Upload and Schedule' }}
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-3 mb-0">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3 mb-0">{{ errorMessage }}</div>
+  </div>
+
+  <div class="card page-card p-4" *ngIf="rows.length">
+    <h5 class="mb-3">Excel Validation Result</h5>
+    <div class="table-responsive">
+      <table id="validationTable" class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Agreement No</th>
+            <th>Customer</th>
+            <th>SMS Mobile</th>
+            <th>WhatsApp Mobile</th>
+            <th>PDF</th>
+            <th>Document Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows">
+            <td>{{ row.agreementNumber }}</td>
+            <td>{{ row.customerName }}</td>
+            <td>{{ row.mobileSms }}</td>
+            <td>{{ row.mobileWhatsapp }}</td>
+            <td>{{ row.expectedPdfFile }}</td>
+            <td>
+              <span [class]="row.documentPresent ? 'badge bg-success' : 'badge bg-danger'">
+                {{ row.documentPresent ? 'Present' : 'Missing' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

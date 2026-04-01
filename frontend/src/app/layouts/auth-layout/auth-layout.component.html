@@ -1,0 +1,12 @@
+<div class="min-vh-100 d-flex flex-column">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
+    <div class="container">
+      <span class="navbar-brand fw-bold text-uppercase brand-title mb-0">DAMC Legal Notices</span>
+      <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <main class="flex-grow-1 py-3">
+    <router-outlet></router-outlet>
+  </main>
+</div>
