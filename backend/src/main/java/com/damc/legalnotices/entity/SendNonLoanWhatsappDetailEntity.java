@@ -48,6 +48,9 @@ public class SendNonLoanWhatsappDetailEntity {
 
     @Column(name = "send_response", columnDefinition = "longtext")
     private String sendResponse;
+    
+    @Column(name = "ack_id")
+    private String ackId;
 
     @Column(name = "created_by")
     private Long createdBy;

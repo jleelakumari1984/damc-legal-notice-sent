@@ -17,45 +17,47 @@ import java.time.Instant;
 @Table(name = "send_non_loan_sms_details")
 public class SendNonLoanSmsDetailEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sno")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "sno")
+  private Long id;
 
-    @Column(name = "type", length = 45)
-    private String type;
+  @Column(name = "type", length = 45)
+  private String type;
 
-    
-    @Column(name = "schedule_sno")
-    private Long scheduleSno;
-    
+  @Column(name = "schedule_sno")
+  private Long scheduleSno;
+
   @Column(name = "process_sno")
-    private Long processSno;
+  private Long processSno;
 
-    @Column(name = "sms_template_sno")
-    private Long smsTemplateSno;
+  @Column(name = "sms_template_sno")
+  private Long smsTemplateSno;
 
-    @Column(name = "send_to", length = 15)
-    private String sendTo;
+  @Column(name = "send_to", length = 15)
+  private String sendTo;
 
-    @Column(name = "message", columnDefinition = "longtext")
-    private String message;
+  @Column(name = "message", columnDefinition = "longtext")
+  private String message;
 
-    @Column(name = "send_at")
-    private Instant sendAt;
+  @Column(name = "send_at")
+  private Instant sendAt;
 
-    @Column(name = "send_status")
-    private Integer sendStatus;
+  @Column(name = "send_status")
+  private Integer sendStatus;
 
-    @Column(name = "send_response", columnDefinition = "longtext")
-    private String sendResponse;
+  @Column(name = "send_response", columnDefinition = "longtext")
+  private String sendResponse;
 
-    @Column(name = "created_by")
-    private Long createdBy;
+  @Column(name = "ack_id")
+  private String ackId;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_by")
+  private Long createdBy;
 
-    @Column(name = "error_message", columnDefinition = "longtext")
-    private String errorMessage;
+  @Column(name = "created_at", insertable = false, updatable = false)
+  private Instant createdAt;
+
+  @Column(name = "error_message", columnDefinition = "longtext")
+  private String errorMessage;
 }

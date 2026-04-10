@@ -24,10 +24,10 @@ public class SendLoanWhatsappDetailEntity {
 
     @Column(name = "type", length = 45)
     private String type;
-  
+
     @Column(name = "schedule_sno")
     private Long scheduleSno;
-    
+
     @Column(name = "process_sno")
     private Long processSno;
 
@@ -51,6 +51,9 @@ public class SendLoanWhatsappDetailEntity {
 
     @Column(name = "send_response", columnDefinition = "longtext")
     private String sendResponse;
+
+    @Column(name = "ack_id")
+    private String ackId;
 
     @Column(name = "created_by")
     private Long createdBy;

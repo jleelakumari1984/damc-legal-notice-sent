@@ -33,6 +33,13 @@ const routes: Routes = [
           import('./pages/notices-schedule-details/notices-schedule-details.module').then(
             (module) => module.NoticesScheduleDetailsModule
           )
+      },
+      {
+        path: 'excel-mappings',
+        loadChildren: () =>
+          import('./pages/excel-mappings/excel-mappings.module').then(
+            (module) => module.ExcelMappingsModule
+          )
       }
     ]
   },
