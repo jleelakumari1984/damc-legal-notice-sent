@@ -56,16 +56,12 @@ public class SmsSenderServiceImpl implements SmsSenderService {
         try {
             checkValidData(smsData);
             String smsPostData = smsData.getPostData(smsConfig);
-            if (smsData.isSendEnabled()) {
-                String messageUrl = smsConfig.getUrl();
-                ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(messageUrl, smsPostData,
-                        String.class);
-                log.info("SMS Sent:" + messageUrl + ":" + smsPostData + ":" + response.getBody());
+            String messageUrl = smsConfig.getUrl();
+            ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(messageUrl, smsPostData,
+                    String.class);
+            log.info("SMS Sent:" + messageUrl + ":" + smsPostData + ":" + response.getBody());
 
-                notificationsSave.StoreSmsDetails(sendType, smsData, true, response.getBody(), false, null);
-            } else {
-                throw new SmsSendException("Send Disabled");
-            }
+            notificationsSave.StoreSmsDetails(sendType, smsData, true, response.getBody(), false, null);
 
         } catch (SmsSendException ex) {
             notificationsSave.StoreSmsDetails(sendType, smsData, false, ex.getMessage(), false, ex);

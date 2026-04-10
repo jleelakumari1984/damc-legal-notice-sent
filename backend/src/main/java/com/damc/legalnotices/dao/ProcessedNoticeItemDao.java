@@ -11,7 +11,7 @@ public class ProcessedNoticeItemDao {
     private Long scheduledNoticeId;
     private Long scheduledNoticeItemId;
     private String agreementNumber;
-    private Map<String, String> excelData;
+    private Map<String, Object> excelData;
     private String status;
     private String failureReason;
 }

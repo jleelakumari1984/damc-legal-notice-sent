@@ -57,8 +57,8 @@ public class WhatsAppDataDto {
         sendObject.put("template_name", config.getTemplateName());
         sendObject.put("components", getComponents());
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        sendObject.replace("token", whatAppConfig.getAccessToken());
         setPostMessage(ow.writeValueAsString(sendObject));
+        sendObject.replace("token", whatAppConfig.getAccessToken());
         return ow.writeValueAsString(sendObject);
     }
 }

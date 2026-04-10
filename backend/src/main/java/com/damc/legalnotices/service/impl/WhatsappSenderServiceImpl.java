@@ -110,29 +110,27 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
                 String downloadUrl = whapAppConfig.getAttachmentDownloadUrl();
                 for (String attachment : attachments) {
                     Path attachmentPath = Path.of(attachment);
-                    String fileUrl = downloadUrl + whatsAppData.getScheduleItemId() + "/" + attachmentPath.getFileName();
+                    String fileUrl = downloadUrl + whatsAppData.getScheduleItemId() + "/"
+                            + attachmentPath.getFileName();
                     whatsAppData.getComponents().add(WhatsAppAttachmentDto.ofDocument(fileUrl));
                 }
             }
             String whatsAppPostData = whatsAppData.getPostData(whapAppConfig);
             String messageUrl = whapAppConfig.getUrl();
-            if (whatsAppData.isSendEnabled()) {
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                HttpEntity<String> entity = new HttpEntity<String>(whatsAppPostData, headers);
-                ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(messageUrl, entity,
-                        String.class);
-                log.info("WhatsApp Sent:" + messageUrl + ":" + whatsAppPostData + ":" + response.getBody());
-                if (StringUtils.hasText(response.getBody()) && response.getBody().contains("error")) {
-                    throw new WhatsAppSendException(response.getBody());
-                }
-                notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, true, response.getBody(),
-                        false,
-                        null);
-            } else {
-                throw new WhatsAppSendException("Send Disabled");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity = new HttpEntity<String>(whatsAppPostData, headers);
+            ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(messageUrl, entity,
+                    String.class);
+            log.info("WhatsApp Sent:" + messageUrl + ":" + whatsAppPostData + ":" + response.getBody());
+            if (StringUtils.hasText(response.getBody()) && response.getBody().contains("error")) {
+                throw new WhatsAppSendException(response.getBody());
             }
+            notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, true, response.getBody(),
+                    false,
+                    null);
+
         } catch (WhatsAppSendException ex) {
             notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, false, ex.getMessage(), false, ex);
             throw ex;

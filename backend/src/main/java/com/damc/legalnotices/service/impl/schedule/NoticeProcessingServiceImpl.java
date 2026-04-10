@@ -206,6 +206,13 @@ public class NoticeProcessingServiceImpl implements NoticeProcessingService {
                         item.setFailureReason(ex.getMessage());
                         item.setProcessedAt(LocalDateTime.now());
                     }
+                    ProcessedNoticeItemDao noticeItemDao = ProcessedNoticeItemDao.builder()
+                            .scheduledNoticeId(notice.getId())
+                            .excelData(getExcelData(item))
+                            .failureReason(item.getFailureReason())
+                            .status(item.getStatus().toString())
+                            .agreementNumber(item.getAgreementNumber()).build();
+                    result.add(noticeItemDao);
 
                 }
 
@@ -213,6 +220,13 @@ public class NoticeProcessingServiceImpl implements NoticeProcessingService {
                 log.error("PendingNoticeItems failed for notice id {}", notice.getId(), ex);
 
             } finally {
+                items.stream()
+                        .filter(item -> ProcessingStatus.PROCESSING.equals(item.getStatus()))
+                        .forEach(item -> {
+                            item.setStatus(ProcessingStatus.PENDING);
+                            item.setIdentifier(0L);
+                            scheduledNoticeItemRepository.save(item);
+                        });
             }
 
         }
