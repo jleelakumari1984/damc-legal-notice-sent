@@ -14,10 +14,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 public class ExcelPreviewRowDto {
     private Map<String, Object> data;
+    private int rowNum;
 
     @JsonIgnore
-    public String getKeyColumnData(List<ProcessExcelMappingDao> keyColumns,String separator) {
-         if (keyColumns == null || keyColumns.isEmpty() || data == null) {
+    public String getKeyColumnData(List<ProcessExcelMappingDao> keyColumns, String separator) {
+        if (keyColumns == null || keyColumns.isEmpty() || data == null) {
             return "";
         }
         if (separator == null) {

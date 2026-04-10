@@ -16,6 +16,8 @@ app.jwt.expiration-ms=86400000
 
 app.storage.upload-dir=data/uploads/zips
 
+app.location.preview-max-rows=100
+
 app.scheduler.batch-size=50
 app.scheduler.fixed-delay-ms=60000
 

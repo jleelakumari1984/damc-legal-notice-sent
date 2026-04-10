@@ -10,4 +10,5 @@ import java.util.List;
 public class ExcelPreviewDto {
     private List<String> columnNames;
     private List<ExcelPreviewRowDto> rows;
+    private int totalRows;
 }
