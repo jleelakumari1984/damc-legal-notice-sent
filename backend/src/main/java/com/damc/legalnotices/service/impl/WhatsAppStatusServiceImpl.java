@@ -1,0 +1,35 @@
+package com.damc.legalnotices.service.impl;
+
+import com.damc.legalnotices.entity.StatusReportWhatsappEntity;
+import com.damc.legalnotices.repository.StatusReportWhatsappRepository;
+import com.damc.legalnotices.service.WhatsAppStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class WhatsAppStatusServiceImpl implements WhatsAppStatusService {
+
+    private final StatusReportWhatsappRepository whatsappRepository;
+
+    @Override
+    public void saveData(String requestParams, String requestBody) {
+        StatusReportWhatsappEntity entity = new StatusReportWhatsappEntity();
+        entity.setRequestParams(requestParams);
+        entity.setRequestBody(requestBody);
+        whatsappRepository.save(entity);
+    }
+
+    @Override
+    public List<StatusReportWhatsappEntity> getAll() {
+        return whatsappRepository.findAll();
+    }
+
+    @Override
+    public StatusReportWhatsappEntity getById(Long id) {
+        return whatsappRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("WhatsApp report not found: " + id));
+    }
+}

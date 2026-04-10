@@ -1,0 +1,125 @@
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="brand-title mb-0">Scheduled Notices</h3>
+        <button class="btn btn-outline-secondary btn-sm" (click)="loadNotices()">Refresh</button>
+    </div>
+
+    <!-- Notices List -->
+    <div class="card page-card p-4 mb-4">
+        <div *ngIf="loadingList" class="text-muted">Loading notices...</div>
+        <div *ngIf="errorMessage" class="alert alert-danger mb-3">{{ errorMessage }}</div>
+
+        <div class="table-responsive" *ngIf="!loadingList">
+            <table id="noticesTable" class="table table-striped table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>File Name</th>
+                        <th>Process ID</th>
+                        <th>SMS</th>
+                        <th>WhatsApp</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let notice of notices">
+                        <td>{{ notice.id }}</td>
+                        <td>{{ notice.originalFileName }}</td>
+                        <td>{{ notice.processSno }}</td>
+                        <td>
+                            <div class="badge" [ngClass]="notice.sendSms ? 'bg-success' : 'bg-secondary'">
+                                {{ notice.sendSms ? 'Yes' : 'No' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="badge" [ngClass]="notice.sendWhatsapp ? 'bg-success' : 'bg-secondary'">
+                                {{ notice.sendWhatsapp ? 'Yes' : 'No' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="badge" [ngClass]="statusBadge(notice.status)">{{ notice.status }}</div>
+                        </td>
+                        <td>{{ notice.createdAt | date:'dd MMM yyyy, hh:mm a' }}</td>
+                        <td>
+                            <button class="btn btn-brand btn-sm" (click)="viewDetail(notice.id)">View Details</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notice Detail -->
+    <div id="detailSection" *ngIf="loadingDetail || selectedNotice || detailError">
+        <div *ngIf="loadingDetail" class="text-muted mb-3">Loading details...</div>
+        <div *ngIf="detailError" class="alert alert-danger">{{ detailError }}</div>
+
+        <div *ngIf="selectedNotice && !loadingDetail" class="card page-card p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="mb-0">Notice #{{ selectedNotice.id }} — {{ selectedNotice.originalFileName }}</h5>
+                <span class="badge fs-6" [ngClass]="statusBadge(selectedNotice.status)">{{ selectedNotice.status
+                    }}</span>
+            </div>
+
+            <div class="row g-2 mb-3 text-sm">
+                <div class="col-md-3">
+                    <span class="text-muted">Process ID:</span> {{ selectedNotice.processSno }}
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted">SMS:</span>
+                    <span class="badge ms-1" [ngClass]="selectedNotice.sendSms ? 'bg-success' : 'bg-secondary'">
+                        {{ selectedNotice.sendSms ? 'Yes' : 'No' }}
+                    </span>
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted">WhatsApp:</span>
+                    <span class="badge ms-1" [ngClass]="selectedNotice.sendWhatsapp ? 'bg-success' : 'bg-secondary'">
+                        {{ selectedNotice.sendWhatsapp ? 'Yes' : 'No' }}
+                    </span>
+                </div>
+                <div class="col-md-3">
+                    <span class="text-muted">Created:</span> {{ selectedNotice.createdAt | date:'dd MMM yyyy, hh:mm a'
+                    }}
+                </div>
+                <div class="col-md-3" *ngIf="selectedNotice.processedAt">
+                    <span class="text-muted">Processed:</span> {{ selectedNotice.processedAt | date:'dd MMM yyyy, hh:mm
+                    a' }}
+                </div>
+                <div class="col-12" *ngIf="selectedNotice.failureReason">
+                    <span class="text-muted">Failure Reason:</span>
+                    <span class="text-danger ms-1">{{ selectedNotice.failureReason }}</span>
+                </div>
+            </div>
+
+            <h6 class="mb-2">Items ({{ selectedNotice.items.length || 0 }})</h6>
+            <div class="table-responsive">
+                <table id="noticeItemsTable" class="table table-bordered table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Agreement No</th>
+                            <th *ngFor="let col of itemColumns">{{ col }}</th>
+                            <th>Status</th>
+                            <th>Processed At</th>
+                            <th>Attachments</th>
+                            <th>Failure Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of selectedNotice.items; let i = index">
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ item.agreementNumber }}</td>
+                            <td *ngFor="let col of itemColumns">{{ item.excelData[col] }}</td>
+                            <td><span class="badge" [ngClass]="statusBadge(item.status)">{{ item.status }}</span></td>
+                            <td>{{ item.processedAt | date:'dd MMM yyyy, hh:mm a' }}</td>
+                            <td>{{ item.attachements }}</td>
+                            <td class="text-danger">{{ item.failureReason }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

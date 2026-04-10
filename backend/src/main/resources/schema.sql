@@ -15,23 +15,15 @@ CREATE TABLE IF NOT EXISTS scheduled_notices (
   INDEX idx_scheduled_notice_process (process_sno)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS scheduled_notice_items (
-  id BIGINT NOT NULL AUTO_INCREMENT,
-  scheduled_notice_id BIGINT NOT NULL,
-  agreement_number VARCHAR(100) NOT NULL,
-  customer_name VARCHAR(200) NULL,
-  mobile_sms VARCHAR(20) NULL,
-  mobile_whatsapp VARCHAR(20) NULL,
-  pdf_file_name VARCHAR(255) NULL,
-  pdf_file_path VARCHAR(500) NULL,
-  document_present BIT(1) NOT NULL,
-  status VARCHAR(20) NOT NULL,
-  failure_reason VARCHAR(500) NULL,
-  processed_at TIMESTAMP NULL,
-  PRIMARY KEY (id),
-  INDEX idx_notice_item_notice (scheduled_notice_id),
-  INDEX idx_notice_item_status (status),
-  CONSTRAINT fk_notice_item_notice
-    FOREIGN KEY (scheduled_notice_id) REFERENCES scheduled_notices (id)
-    ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS `scheduled_notice_items` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `scheduled_notice_id` bigint NOT NULL,
+  `agreement_number` varchar(255) NOT NULL,
+  `processed_at` datetime(6) DEFAULT NULL,
+  `excel_data` text,
+  `status` enum('COMPLETED','FAILED','PENDING','PROCESSING') NOT NULL,
+  `failure_reason` text,
+  PRIMARY KEY (`id`),
+  KEY `FKfa9p95naj6ocinrmic9sc8g8t` (`scheduled_notice_id`),
+  CONSTRAINT `FKfa9p95naj6ocinrmic9sc8g8t` FOREIGN KEY (`scheduled_notice_id`) REFERENCES `scheduled_notices` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -26,6 +26,13 @@ const routes: Routes = [
         path: 'send-notices',
         loadChildren: () =>
           import('./pages/send-notices/send-notices.module').then((module) => module.SendNoticesModule)
+      },
+      {
+        path: 'notices',
+        loadChildren: () =>
+          import('./pages/notices-schedule-details/notices-schedule-details.module').then(
+            (module) => module.NoticesScheduleDetailsModule
+          )
       }
     ]
   },

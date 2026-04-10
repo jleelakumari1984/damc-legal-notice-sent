@@ -8,19 +8,21 @@
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">Notice Type</label>
-          <select class="form-select" formControlName="processSno">
+          <select class="form-select" formControlName="processSno" (change)="onNoticeTypeChange($event)">
             <option value="">Select Notice Type</option>
-            <option *ngFor="let type of noticeTypes" [value]="type.id">{{ type.name }}</option>
+            <option *ngFor="let type of noticeTypes" [value]="type.id"
+              [disabled]="type.excelMap == null || !type.excelMap.length">{{ type.name }}</option>
           </select>
         </div>
 
         <div class="col-md-4">
           <label class="form-label">Upload ZIP (Excel + PDFs)</label>
-          <input type="file" class="form-control" accept=".zip" (change)="onFileChange($event)" />
+          <input type="file" class="form-control" accept=".zip,.xlsx,.xls" (change)="onFileChange($event)"
+            [disabled]="!selectedNoticeType" />
         </div>
 
         <div class="col-md-4">
-          <label class="form-label">Date</label>
+          <label class="form-label">Schedule Date</label>
           <input type="text" class="form-control datepicker" formControlName="scheduleDate" placeholder="YYYY-MM-DD" />
         </div>
 
@@ -47,6 +49,53 @@
     <div *ngIf="errorMessage" class="alert alert-danger mt-3 mb-0">{{ errorMessage }}</div>
   </div>
 
+  <!-- Excel Preview -->
+  <div class="card page-card p-4 mb-4" *ngIf="previewLoading || preview">
+    <h5 class="mb-3">Excel Preview</h5>
+    <div *ngIf="previewLoading" class="text-muted">Loading preview...</div>
+    <div *ngIf="preview && !previewLoading" class="table-responsive">
+      <table id="previewDataTable" class="table table-bordered table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th></th>
+            <th *ngFor="let col of preview.columnNames">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of preview.rows" [class.table-primary]="selectedPreviewRow === row">
+            <td>
+              <input type="radio" name="previewRowSelect" (change)="selectedPreviewRow = row"
+                [checked]="selectedPreviewRow === row" />
+            </td>
+            <td *ngFor="let col of preview.columnNames">{{ row.data[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="preview && !previewLoading" class="mt-3 d-flex align-items-start gap-3 flex-wrap">
+      <div class="d-flex align-items-center gap-2">
+        <label class="form-label mb-0">Mobile Number</label>
+        <input type="text" class="form-control form-control-sm" style="width:180px" [(ngModel)]="sampleMobile"
+          placeholder="e.g. 9876543210" [disabled]="!selectedPreviewRow" />
+      </div>
+      <div class="form-check align-self-center">
+        <input class="form-check-input" type="checkbox" id="sampleSms" [(ngModel)]="sampleSendSms" />
+        <label class="form-check-label" for="sampleSms">SMS</label>
+      </div>
+      <div class="form-check align-self-center">
+        <input class="form-check-input" type="checkbox" id="sampleWhatsapp" [(ngModel)]="sampleSendWhatsapp" />
+        <label class="form-check-label" for="sampleWhatsapp">WhatsApp</label>
+      </div>
+      <button class="btn btn-brand px-2 btn-sm" (click)="sendSample()"
+        [disabled]="sampleLoading || !selectedPreviewRow">
+        {{ sampleLoading ? 'Sending...' : 'Send Sample' }}
+      </button>
+      <div *ngIf="sampleSuccess" class="text-success small align-self-center">{{ sampleSuccess }}</div>
+      <div *ngIf="sampleError" class="text-danger small align-self-center">{{ sampleError }}</div>
+    </div>
+  </div>
+
   <div class="card page-card p-4" *ngIf="rows.length">
     <h5 class="mb-3">Excel Validation Result</h5>
     <div class="table-responsive">
@@ -54,25 +103,13 @@
         <thead>
           <tr>
             <th>Agreement No</th>
-            <th>Customer</th>
-            <th>SMS Mobile</th>
-            <th>WhatsApp Mobile</th>
-            <th>PDF</th>
-            <th>Document Status</th>
+            <th *ngFor="let col of validationColumns">{{ col }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of rows">
             <td>{{ row.agreementNumber }}</td>
-            <td>{{ row.customerName }}</td>
-            <td>{{ row.mobileSms }}</td>
-            <td>{{ row.mobileWhatsapp }}</td>
-            <td>{{ row.expectedPdfFile }}</td>
-            <td>
-              <span [class]="row.documentPresent ? 'badge bg-success' : 'badge bg-danger'">
-                {{ row.documentPresent ? 'Present' : 'Missing' }}
-              </span>
-            </td>
+            <td *ngFor="let col of validationColumns">{{ parseExcelData(row.excelData)[col] }}</td>
           </tr>
         </tbody>
       </table>

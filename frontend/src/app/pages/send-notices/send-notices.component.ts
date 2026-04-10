@@ -2,7 +2,7 @@ import { AfterViewInit, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import { DatatableHelper } from '../../shared/datatable/datatable.helper';
-import { NoticeType, SendNoticesService, ValidationRow } from './send-notices.service';
+import { ExcelPreview, ExcelPreviewRow, NoticeFileData, NoticeType, SendNoticesService, SendSampleRequest, ValidationRow } from '../../core/services/send-notices.service';
 
 declare const $: any;
 
@@ -13,17 +13,37 @@ declare const $: any;
 })
 export class SendNoticesComponent implements AfterViewInit {
   noticeTypes: NoticeType[] = [];
+  selectedNoticeType: NoticeType | null = null;
   rows: ValidationRow[] = [];
   selectedFile: File | null = null;
   successMessage = '';
   errorMessage = '';
   loading = false;
+  previewLoading = false;
+  preview: ExcelPreview | null = null;
+  validationColumns: string[] = [];
+  selectedPreviewRow: ExcelPreviewRow | null = null;
+  sampleMobile = '';
+  sampleSendSms = true;
+  sampleSendWhatsapp = true;
+  sampleLoading = false;
+  sampleSuccess = '';
+  sampleError = '';
+
+  parseExcelData(json: string): Record<string, unknown> {
+    try {
+      const parsed = JSON.parse(json);
+      return (parsed?.data ?? parsed) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
+  }
 
   readonly form = this.fb.group({
     processSno: ['', Validators.required],
     sendSms: [true],
     sendWhatsapp: [true],
-    scheduleDate: ['']
+    scheduleDate: [new Date().toISOString().split('T')[0]]
   });
 
   constructor(
@@ -42,9 +62,73 @@ export class SendNoticesComponent implements AfterViewInit {
     });
   }
 
+  onNoticeTypeChange(event: Event): void {
+    const id = Number((event.target as HTMLSelectElement).value);
+    this.selectedNoticeType = this.noticeTypes.find(t => t.id === id) ?? null;
+  }
+
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.selectedFile = input.files?.[0] || null;
+    const file = input.files?.[0] || null;
+    const name = file?.name.toLowerCase() ?? '';
+    if (file && !name.endsWith('.zip') && !name.endsWith('.xlsx') && !name.endsWith('.xls')) {
+      this.errorMessage = 'Only ZIP and Excel files (.zip, .xlsx, .xls) are allowed.';
+      input.value = '';
+      this.selectedFile = null;
+      this.preview = null;
+      return;
+    }
+    this.errorMessage = '';
+    this.selectedFile = file;
+    this.preview = null;
+    if (this.selectedFile) {
+      this.previewLoading = true;
+      this.service.previewExcel(this.selectedFile).subscribe({
+        next: (data) => {
+          this.preview = data;
+          this.previewLoading = false;
+          this.selectedPreviewRow = null;
+          this.sampleMobile = '';
+          this.sampleSuccess = '';
+          this.sampleError = '';
+          setTimeout(() => this.datatableHelper.init('#previewDataTable'), 100);
+        },
+        error: () => {
+          this.previewLoading = false;
+        }
+      });
+    }
+  }
+
+  sendSample(): void {
+    if (!this.selectedPreviewRow || !this.selectedNoticeType || !this.sampleMobile.trim()) {
+      this.sampleError = 'Please select a row and enter a mobile number.';
+      return;
+    }
+    if (!this.sampleSendSms && !this.sampleSendWhatsapp) {
+      this.sampleError = 'Please choose SMS and/or WhatsApp.';
+      return;
+    }
+    this.sampleLoading = true;
+    this.sampleSuccess = '';
+    this.sampleError = '';
+    const request: SendSampleRequest = {
+      processSno: this.selectedNoticeType.id,
+      mobileNumber: this.sampleMobile.trim(),
+      sendSms: this.sampleSendSms,
+      sendWhatsapp: this.sampleSendWhatsapp,
+      rowData: this.selectedPreviewRow.data
+    };
+    this.service.sendSample(request).subscribe({
+      next: () => {
+        this.sampleLoading = false;
+        this.sampleSuccess = 'Sample sent successfully to ' + this.sampleMobile.trim();
+      },
+      error: (err) => {
+        this.sampleLoading = false;
+        this.sampleError = err?.error?.error || 'Failed to send sample.';
+      }
+    });
   }
 
   submit(): void {
@@ -70,7 +154,9 @@ export class SendNoticesComponent implements AfterViewInit {
     this.service.scheduleNotice(processSno, sendSms, sendWhatsapp, this.selectedFile).subscribe({
       next: (response) => {
         this.loading = false;
-        this.rows = response.rows;
+        const fileData: NoticeFileData = response.fileData ?? { columnNames: [], rows: [] };
+        this.rows = fileData.rows;
+        this.validationColumns = fileData.columnNames;
         this.successMessage = `Scheduled successfully with ID ${response.scheduleId}`;
         setTimeout(() => this.datatableHelper.init('#validationTable'), 100);
       },

@@ -1,12 +1,21 @@
 package com.damc.legalnotices.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.damc.legalnotices.config.LocationProperties;
+import com.damc.legalnotices.dao.ProcessExcelMappingDao;
 import com.damc.legalnotices.dao.ProcessTemplateDao;
 import com.damc.legalnotices.dao.ScheduledNoticeDao;
+import com.damc.legalnotices.dao.ScheduledNoticeDetailDao;
+import com.damc.legalnotices.dao.ScheduledNoticeItemDao;
+import com.damc.legalnotices.dto.ExcelPreviewDto;
+import com.damc.legalnotices.dto.ExcelPreviewRowDto;
+import com.damc.legalnotices.dto.NoticeValidationFileDto;
 import com.damc.legalnotices.dto.NoticeValidationResponseDto;
 import com.damc.legalnotices.dto.NoticeValidationRowDto;
-import com.damc.legalnotices.entity.LoginDetail;
-import com.damc.legalnotices.entity.ScheduledNotice;
-import com.damc.legalnotices.entity.ScheduledNoticeItem;
+import com.damc.legalnotices.entity.LoginDetailEntity;
+import com.damc.legalnotices.entity.MasterProcessTemplateDetailEntity;
+import com.damc.legalnotices.entity.ScheduledNoticeEntity;
+import com.damc.legalnotices.entity.ScheduledNoticeItemEntity;
 import com.damc.legalnotices.enums.ProcessingStatus;
 import com.damc.legalnotices.repository.LoginDetailRepository;
 import com.damc.legalnotices.repository.MasterProcessTemplateDetailRepository;
@@ -14,128 +23,163 @@ import com.damc.legalnotices.repository.ScheduledNoticeItemRepository;
 import com.damc.legalnotices.repository.ScheduledNoticeRepository;
 import com.damc.legalnotices.service.NoticeService;
 import com.damc.legalnotices.util.EntityDaoConverter;
-import com.damc.legalnotices.util.ExcelAgreementRow;
 import com.damc.legalnotices.util.ExcelParserUtil;
-import com.damc.legalnotices.util.ZipExtractorUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 
-    @Value("${app.storage.zip-upload-dir}")
-    private String zipUploadDir;
-
-    @Value("${app.storage.extracted-dir}")
-    private String extractedDir;
+    private final ObjectMapper objectMapper;
 
     private final MasterProcessTemplateDetailRepository processTemplateRepository;
     private final ScheduledNoticeRepository scheduledNoticeRepository;
     private final ScheduledNoticeItemRepository scheduledNoticeItemRepository;
     private final LoginDetailRepository loginDetailRepository;
-    private final ZipExtractorUtil zipExtractorUtil;
     private final ExcelParserUtil excelParserUtil;
     private final EntityDaoConverter entityDaoConverter;
+    private final LocationProperties storageProperties;
 
     @Override
     @Transactional
     public NoticeValidationResponseDto scheduleNotice(Long processSno,
-                                                      Boolean sendSms,
-                                                      Boolean sendWhatsapp,
-                                                      MultipartFile zipFile,
-                                                      String loginName) {
+            Boolean sendSms,
+            Boolean sendWhatsapp,
+            MultipartFile zipFile,
+            String loginName) {
         if (zipFile == null || zipFile.isEmpty()) {
-            throw new IllegalArgumentException("ZIP file is required");
+            throw new IllegalArgumentException("File is required");
         }
+
+        String originalName = zipFile.getOriginalFilename();
+        if (!excelParserUtil.checkIsValidFileFormat(originalName)) {
+            throw new IllegalArgumentException("Only ZIP (.zip) or Excel (.xlsx, .xls) files are allowed");
+        }
+
         if (!Boolean.TRUE.equals(sendSms) && !Boolean.TRUE.equals(sendWhatsapp)) {
             throw new IllegalArgumentException("Please select at least one channel (SMS or WhatsApp)");
         }
 
-        processTemplateRepository.findById(processSno)
+        MasterProcessTemplateDetailEntity template = processTemplateRepository.findByIdWithExcelMappings(processSno)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid notice type"));
 
-        LoginDetail user = loginDetailRepository.findByLoginNameAndEnabledTrue(loginName)
+        if (template.getExcelMappings() == null || template.getExcelMappings().isEmpty()) {
+            throw new IllegalArgumentException("Notice type is not properly configured with Excel mappings");
+        }
+
+        LoginDetailEntity user = loginDetailRepository.findByLoginNameAndEnabledTrue(loginName)
                 .orElseThrow(() -> new IllegalArgumentException("Logged in user not found"));
 
-        Path savedZipPath = saveZipFile(zipFile);
-        Path extractedPath = extractZip(savedZipPath);
-
-        Path excelPath = findExcel(extractedPath);
-        List<ExcelAgreementRow> excelRows;
-        try {
-            excelRows = excelParserUtil.parse(excelPath);
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("Unable to parse excel from ZIP: " + ex.getMessage());
+        Path savedFilePath;
+        Path extractedPath;
+        Path directExcelPath = null;
+        Path uploadDir = Path.of(storageProperties.getUploadDir()).toAbsolutePath().normalize();
+        if (excelParserUtil.isZipFile(originalName)) {
+            savedFilePath = excelParserUtil.saveZipFile(zipFile);
+            extractedPath = excelParserUtil.extractZip(savedFilePath);
+            extractedPath = excelParserUtil.findExcel(extractedPath).getParent();
+        } else {
+            savedFilePath = excelParserUtil.saveExcelFile(zipFile);
+            extractedPath = savedFilePath.getParent();
+            directExcelPath = savedFilePath;
         }
-        if (excelRows.isEmpty()) {
-            throw new IllegalArgumentException("Excel has no valid agreement rows");
-        }
-
-        ScheduledNotice scheduledNotice = new ScheduledNotice();
+        String removedUploadPath = savedFilePath.toAbsolutePath().toString().replace(uploadDir.toString(), "");
+        String removedExtractedPath = extractedPath.toAbsolutePath().toString().replace(uploadDir.toString(), "");
+        ScheduledNoticeEntity scheduledNotice = new ScheduledNoticeEntity();
         scheduledNotice.setProcessSno(processSno);
         scheduledNotice.setOriginalFileName(zipFile.getOriginalFilename());
-        scheduledNotice.setZipFilePath(savedZipPath.toAbsolutePath().toString());
-        scheduledNotice.setExtractedFolderPath(extractedPath.toAbsolutePath().toString());
+        scheduledNotice.setZipFilePath(removedUploadPath);
+        scheduledNotice.setExtractedFolderPath(removedExtractedPath);
         scheduledNotice.setSendSms(Boolean.TRUE.equals(sendSms));
         scheduledNotice.setSendWhatsapp(Boolean.TRUE.equals(sendWhatsapp));
         scheduledNotice.setCreatedBy(user.getId());
         scheduledNotice.setCreatedAt(LocalDateTime.now());
-        scheduledNotice.setStatus(ProcessingStatus.PENDING);
+        scheduledNotice.setStatus(ProcessingStatus.EXCELPROCESSING);
         scheduledNotice = scheduledNoticeRepository.save(scheduledNotice);
+        log.info("ScheduledNotice created with id: {}", scheduledNotice.getId());
+        ProcessingStatus excelProcess = ProcessingStatus.EXCELUPLOADED;
+        try {
+            NoticeValidationFileDto validationRows = storeExcelData(extractedPath, directExcelPath, template,
+                    scheduledNotice);
+            excelProcess = ProcessingStatus.EXCELCOMPLETED;
+            validationRows.getRows().sort(Comparator.comparing(NoticeValidationRowDto::getAgreementNumber));
 
+            return NoticeValidationResponseDto.builder()
+                    .scheduleId(scheduledNotice.getId())
+                    .originalZipFile(scheduledNotice.getOriginalFileName())
+                    .extractedFolder(scheduledNotice.getExtractedFolderPath())
+                    .status(scheduledNotice.getStatus().name())
+                    .fileData(validationRows)
+                    .build();
+        } finally {
+            scheduledNotice.setStatus(excelProcess);
+            scheduledNotice = scheduledNoticeRepository.save(scheduledNotice);
+        }
+    }
+
+    @Override
+    public NoticeValidationFileDto storeExcelData(Path extractedPath, MasterProcessTemplateDetailEntity template,
+            ScheduledNoticeEntity scheduledNotice) {
+        return storeExcelData(extractedPath, null, template, scheduledNotice);
+    }
+
+    private NoticeValidationFileDto storeExcelData(Path extractedPath, Path directExcelPath,
+            MasterProcessTemplateDetailEntity template, ScheduledNoticeEntity scheduledNotice) {
+        List<ProcessExcelMappingDao> keyColumns = template.getExcelMappings().stream()
+                .filter(mapping -> mapping.getIsKey() == 1)
+                .map(entityDaoConverter::toProcessExcelMappingDao)
+                .toList();
+
+        List<ProcessExcelMappingDao> attachmentColumns = template.getExcelMappings().stream()
+                .filter(mapping -> mapping.getIsAttachment() == 1)
+                .map(entityDaoConverter::toProcessExcelMappingDao)
+                .toList();
+        Path excelPath = directExcelPath != null ? directExcelPath : excelParserUtil.findExcel(extractedPath);
+        ExcelPreviewDto excelPreview;
+        try {
+            excelPreview = excelParserUtil.parseAsPreview(excelPath);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Unable to parse excel from ZIP: " + ex.getMessage());
+        }
+        if (excelPreview.getRows().isEmpty()) {
+            throw new IllegalArgumentException("Excel has no valid agreement rows");
+        }
         List<NoticeValidationRowDto> validationRows = new ArrayList<>();
-        for (ExcelAgreementRow row : excelRows) {
-            boolean exists = row.getPdfFileName() != null && !row.getPdfFileName().isBlank()
-                    && Files.exists(extractedPath.resolve(row.getPdfFileName()).normalize());
-
-            ScheduledNoticeItem item = new ScheduledNoticeItem();
-            item.setScheduledNotice(scheduledNotice);
-            item.setAgreementNumber(row.getAgreementNumber());
-            item.setCustomerName(row.getCustomerName());
-            item.setMobileSms(row.getMobileSms());
-            item.setMobileWhatsapp(row.getMobileWhatsapp());
-            item.setPdfFileName(row.getPdfFileName());
-            item.setPdfFilePath(exists ? extractedPath.resolve(row.getPdfFileName()).normalize().toString() : null);
-            item.setDocumentPresent(exists);
-            item.setStatus(exists ? ProcessingStatus.PENDING : ProcessingStatus.FAILED);
-            item.setFailureReason(exists ? null : "PDF file not found in extracted zip");
-            if (!exists) {
-                item.setProcessedAt(LocalDateTime.now());
+        for (ExcelPreviewRowDto row : excelPreview.getRows()) {
+            String excelData;
+            try {
+                excelData = objectMapper.writeValueAsString(row.getData());
+            } catch (Exception ex) {
+                excelData = row.toString();
             }
+
+            ScheduledNoticeItemEntity item = new ScheduledNoticeItemEntity();
+            item.setScheduledNotice(scheduledNotice);
+            item.setAgreementNumber(row.getKeyColumnData(keyColumns, null));
+            item.setAttachements(row.getKeyColumnData(attachmentColumns, ";"));
+            item.setExcelData(excelData);
+            item.setStatus(ProcessingStatus.PENDING);
             scheduledNoticeItemRepository.save(item);
 
             validationRows.add(NoticeValidationRowDto.builder()
-                    .agreementNumber(row.getAgreementNumber())
-                    .customerName(row.getCustomerName())
-                    .mobileSms(row.getMobileSms())
-                    .mobileWhatsapp(row.getMobileWhatsapp())
-                    .expectedPdfFile(row.getPdfFileName())
-                    .documentPresent(exists)
+                    .agreementNumber(row.getKeyColumnData(keyColumns, null))
+                    .excelData(excelData)
                     .build());
         }
-
-        validationRows.sort(Comparator.comparing(NoticeValidationRowDto::getAgreementNumber));
-
-        return NoticeValidationResponseDto.builder()
-                .scheduleId(scheduledNotice.getId())
-                .originalZipFile(scheduledNotice.getOriginalFileName())
-                .extractedFolder(scheduledNotice.getExtractedFolderPath())
-                .status(scheduledNotice.getStatus().name())
+        return NoticeValidationFileDto.builder()
+                .columnNames(excelPreview.getColumnNames())
                 .rows(validationRows)
                 .build();
     }
@@ -149,55 +193,38 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
+    public ScheduledNoticeDetailDao getScheduledNoticeDetail(Long id) {
+        ScheduledNoticeEntity notice = scheduledNoticeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found: " + id));
+        List<ScheduledNoticeItemDao> items = scheduledNoticeItemRepository.findByScheduledNoticeId(id).stream()
+                .map(entityDaoConverter::toScheduledNoticeItemDao)
+                .toList();
+        return ScheduledNoticeDetailDao.builder()
+                .id(notice.getId())
+                .processSno(notice.getProcessSno())
+                .originalFileName(notice.getOriginalFileName())
+                .sendSms(notice.getSendSms())
+                .sendWhatsapp(notice.getSendWhatsapp())
+                .status(notice.getStatus().name())
+                .createdAt(notice.getCreatedAt())
+                .processedAt(notice.getProcessedAt())
+                .failureReason(notice.getFailureReason())
+                .items(items)
+                .build();
+    }
+
+    @Override
     public List<ProcessTemplateDao> getNoticeTypes() {
-        return processTemplateRepository.findAll().stream()
+        return processTemplateRepository.findAllWithExcelMappings().stream()
                 .map(process -> ProcessTemplateDao.builder()
                         .id(process.getId())
-                        .name(process.getName())
+                        .name(process.getStepName())
+                        .excelMap(process.getExcelMappings() == null || process.getExcelMappings().isEmpty() ? null
+                                : process.getExcelMappings().stream()
+                                        .map(entityDaoConverter::toProcessExcelMappingDao)
+                                        .toList())
                         .build())
                 .toList();
     }
 
-    private Path saveZipFile(MultipartFile zipFile) {
-        try {
-            String original = zipFile.getOriginalFilename();
-            if (original == null || !original.toLowerCase().endsWith(".zip")) {
-                throw new IllegalArgumentException("Only ZIP file upload is allowed");
-            }
-
-            Path uploadDir = Paths.get(zipUploadDir);
-            Files.createDirectories(uploadDir);
-            String fileName = UUID.randomUUID() + "_" + original;
-            Path targetPath = uploadDir.resolve(fileName);
-            Files.copy(zipFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            return targetPath;
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("Failed to save ZIP file: " + ex.getMessage());
-        }
-    }
-
-    private Path extractZip(Path zipPath) {
-        try {
-            Path targetDir = Paths.get(extractedDir).resolve(UUID.randomUUID().toString());
-            zipExtractorUtil.extract(zipPath, targetDir);
-            return targetDir;
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("Failed to extract ZIP file: " + ex.getMessage());
-        }
-    }
-
-    private Path findExcel(Path extractedPath) {
-        try (var stream = Files.walk(extractedPath)) {
-            return stream
-                    .filter(Files::isRegularFile)
-                    .filter(path -> {
-                        String name = path.getFileName().toString().toLowerCase();
-                        return name.endsWith(".xlsx") || name.endsWith(".xls");
-                    })
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Excel file not found in ZIP"));
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("Unable to inspect extracted ZIP: " + ex.getMessage());
-        }
-    }
 }

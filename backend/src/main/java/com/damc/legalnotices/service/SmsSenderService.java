@@ -1,8 +1,8 @@
 package com.damc.legalnotices.service;
 
-import com.damc.legalnotices.entity.MasterProcessSmsConfigDetail;
-import com.damc.legalnotices.entity.ScheduledNoticeItem;
+import com.damc.legalnotices.dto.SmsDataDto;
+import com.damc.legalnotices.entity.MasterProcessTemplateDetailEntity;
 
 public interface SmsSenderService {
-    void send(ScheduledNoticeItem item, MasterProcessSmsConfigDetail config, String attachmentPath);
+    void send(SmsDataDto item, MasterProcessTemplateDetailEntity template);
 }

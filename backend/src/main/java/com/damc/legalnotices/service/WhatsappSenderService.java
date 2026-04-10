@@ -1,8 +1,10 @@
 package com.damc.legalnotices.service;
 
-import com.damc.legalnotices.entity.MasterProcessWhatsappConfigDetail;
-import com.damc.legalnotices.entity.ScheduledNoticeItem;
+import java.util.List;
+
+import com.damc.legalnotices.dto.WhatsAppDataDto;
+import com.damc.legalnotices.entity.MasterProcessTemplateDetailEntity;
 
 public interface WhatsappSenderService {
-    void send(ScheduledNoticeItem item, MasterProcessWhatsappConfigDetail config, String attachmentPath);
+    void send(WhatsAppDataDto item, MasterProcessTemplateDetailEntity template, List<String> attachments);
 }

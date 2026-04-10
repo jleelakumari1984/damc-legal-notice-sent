@@ -15,7 +15,6 @@ public class ZipExtractorUtil {
 
     public void extract(Path zipFilePath, Path targetDir) throws IOException {
         Files.createDirectories(targetDir);
-
         try (InputStream inputStream = Files.newInputStream(zipFilePath);
              ZipInputStream zis = new ZipInputStream(inputStream)) {
             ZipEntry entry;
