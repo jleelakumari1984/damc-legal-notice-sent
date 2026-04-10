@@ -17,7 +17,7 @@ public interface ScheduledNoticeItemRepository extends JpaRepository<ScheduledNo
 
     List<ScheduledNoticeItemEntity> findByScheduledNoticeId(Long scheduledNoticeId);
 
-    @Query("SELECT DISTINCT p FROM ScheduledNoticeItemEntity p LEFT JOIN FETCH p.scheduledNotice")
+    @Query("SELECT DISTINCT p FROM ScheduledNoticeItemEntity p LEFT JOIN FETCH p.scheduledNotice where p.identifier = :identifier")
     List<ScheduledNoticeItemEntity> findByIdentifier(long identifier);
 
     @Modifying

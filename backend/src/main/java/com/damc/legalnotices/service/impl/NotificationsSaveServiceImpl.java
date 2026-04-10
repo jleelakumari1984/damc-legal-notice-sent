@@ -3,6 +3,7 @@ package com.damc.legalnotices.service.impl;
 import java.time.Instant;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.damc.legalnotices.dto.SmsDataDto;
 import com.damc.legalnotices.dto.WhatsAppDataDto;
@@ -19,6 +20,8 @@ import com.damc.legalnotices.repository.SendLoanWhatsappDetailRepository;
 import com.damc.legalnotices.repository.SendNonLoanSmsDetailRepository;
 import com.damc.legalnotices.repository.SendNonLoanWhatsappDetailRepository;
 import com.damc.legalnotices.service.NotificationsSaveService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
         private final SendNonLoanWhatsappDetailRepository sendNonLoanWhatsappDetailRepository;
         private final SendLoanSmsDetailRepository sendLoanSmsDetailRepository;
         private final SendLoanWhatsappDetailRepository sendLoanWhatsappDetailRepository;
+        private final ObjectMapper objectMapper;
 
         @Override
         public void StoreSmsDetails(String sendType, SmsDataDto smsData, boolean success, String response,
@@ -69,6 +73,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                                 entity.setSendAt(Instant.now());
                                 entity.setSendStatus(success ? (schedule ? 2 : 1) : -2);
                                 entity.setSendResponse(response);
+                                entity.setAckId(parseSmsAckId(response));
                                 sendLoanSmsDetailRepository.save(entity);
                         } else {
                                 SendNonLoanSmsDetailEntity entity = new SendNonLoanSmsDetailEntity();
@@ -80,6 +85,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                                 entity.setSendAt(Instant.now());
                                 entity.setSendStatus(success ? (schedule ? 2 : 1) : -2);
                                 entity.setSendResponse(response);
+                                entity.setAckId(parseSmsAckId(response));
                                 sendNonLoanSmsDetailRepository.save(entity);
                         }
                 }
@@ -120,6 +126,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                                 entity.setSendAt(Instant.now());
                                 entity.setSendStatus(success ? (schedule ? 2 : 1) : -2);
                                 entity.setSendResponse(response);
+                                entity.setAckId(parseWhatsAppAckId(response));
                                 sendLoanWhatsappDetailRepository.save(entity);
                         } else {
                                 SendNonLoanWhatsappDetailEntity entity = new SendNonLoanWhatsappDetailEntity();
@@ -131,9 +138,41 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                                 entity.setSendAt(Instant.now());
                                 entity.setSendStatus(success ? (schedule ? 2 : 1) : -2);
                                 entity.setSendResponse(response);
+                                entity.setAckId(parseWhatsAppAckId(response));
                                 sendNonLoanWhatsappDetailRepository.save(entity);
                         }
                 }
         }
 
+        /**
+         * Parses SMS send response: {"data":{"ack_id":"...","msgid":"..."}}
+         */
+        private String parseSmsAckId(String response) {
+                if (!StringUtils.hasText(response)) return null;
+                try {
+                        JsonNode root = objectMapper.readTree(response);
+                        String ackId = root.path("data").path("ack_id").asText(null);
+                        return StringUtils.hasText(ackId) ? ackId : null;
+                } catch (Exception ex) {
+                        log.warn("Could not parse SMS ack_id from response: {}", ex.getMessage());
+                        return null;
+                }
+        }
+
+        /**
+         * Parses WhatsApp send response: {"status":"success","message_id":47880,"message_wamid":"..."}
+         */
+        private String parseWhatsAppAckId(String response) {
+                if (!StringUtils.hasText(response)) return null;
+                try {
+                        JsonNode root = objectMapper.readTree(response);
+                        String wamid = root.path("message_wamid").asText(null);
+                        if (StringUtils.hasText(wamid) && !"null".equals(wamid)) return wamid;
+                        long messageId = root.path("message_id").asLong(0);
+                        return messageId > 0 ? String.valueOf(messageId) : null;
+                } catch (Exception ex) {
+                        log.warn("Could not parse WhatsApp ack_id from response: {}", ex.getMessage());
+                        return null;
+                }
+        }
 }

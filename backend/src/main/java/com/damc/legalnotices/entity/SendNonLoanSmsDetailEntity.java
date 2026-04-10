@@ -52,6 +52,12 @@ public class SendNonLoanSmsDetailEntity {
   @Column(name = "ack_id")
   private String ackId;
 
+  @Column(name = "received_status", length = 50)
+  private String receivedStatus;
+
+  @Column(name = "received_at")
+  private Instant receivedAt;
+
   @Column(name = "created_by")
   private Long createdBy;
 

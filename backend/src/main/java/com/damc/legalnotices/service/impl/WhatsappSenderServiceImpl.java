@@ -110,9 +110,13 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
                 String downloadUrl = whapAppConfig.getAttachmentDownloadUrl();
                 for (String attachment : attachments) {
                     Path attachmentPath = Path.of(attachment);
+                    String filenameWithExt = attachmentPath.getFileName().toString();
+                    String filename = filenameWithExt.contains(".")
+                            ? filenameWithExt.substring(0, filenameWithExt.lastIndexOf('.'))
+                            : filenameWithExt;
                     String fileUrl = downloadUrl + whatsAppData.getScheduleItemId() + "/"
                             + attachmentPath.getFileName();
-                    whatsAppData.getComponents().add(WhatsAppAttachmentDto.ofDocument(fileUrl));
+                    whatsAppData.getComponents().add(WhatsAppAttachmentDto.ofDocument(fileUrl, filename));
                 }
             }
             String whatsAppPostData = whatsAppData.getPostData(whapAppConfig);

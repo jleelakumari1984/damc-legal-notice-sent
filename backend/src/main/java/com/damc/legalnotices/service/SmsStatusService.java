@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface SmsStatusService {
 
-    void saveData(String requestParams, String requestBody);
+    StatusReportSmsEntity saveData(String requestParams, String requestBody);
+
+    StatusReportSmsEntity saveData(StatusReportSmsEntity entity);
 
     List<StatusReportSmsEntity> getAll();
 

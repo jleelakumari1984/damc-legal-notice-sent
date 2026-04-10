@@ -15,11 +15,11 @@ public class SmsStatusServiceImpl implements SmsStatusService {
     private final StatusReportSmsRepository smsRepository;
 
     @Override
-    public void saveData(String requestParams, String requestBody) {
+    public StatusReportSmsEntity saveData(String requestParams, String requestBody) {
         StatusReportSmsEntity entity = new StatusReportSmsEntity();
         entity.setRequestParams(requestParams);
         entity.setRequestBody(requestBody);
-        smsRepository.save(entity);
+        return smsRepository.save(entity);
     }
 
     @Override
@@ -31,5 +31,10 @@ public class SmsStatusServiceImpl implements SmsStatusService {
     public StatusReportSmsEntity getById(Long id) {
         return smsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("SMS report not found: " + id));
+    }
+
+    @Override
+    public StatusReportSmsEntity saveData(StatusReportSmsEntity entity) {
+        return smsRepository.save(entity);
     }
 }

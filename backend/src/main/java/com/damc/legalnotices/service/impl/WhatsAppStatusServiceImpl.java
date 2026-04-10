@@ -15,11 +15,11 @@ public class WhatsAppStatusServiceImpl implements WhatsAppStatusService {
     private final StatusReportWhatsappRepository whatsappRepository;
 
     @Override
-    public void saveData(String requestParams, String requestBody) {
+    public StatusReportWhatsappEntity saveData(String requestParams, String requestBody) {
         StatusReportWhatsappEntity entity = new StatusReportWhatsappEntity();
         entity.setRequestParams(requestParams);
         entity.setRequestBody(requestBody);
-        whatsappRepository.save(entity);
+        return whatsappRepository.save(entity);
     }
 
     @Override
@@ -31,5 +31,11 @@ public class WhatsAppStatusServiceImpl implements WhatsAppStatusService {
     public StatusReportWhatsappEntity getById(Long id) {
         return whatsappRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("WhatsApp report not found: " + id));
+    }
+
+    @Override
+    public StatusReportWhatsappEntity saveData(StatusReportWhatsappEntity entity) {
+        return whatsappRepository.save(entity);
+
     }
 }

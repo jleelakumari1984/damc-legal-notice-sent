@@ -1,4 +1,4 @@
-package com.damc.legalnotices.controller;
+package com.damc.legalnotices.controller.status;
 
 import com.damc.legalnotices.entity.StatusReportSmsEntity;
 import com.damc.legalnotices.entity.StatusReportWhatsappEntity;

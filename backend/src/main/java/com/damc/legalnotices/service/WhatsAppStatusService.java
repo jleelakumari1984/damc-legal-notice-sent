@@ -6,9 +6,11 @@ import java.util.List;
 
 public interface WhatsAppStatusService {
 
-    void saveData(String requestParams, String requestBody);
+    StatusReportWhatsappEntity saveData(String requestParams, String requestBody);
 
     List<StatusReportWhatsappEntity> getAll();
 
     StatusReportWhatsappEntity getById(Long id);
+
+    StatusReportWhatsappEntity saveData(StatusReportWhatsappEntity entity);
 }

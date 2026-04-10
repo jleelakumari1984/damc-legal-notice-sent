@@ -28,15 +28,16 @@ public class WhatsAppAttachmentDto {
     @Builder
     public static class Document {
         private String link;
+        private String filename;
     }
 
-    public static WhatsAppAttachmentDto ofDocument(String link) {
+    public static WhatsAppAttachmentDto ofDocument(String link,String filename) {
         return WhatsAppAttachmentDto.builder()
                 .type("header")
                 .parameters(List.of(
                         Parameter.builder()
                                 .type("document")
-                                .document(Document.builder().link(link).build())
+                                .document(Document.builder().link(link).filename(filename).build())
                                 .build()))
                 .build();
     }

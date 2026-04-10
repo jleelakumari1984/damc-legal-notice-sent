@@ -294,13 +294,8 @@ public class NoticeProcessingServiceImpl implements NoticeProcessingService {
         if (row == null) {
             return "";
         }
-        @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) row.get("data");
-        if (data == null) {
-            return null;
-        }
         for (ProcessExcelMappingDao mobileColumn : mobileColumns) {
-            Object mobileObj = data.get(mobileColumn.getExcelFieldName());
+            Object mobileObj = row.get(mobileColumn.getExcelFieldName());
             String mobile = mobileObj != null ? mobileObj.toString() : null;
             if (mobile != null && !mobile.isBlank()) {
                 return mobile;
