@@ -5,8 +5,11 @@ public enum ProcessingStatus {
     EXCELPROCESSING,
     EXCELCOMPLETED,
     EXCELFAILED,
+    UPLOADED,
     PENDING,
     PROCESSING,
     COMPLETED,
-    FAILED
+    FAILED,
+    START,
+    STOP
 }

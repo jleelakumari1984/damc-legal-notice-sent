@@ -9,7 +9,12 @@ import { AuthService } from '../../core/services/auth/auth.service';
   styleUrls: ['./auth-layout.component.css']
 })
 export class AuthLayoutComponent {
-  constructor(private readonly authService: AuthService, private readonly router: Router) {}
+  userName: string | undefined = undefined;
+
+  constructor(private readonly authService: AuthService, private readonly router: Router) {
+    this.userName = this.authService.getUser()?.displayName;
+
+  }
 
   logout(): void {
     this.authService.logout();

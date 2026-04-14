@@ -1,0 +1,72 @@
+<div id="detailSection">
+    <div *ngIf="loadingDetail" class="text-muted mb-3">Loading details...</div>
+    <div *ngIf="detailError" class="alert alert-danger">{{ detailError }}</div>
+
+    <div *ngIf="selectedNotice && !loadingDetail" class="card page-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5 class="mb-0">Notice # {{ selectedNotice.summary.originalFileName }}</h5>
+            <span class="badge fs-6" [ngClass]="statusBadge(selectedNotice.summary.status)">{{
+                selectedNotice.summary.status
+                }}</span>
+        </div>
+
+        <div class="row g-2 mb-3 text-sm">
+            <div class="col-md-3">
+                <span class="text-muted">Process Name:</span> {{ selectedNotice.summary.processName }}
+            </div>
+            <div class="col-md-3">
+                <span class="text-muted">SMS:</span>
+                <span class="badge ms-1" [ngClass]="selectedNotice.summary.sendSms ? 'bg-success' : 'bg-secondary'">
+                    {{ selectedNotice.summary.sendSms ? 'Yes' : 'No' }}
+                </span>
+            </div>
+            <div class="col-md-3">
+                <span class="text-muted">WhatsApp:</span>
+                <span class="badge ms-1"
+                    [ngClass]="selectedNotice.summary.sendWhatsapp ? 'bg-success' : 'bg-secondary'">
+                    {{ selectedNotice.summary.sendWhatsapp ? 'Yes' : 'No' }}
+                </span>
+            </div>
+            <div class="col-md-3">
+                <span class="text-muted">Created:</span> {{ selectedNotice.summary.createdAt | date:'dd MMM yyyy, hh:mm
+                a' }}
+            </div>
+            <div class="col-md-3" *ngIf="selectedNotice.summary.processedAt">
+                <span class="text-muted">Processed:</span> {{ selectedNotice.summary.processedAt | date:'dd MMM yyyy,
+                hh:mm a'
+                }}
+            </div>
+            <div class="col-12" *ngIf="selectedNotice.summary.failureReason">
+                <span class="text-muted">Failure Reason:</span>
+                <span class="text-danger ms-1">{{ selectedNotice.summary.failureReason }}</span>
+            </div>
+        </div>
+
+        <h6 class="mb-2">Items ({{ selectedNotice.items.length || 0 }})</h6>
+        <div class="table-responsive">
+            <table id="noticeItemsTable" class="table table-bordered table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th class="text-nowrap">Agreement No</th>
+                        <th class="text-nowrap">Status</th>
+                        <th class="text-nowrap">Processed At</th>
+                        <th *ngFor="let col of itemColumns" class="text-nowrap">{{ col }}</th>
+                        <th class="text-nowrap">Failure Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of selectedNotice.items; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ item.agreementNumber }}</td>
+                        <td class="text-nowrap"><span class="badge" [ngClass]="statusBadge(item.status)">{{ item.status
+                                }}</span></td>
+                        <td class="text-nowrap">{{ item.processedAt | date:'dd MMM yyyy, hh:mm a' }}</td>
+                        <td *ngFor="let col of itemColumns" class="text-nowrap">{{ item.excelData[col] }}</td>
+                        <td class="text-danger">{{ item.failureReason }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

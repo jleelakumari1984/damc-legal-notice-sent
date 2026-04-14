@@ -25,21 +25,37 @@ const routes: Routes = [
       {
         path: 'send-notices',
         loadChildren: () =>
-          import('./pages/send-notices/send-notices.module').then((module) => module.SendNoticesModule)
+          import('./pages/notice/send/send-notices.module').then((module) => module.SendNoticesModule)
       },
       {
-        path: 'notices',
+        path: 'reports',
         loadChildren: () =>
-          import('./pages/notices-schedule-details/notices-schedule-details.module').then(
-            (module) => module.NoticesScheduleDetailsModule
+          import('./pages/reports/notice-reports/notice-reports.module').then(
+            (module) => module.NoticeReportsModule
           )
+      },
+      {
+        path: 'notice',
+        loadChildren: () =>
+          import('./pages/notice/manage/notice.module').then((module) => module.NoticeModule)
       },
       {
         path: 'excel-mappings',
         loadChildren: () =>
-          import('./pages/excel-mappings/excel-mappings.module').then(
-            (module) => module.ExcelMappingsModule
+          import('./pages/notice/excel-mappings/notice-excel-mappings.module').then(
+            (module) => module.NoticeExcelMappingsModule
           )
+      },
+      
+      {
+        path: 'users',
+        loadChildren: () =>
+          import('./pages/users/users.module').then((module) => module.UsersModule)
+      },
+      {
+        path: 'credit',
+        loadChildren: () =>
+          import('./pages/credit/credit.module').then((module) => module.CreditModule)
       }
     ]
   },

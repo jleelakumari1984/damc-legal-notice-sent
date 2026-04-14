@@ -8,32 +8,45 @@ interface LoginRequest {
   username: string;
   password: string;
 }
-
+interface UserResponse {
+  id: number;
+  displayName: string;
+  loginName: string;
+  userEmail: string;
+}
 interface LoginResponse {
   accessToken: string;
-  user: {
-    id: number;
-    displayName: string;
-    loginName: string;
-    userEmail: string;
-  };
+  user: UserResponse;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiUrl = `${environment.apiBaseUrl}/auth`;
-  private readonly tokenKey = 'damc_token';
+  private readonly tokenKey = 'legal_notice_token';
+  private readonly userKey = 'legal_notice_user';
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) { }
 
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, payload).pipe(
       tap((response) => {
         localStorage.setItem(this.tokenKey, response.accessToken);
+        localStorage.setItem(this.userKey, JSON.stringify(response.user));
+
       })
     );
   }
-
+  getUser(): UserResponse | null {
+    const userJson = localStorage.getItem(this.userKey);
+    if (userJson) {
+      try {
+        return JSON.parse(userJson) as UserResponse;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
@@ -58,10 +71,11 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken() && !this.isTokenExpired();
+    return !!this.getToken() && !this.isTokenExpired() && !!this.getUser();
   }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
   }
 }

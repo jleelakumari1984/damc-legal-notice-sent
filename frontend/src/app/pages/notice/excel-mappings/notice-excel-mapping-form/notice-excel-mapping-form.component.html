@@ -1,0 +1,60 @@
+<div class="modal fade" id="mappingModal" tabindex="-1" aria-labelledby="mappingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mappingModalLabel">{{ isEditing ? 'Edit Mapping' : 'Add Mapping' }}</h5>
+        <button type="button" class="btn-close" (click)="cancel()"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Excel Field Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="excelFieldName"
+                placeholder="e.g. Agreement Number"
+                [class.is-invalid]="form.get('excelFieldName')!.invalid && form.get('excelFieldName')!.touched" />
+              <div class="invalid-feedback">Excel field name is required.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">DB Field Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="dbFieldName"
+                placeholder="e.g. agreement_number"
+                [class.is-invalid]="form.get('dbFieldName')!.invalid && form.get('dbFieldName')!.touched" />
+              <div class="invalid-feedback">DB field name is required.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Flags</label>
+              <div class="d-flex gap-4 flex-wrap">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="isKey" formControlName="isKey" />
+                  <label class="form-check-label" for="isKey">Is Key</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="isMobile" formControlName="isMobile" />
+                  <label class="form-check-label" for="isMobile">Is Mobile</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="isMandatory" formControlName="isMandatory" />
+                  <label class="form-check-label" for="isMandatory">Is Mandatory</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="isAttachment" formControlName="isAttachment" />
+                  <label class="form-check-label" for="isAttachment">Is Attachment</label>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="errorMessage" class="col-12">
+              <div class="alert alert-danger mb-0">{{ errorMessage }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn btn-brand px-4" [disabled]="saving || form.invalid">
+            {{ saving ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

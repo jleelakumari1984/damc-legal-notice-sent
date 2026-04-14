@@ -1,0 +1,52 @@
+<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="noticeModalLabel">{{ isEditing ? 'Edit Notice' : 'Add Notice' }}</h5>
+        <button type="button" class="btn-close" (click)="cancel()"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="title" placeholder="Notice title"
+                [class.is-invalid]="form.get('title')!.invalid && form.get('title')!.touched" />
+              <div class="invalid-feedback">Title is required.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Notice Type <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="processSno"
+                [class.is-invalid]="form.get('processSno')!.invalid && form.get('processSno')!.touched">
+                <option value="">-- Select Notice Type --</option>
+                <option *ngFor="let t of noticeTypes" [value]="t.id">{{ t.name }}</option>
+              </select>
+              <div class="invalid-feedback">Notice type is required.</div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendSms" formControlName="sendSms" />
+                <label class="form-check-label" for="sendSms">Send SMS</label>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendWhatsapp" formControlName="sendWhatsapp" />
+                <label class="form-check-label" for="sendWhatsapp">Send WhatsApp</label>
+              </div>
+            </div>
+            <div *ngIf="errorMessage" class="col-12">
+              <div class="alert alert-danger mb-0">{{ errorMessage }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn btn-brand px-4" [disabled]="saving || form.invalid">
+            {{ saving ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

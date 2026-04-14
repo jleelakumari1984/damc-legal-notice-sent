@@ -1,7 +1,7 @@
 package com.damc.legalnotices.util;
 
-import com.damc.legalnotices.dto.ExcelPreviewDto;
-import com.damc.legalnotices.dto.ExcelPreviewRowDto;
+import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
+import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
 import com.damc.legalnotices.errors.StopParsingException;
 
 import lombok.extern.slf4j.Slf4j;

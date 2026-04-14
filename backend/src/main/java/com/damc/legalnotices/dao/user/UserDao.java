@@ -1,0 +1,21 @@
+package com.damc.legalnotices.dao.user;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class UserDao {
+    private Long id;
+    private String displayName;
+    private String userCode;
+    private String loginName;
+    private String userEmail;
+    private String userMobileSms;
+    private String userMobileWhatsapp;
+    private Long accessLevel;
+    private Boolean enabled;
+    private LocalDateTime lastLoginDate;
+}

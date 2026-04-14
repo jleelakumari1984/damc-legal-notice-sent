@@ -17,8 +17,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 import com.damc.legalnotices.config.LocationProperties;
-import com.damc.legalnotices.dto.ExcelPreviewDto;
-import com.damc.legalnotices.dto.ExcelPreviewRowDto;
+import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
+import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
 import com.damc.legalnotices.errors.StopParsingException;
 
 import lombok.AllArgsConstructor;

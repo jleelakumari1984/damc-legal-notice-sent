@@ -1,0 +1,55 @@
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userModalLabel">{{ isEditing ? 'Edit User' : 'Add User' }}</h5>
+        <button type="button" class="btn-close" (click)="cancel()"></button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="name" placeholder="Full name"
+                [class.is-invalid]="form.get('name')!.invalid && form.get('name')!.touched" />
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" formControlName="email" placeholder="email@example.com"
+                [class.is-invalid]="form.get('email')!.invalid && form.get('email')!.touched" />
+              <div class="invalid-feedback">Valid email is required.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Mobile <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="mobile" placeholder="10-digit mobile"
+                [class.is-invalid]="form.get('mobile')!.invalid && form.get('mobile')!.touched" />
+              <div class="invalid-feedback">Enter a valid 10-digit mobile number.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Role <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="role">
+                <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Status <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="status">
+                <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <div *ngIf="errorMessage" class="col-12">
+              <div class="alert alert-danger mb-0">{{ errorMessage }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn btn-brand px-4" [disabled]="saving || form.invalid">
+            {{ saving ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

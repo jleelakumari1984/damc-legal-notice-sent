@@ -1,16 +1,32 @@
 <div class="min-vh-100 d-flex flex-column">
-  <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
-    <div class="container">
-      <span class="navbar-brand fw-bold text-uppercase brand-title mb-0">DAMC Legal Notices</span>
-
-      <div class="d-flex align-items-center gap-3">
-        <a routerLink="/send-notices" routerLinkActive="fw-bold" class="nav-link text-dark">Send Notice</a>
-        <a routerLink="/notices" routerLinkActive="fw-bold" class="nav-link text-dark"> Notice Details</a>
-        <a routerLink="/excel-mappings" routerLinkActive="fw-bold" class="nav-link text-dark">Excel Mappings</a>
-        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+  <header class="topbar d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="brand-wrap">
+      <div>
+        <div class="brand-title">DAMC Legal Notices</div>
+        <div class="brand-sub"></div>
       </div>
     </div>
-  </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <div class="pill"><i class="fa fa-user-circle"></i> Welcome : {{ userName }}</div>
+      <button class="btn btn-light-soft" (click)="logout()"><i class="fa fa-sign-out-alt me-1"></i> Logout</button>
+    </div>
+  </header>
+
+  <div class="menu-strip">
+    <div class="d-flex flex-wrap gap-2">
+      <a routerLink="/notice" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-bullhorn me-1"></i>
+        Notice(s)</a>
+      <a routerLink="/send-notices" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-paper-plane me-1"></i> Send
+        Notice</a>
+      <a routerLink="/reports" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-chart-line me-1"></i>
+        Report(s)</a>
+      <a routerLink="/excel-mappings" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-file-excel me-1"></i> Excel Mappings</a>
+      <a routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
+      <a routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-wallet me-1"></i>
+        Credit</a>
+    </div>
+  </div>
 
   <main class="flex-grow-1 py-3">
     <router-outlet></router-outlet>

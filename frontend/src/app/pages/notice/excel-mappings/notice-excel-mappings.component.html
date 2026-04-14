@@ -1,0 +1,46 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="brand-title mb-0">Excel Field Mappings</h3>
+  </div>
+
+  <!-- Process Selector -->
+  <div class="card page-card p-4 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4" *ngIf="selectFrom === 'default'">
+        <label class="form-label">Select Notice Type</label>
+        <select class="form-select" (change)="onProcessChange($event)" [disabled]="loadingTypes">
+          <option value="">-- Select Notice Type --</option>
+          <option *ngFor="let t of noticeTypes" [value]="t.id">{{ t.name }}</option>
+        </select>
+      </div>
+      <div class="col-md-4" *ngIf="selectFrom !== 'default'">
+        <label class="form-label">Selected Notice Type</label>
+      </div>
+      <div class="col-auto" *ngIf="selectFrom !== 'default'">
+        <button class="btn btn-close btn-sm" (click)="onClose.emit()">Close</button>
+      </div>
+      <div class="col-auto" *ngIf="selectedNotice">
+        <button class="btn btn-brand btn-sm" (click)="openAddForm()">+ Add Mapping</button>
+      </div>
+    </div>
+  </div>
+
+  <app-notice-excel-mapping-form [editMapping]="editMapping" [noticeType]="selectedNotice"
+    (saved)="onSaved()"></app-notice-excel-mapping-form>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible mb-3">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Mappings Table -->
+  <app-excel-mappings-list *ngIf="selectedNotice" [selectedNotice]="selectedNotice" [refreshTrigger]="refreshTrigger"
+    (editRequested)="openEditForm($event)">
+  </app-excel-mappings-list>
+
+</div>
