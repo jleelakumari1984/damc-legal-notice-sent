@@ -372,15 +372,26 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                             scheduledNoticeItemRepository.save(item);
                         });
 
-                long pendingCount = scheduledNoticeItemRepository
-                        .countByScheduledNoticeIdAndStatus(notice.getId(), ProcessingStatus.PENDING);
-                if (pendingCount == 0) {
-                    notice.setStatus(ProcessingStatus.COMPLETED);
+                long failureCount = scheduledNoticeItemRepository
+                        .countByScheduledNoticeIdAndStatus(notice.getId(), ProcessingStatus.FAILED);
+                if (failureCount > 0) {
+                    notice.setStatus(ProcessingStatus.FAILED);
                     notice.setProcessedAt(LocalDateTime.now());
                     scheduledNoticeRepository.save(notice);
-                    log.info("ScheduledNotice id={} marked as COMPLETED (no pending/processing items remaining)",
+                    log.info("ScheduledNotice id={} marked as FAILED ",
                             notice.getId());
+                } else {
+                    long pendingCount = scheduledNoticeItemRepository
+                            .countByScheduledNoticeIdAndStatus(notice.getId(), ProcessingStatus.PENDING);
+                    if (pendingCount == 0) {
+                        notice.setStatus(ProcessingStatus.COMPLETED);
+                        notice.setProcessedAt(LocalDateTime.now());
+                        scheduledNoticeRepository.save(notice);
+                        log.info("ScheduledNotice id={} marked as COMPLETED (no pending/processing items remaining)",
+                                notice.getId());
+                    }
                 }
+
             }
 
         }

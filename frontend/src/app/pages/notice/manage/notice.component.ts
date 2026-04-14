@@ -78,7 +78,10 @@ export class NoticeComponent implements AfterViewInit {
     this.clearMessages();
 
   }
-
+  closeNoticeMapping(): void {
+    this.editNotice = null;
+    this.actionType = 'display';
+  }
   private clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';

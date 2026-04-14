@@ -1,6 +1,6 @@
 <div class="container py-4" [class.d-none]="actionType!='display'">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="brand-title mb-0">Notice Management</h3>
+    <h3 class="brand-title mb-0">Notice(s)</h3>
     <div class="d-flex gap-2">
       <button class="btn btn-outline-secondary btn-sm" (click)="reload()">Refresh</button>
       <button class="btn btn-brand btn-sm" (click)="openAddModal()">+ Add Notice</button>
@@ -34,5 +34,5 @@
 </div>
 
 
-<app-notice-form [editNotice]="editNotice" (saved)="onSaved()"></app-notice-form>
-<app-notice-excel-mappings [selectedNotice]="editNotice" [selectFrom]="'notice'"></app-notice-excel-mappings>
+<app-notice-form *ngIf="actionType === 'edit'" [editNotice]="editNotice" (saved)="onSaved()"></app-notice-form>
+<app-notice-excel-mappings *ngIf="actionType === 'excel'" [selectedNotice]="editNotice" [selectFrom]="'notice'" (onClose)="closeNoticeMapping()"></app-notice-excel-mappings>

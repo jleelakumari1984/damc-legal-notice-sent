@@ -25,6 +25,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     @Transactional
     public UserResponseDto createUser(UserRequestDto request) {
+        
         if (loginDetailRepository.existsByLoginName(request.getLoginName())) {
             throw new IllegalArgumentException("Login name already exists: " + request.getLoginName());
         }

@@ -1,10 +1,23 @@
+import { PaginatedRequest } from "./datatable.model";
 
 
 export interface SmsLog {
   id: number;
-  mobileNumber: string;
+  sendTo: string;
   message: string;
-  status: string;
-  sentAt: string;
+  sendStatus: number;
+  sendAt: Date;
+  ackId: string;
+  receivedStatus: string;
+  receivedAt: Date;
   errorMessage: string;
+
+}
+
+export interface SmsLogResponse {
+  items: SmsLog[];
+}
+
+export interface SmsLogRequest extends PaginatedRequest {
+  status: string;
 }

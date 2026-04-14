@@ -1,9 +1,21 @@
+import { PaginatedRequest } from "./datatable.model";
 
 export interface WhatsappLog {
   id: number;
-  mobileNumber: string;
+  sendTo: string;
   message: string;
-  status: string;
-  sentAt: string;
+  sendStatus: number;
+  sendAt: Date;
+  ackId: string;
+  receivedStatus: string;
   errorMessage: string;
+
+}
+
+export interface WhatsappLogResponse {
+  items: WhatsappLog[];
+}
+
+export interface WhatsappLogRequest extends PaginatedRequest {
+  status: string;
 }

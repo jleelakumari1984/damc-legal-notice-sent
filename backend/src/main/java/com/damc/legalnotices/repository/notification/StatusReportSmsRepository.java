@@ -10,4 +10,5 @@ public interface StatusReportSmsRepository extends JpaRepository<StatusReportSms
 
     // Custom query to find records where ack_id is null
     List<StatusReportSmsEntity> findByProcessDateIsNull();
+
 }

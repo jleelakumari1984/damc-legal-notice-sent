@@ -3,13 +3,13 @@ package com.damc.legalnotices.util;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.config.LocationProperties;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
-import com.damc.legalnotices.dao.notice.ProcessTemplateDao;
+import com.damc.legalnotices.dao.notice.ProcessTemplateReportDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.notice.WhatsAppTemplateDao;
 import com.damc.legalnotices.dao.schedule.ScheduledNoticeDao;
 import com.damc.legalnotices.entity.user.LoginDetailEntity;
-import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
-import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
+import com.damc.legalnotices.entity.view.ProcessConfigReportViewEntity;
+import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity; 
 import com.damc.legalnotices.entity.master.MasterProcessWhatsappConfigDetailEntity;
 import com.damc.legalnotices.entity.schedule.ScheduledNoticeEntity;
 import com.damc.legalnotices.entity.excel.ProcessExcelMappingEntity;
@@ -54,15 +54,16 @@ public class EntityDaoConverter {
                 .build();
     }
 
-    public ProcessTemplateDao toProcessTemplateDao(MasterProcessTemplateDetailEntity process) {
-        return ProcessTemplateDao.builder()
-                .id(process.getId())
-                .name(process.getStepName())
-                .createdAt(process.getCreatedAt())
-                .excelMap(process.getExcelMappings() == null || process.getExcelMappings().isEmpty() ? null
-                        : process.getExcelMappings().stream()
-                                .map(this::toProcessExcelMappingDao)
-                                .toList())
+    public ProcessTemplateReportDao toProcessTemplateReportDao(
+            ProcessConfigReportViewEntity processConfigReportViewEntity) {
+        return ProcessTemplateReportDao.builder()
+                .id(processConfigReportViewEntity.getSno())
+                .name(processConfigReportViewEntity.getStepName())
+                .createdAt(processConfigReportViewEntity.getCreatedAt())
+                .excelMapCount(processConfigReportViewEntity.getExcelMapCount() == null ? 0 : processConfigReportViewEntity.getExcelMapCount())
+                .smsMapCount(processConfigReportViewEntity.getSmsMapCount() == null ? 0 : processConfigReportViewEntity.getSmsMapCount())
+                .whatsappMapCount(processConfigReportViewEntity.getWhatsappMapCount() == null ? 0 : processConfigReportViewEntity.getWhatsappMapCount())
+                .mailMapCount(processConfigReportViewEntity.getMailMapCount() == null ? 0 : processConfigReportViewEntity.getMailMapCount())
                 .build();
     }
 
@@ -116,7 +117,8 @@ public class EntityDaoConverter {
     }
 
     private String readTemplateContent(String relativePath) {
-        if (relativePath == null || relativePath.isBlank()) return null;
+        if (relativePath == null || relativePath.isBlank())
+            return null;
         try {
             Path path = Path.of(appConfig.getTemplateLocation(), relativePath);
             return java.nio.file.Files.readString(path);

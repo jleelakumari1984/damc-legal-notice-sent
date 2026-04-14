@@ -13,6 +13,7 @@ interface UserResponse {
   displayName: string;
   loginName: string;
   userEmail: string;
+  accessLevel: number;
 }
 interface LoginResponse {
   accessToken: string;
@@ -25,11 +26,16 @@ export class AuthService {
   private readonly tokenKey = 'legal_notice_token';
   private readonly userKey = 'legal_notice_user';
 
+  accessToken: string | null = null;
+  user: UserResponse | null = null;
   constructor(private readonly http: HttpClient) { }
+
 
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, payload).pipe(
       tap((response) => {
+        this.accessToken = response.accessToken;
+        this.user = response.user;
         localStorage.setItem(this.tokenKey, response.accessToken);
         localStorage.setItem(this.userKey, JSON.stringify(response.user));
 
@@ -47,7 +53,14 @@ export class AuthService {
     }
     return null;
   }
+
+  isSuperAdmin(): boolean {
+    console.log('Checking super admin access for user:', this.user, this.accessToken);
+    return this.getUser()?.accessLevel === 1;
+  }
+
   getToken(): string | null {
+    //   console.log('Getting token:', this.accessToken);
     return localStorage.getItem(this.tokenKey);
   }
 

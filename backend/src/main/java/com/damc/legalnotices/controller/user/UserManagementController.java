@@ -1,8 +1,10 @@
 package com.damc.legalnotices.controller.user;
 
+import com.damc.legalnotices.annotation.RequiresAccess;
 import com.damc.legalnotices.dto.user.UserRequestDto;
 import com.damc.legalnotices.dto.user.UserResponseDto;
 import com.damc.legalnotices.dto.user.UserUpdateDto;
+import com.damc.legalnotices.enums.UserAccessLevelEnum;
 import com.damc.legalnotices.service.user.UserManagementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@RequiresAccess(level = UserAccessLevelEnum.SUPER_ADMIN) // all user-management endpoints require admin (level 1)
 public class UserManagementController {
 
     private final UserManagementService userManagementService;

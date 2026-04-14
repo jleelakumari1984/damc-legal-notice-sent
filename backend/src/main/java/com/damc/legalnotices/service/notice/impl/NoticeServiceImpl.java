@@ -1,11 +1,11 @@
 package com.damc.legalnotices.service.notice.impl;
 
-import com.damc.legalnotices.dao.notice.ProcessTemplateDao;
+import com.damc.legalnotices.dao.notice.ProcessTemplateReportDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.notice.WhatsAppTemplateDao;
 import com.damc.legalnotices.repository.master.MasterProcessSmsConfigDetailRepository;
-import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
 import com.damc.legalnotices.repository.master.MasterProcessWhatsappConfigDetailRepository;
+import com.damc.legalnotices.repository.view.ProcessConfigReportViewRepository;
 import com.damc.legalnotices.service.notice.NoticeService;
 import com.damc.legalnotices.util.EntityDaoConverter;
 import lombok.RequiredArgsConstructor;
@@ -19,22 +19,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 
-    private final MasterProcessTemplateDetailRepository processTemplateRepository;
     private final MasterProcessSmsConfigDetailRepository smsConfigRepository;
     private final MasterProcessWhatsappConfigDetailRepository whatsappConfigRepository;
+    private final ProcessConfigReportViewRepository processConfigReportViewRepository;
+
     private final EntityDaoConverter entityDaoConverter;
 
     @Override
-    public List<ProcessTemplateDao> getNoticeTypes() {
-        return processTemplateRepository.findAllWithExcelMappings().stream()
-                .map(entityDaoConverter::toProcessTemplateDao)
+    public List<ProcessTemplateReportDao> getNoticeTypes() {
+        return processConfigReportViewRepository.findAll().stream()
+                .map(entityDaoConverter::toProcessTemplateReportDao)
                 .toList();
     }
 
     @Override
-    public ProcessTemplateDao getNoticeTypesDetail(Long id) {
-        return processTemplateRepository.findByIdWithExcelMappings(id)
-                .map(entityDaoConverter::toProcessTemplateDao)
+    public ProcessTemplateReportDao getNoticeTypesDetail(Long id) {
+        return processConfigReportViewRepository.findById(id)
+                .map(entityDaoConverter::toProcessTemplateReportDao)
                 .orElseThrow(() -> new IllegalArgumentException("Notice type not found with id: " + id));
     }
 
@@ -51,5 +52,7 @@ public class NoticeServiceImpl implements NoticeService {
                 .map(entityDaoConverter::toWhatsAppTemplateDao)
                 .toList();
     }
+
+ 
 
 }

@@ -40,14 +40,6 @@ const routes: Routes = [
           import('./pages/notice/manage/notice.module').then((module) => module.NoticeModule)
       },
       {
-        path: 'excel-mappings',
-        loadChildren: () =>
-          import('./pages/notice/excel-mappings/notice-excel-mappings.module').then(
-            (module) => module.NoticeExcelMappingsModule
-          )
-      },
-      
-      {
         path: 'users',
         loadChildren: () =>
           import('./pages/users/users.module').then((module) => module.UsersModule)
@@ -66,4 +58,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

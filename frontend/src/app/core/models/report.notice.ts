@@ -1,45 +1,9 @@
 import { SmsLog } from "./sms.model";
 import { WhatsappLog } from "./whatsapp.model";
 
-
-export interface NoticeItemDetail {
-    id: number;
-    agreementNumber: string;
-    status: string;
-    failureReason: string;
-    processedAt: string;
-    excelData: Record<string, unknown>;
-    attachements: string;
-    smsLogs: SmsLog[];
-    whatsappLogs: WhatsappLog[];
-}
-
-export interface NoticeReportDetail {
-    id: number;
-    processSno: number;
-    originalFileName: string;
-    sendSms: boolean;
-    sendWhatsapp: boolean;
-    status: string;
-    createdAt: string;
-    processedAt: string;
-    failureReason: string;
-    items: NoticeReportItem[];
-}
-export interface NoticeReportItem {
-    id: number;
-    agreementNumber: string;
-    excelData: Record<string, unknown>;
-    status: string;
-    failureReason: string;
-    processedAt: string;
-    attachements: string;
-}
-
-
 export interface NoticeReportSummary {
     id: number;
-    processName: number;
+    processName: string;
     originalFileName: string;
     zipFilePath: string;
     extractedFolderPath: string;
@@ -49,6 +13,11 @@ export interface NoticeReportSummary {
     processedAt: string;
     failureReason: string;
     createdAt: string;
+    totalItems: number;
+    pendingItems: number;
+    processingItems: number;
+    completedItems: number;
+    failedItems: number;
 }
 
 export interface NoticeReportItem {
@@ -60,7 +29,6 @@ export interface NoticeReportItem {
     processedAt: string;
     attachements: string;
 }
-
 
 
 export interface NoticeReportItemDetail {
@@ -78,4 +46,14 @@ export interface NoticeReportItemDetail {
 export interface NoticeReportDetail {
     summary: NoticeReportSummary;
     items: NoticeReportItem[];
+}
+
+export interface NoticeReportSmsDetail {
+    summary: NoticeReportSummary;
+    items: SmsLog[];
+}
+
+export interface NoticeReportWhatsappDetail {
+    summary: NoticeReportSummary;
+    items: WhatsappLog[];
 }

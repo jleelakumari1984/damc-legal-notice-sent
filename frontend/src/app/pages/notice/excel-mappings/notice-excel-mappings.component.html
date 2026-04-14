@@ -13,34 +13,37 @@
           <option *ngFor="let t of noticeTypes" [value]="t.id">{{ t.name }}</option>
         </select>
       </div>
-      <div class="col-md-4" *ngIf="selectFrom !== 'default'">
-        <label class="form-label">Selected Notice Type</label>
-      </div>
-      <div class="col-auto" *ngIf="selectFrom !== 'default'">
-        <button class="btn btn-close btn-sm" (click)="onClose.emit()">Close</button>
+      <div class="col d-flex align-items-center gap-2" *ngIf="selectFrom !== 'default'">
+        <label class="form-label mb-0">Selected Notice Type</label>
+        <input type="text" class="form-control w-auto" [value]="selectedNotice?.name" disabled>
       </div>
       <div class="col-auto" *ngIf="selectedNotice">
         <button class="btn btn-brand btn-sm" (click)="openAddForm()">+ Add Mapping</button>
       </div>
+      <div class="col-auto" *ngIf="selectFrom !== 'default'">
+        <button class="btn btn-secondary btn-sm" (click)="onClose.emit()">Close</button>
+      </div>
+    </div>
+    <!-- Mappings Table -->
+    <app-excel-mappings-list *ngIf="selectedNotice" [selectedNotice]="selectedNotice" [refreshTrigger]="refreshTrigger"
+      (editRequested)="openEditForm($event)">
+    </app-excel-mappings-list>
+
+    <!-- Messages -->
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible mb-3">
+      {{ successMessage }}
+      <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
     </div>
   </div>
 
   <app-notice-excel-mapping-form [editMapping]="editMapping" [noticeType]="selectedNotice"
     (saved)="onSaved()"></app-notice-excel-mapping-form>
 
-  <!-- Messages -->
-  <div *ngIf="successMessage" class="alert alert-success alert-dismissible mb-3">
-    {{ successMessage }}
-    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
-  </div>
-  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
-    {{ errorMessage }}
-    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
-  </div>
 
-  <!-- Mappings Table -->
-  <app-excel-mappings-list *ngIf="selectedNotice" [selectedNotice]="selectedNotice" [refreshTrigger]="refreshTrigger"
-    (editRequested)="openEditForm($event)">
-  </app-excel-mappings-list>
+
 
 </div>

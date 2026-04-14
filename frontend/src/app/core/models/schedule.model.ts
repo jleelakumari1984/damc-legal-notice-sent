@@ -8,3 +8,15 @@ export interface SendSampleRequest {
 }
 
 
+export enum ProcessingStatus {
+  EXCELUPLOADED   = 'EXCELUPLOADED',
+  EXCELPROCESSING = 'EXCELPROCESSING',
+  EXCELCOMPLETED  = 'EXCELCOMPLETED',
+  EXCELFAILED     = 'EXCELFAILED',
+  PENDING         = 'PENDING',
+  PROCESSING      = 'PROCESSING',
+  COMPLETED       = 'COMPLETED',
+  FAILED          = 'FAILED',
+  START           = 'START',
+  STOP            = 'STOP'
+}

@@ -2,9 +2,9 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { NoticeReportsDatatable } from '../../../shared/datatable/notice-reports-datatable';
- 
+
 import { statusBadgeClass } from '../../../shared/datatable/datatable.utils';
-import { NoticeReportDetail, NoticeReportItemDetail } from '../../../core/models/report.notice';
+import { NoticeReportDetail, NoticeReportItemDetail, NoticeReportSummary } from '../../../core/models/report.notice';
 import { NoticeReportsService } from '../../../core/services/notice-reports.service';
 
 declare const $: any;
@@ -15,12 +15,11 @@ declare const $: any;
   styleUrls: ['./notice-reports.component.css']
 })
 export class NoticeReportsComponent implements OnInit, AfterViewInit {
-  selectedNotice: NoticeReportDetail | null = null;
-  loadingDetail = false;
-  errorMessage = '';
-  detailError = '';
-  itemColumns: string[] = [];
 
+  selectedReport: NoticeReportSummary | null = null;
+  errorMessage = '';
+  actionType: string = 'display';
+  reportStatus = '';
   // Item logs modal
   selectedItemDetail: NoticeReportItemDetail | null = null;
   loadingItemDetail = false;
@@ -40,66 +39,45 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
 
   private initTable(): void {
     this.datatableHelper.initTable('#noticesTable', new NoticeReportsDatatable({
-      onViewDetail: (id) => this.viewDetail(id),
+      onViewDetail: (id, status, itemCount) => this.viewDetail(id, status, itemCount),
+      onSmsDetail: (id) => this.viewSmsLogs(id),
+      onWhatsappDetail: (id) => this.viewWhatsappLogs(id),
       onError: (msg) => this.errorMessage = msg
-    }));
+    }, this.service));
+  }
+  viewSmsLogs(selectedNotice: NoticeReportSummary): void {
+    if (this.actionType === 'sms' && ((this.selectedReport && this.selectedReport.id === selectedNotice.id))) {
+      return; // Prevent multiple clicks
+    }
+    this.actionType = 'sms';
+    this.reportStatus = '';
+    this.selectedReport = selectedNotice;
+  }
+  viewWhatsappLogs(selectedNotice: NoticeReportSummary): void {
+    if (this.actionType === 'whatsapp' && ((this.selectedReport && this.selectedReport.id === selectedNotice.id))) {
+      return; // Prevent multiple clicks
+    }
+    this.actionType = 'whatsapp';
+    this.reportStatus = '';
+    this.selectedReport = selectedNotice;
   }
 
   reload(): void {
     this.errorMessage = '';
     this.datatableHelper.reload('#noticesTable');
+
   }
 
-  viewDetail(id: number): void {
-    if (this.selectedNotice && this.selectedNotice.summary.id === id) {
+  viewDetail(selectedReport: NoticeReportSummary, status: string, itemCount: number): void {
+    if (this.actionType === 'detail' && ((this.selectedReport && this.selectedReport.id === selectedReport.id) || (itemCount && itemCount <= 0))) {
       return; // Prevent multiple clicks
     }
-    this.loadingDetail = true;
-    this.detailError = '';
-    this.selectedNotice = null;
-    this.service.getById(id).subscribe({
-      next: (detail) => {
-        this.selectedNotice = detail;
-        this.loadingDetail = false;
-        this.itemColumns = detail.items?.length
-          ? Object.keys(detail.items[0].excelData ?? {})
-          : [];
-        setTimeout(() => {
-          this.datatableHelper.init('#noticeItemsTable');
-          document.getElementById('detailSection')?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      },
-      error: () => {
-        this.loadingDetail = false;
-        this.detailError = 'Failed to load notice details.';
-      }
-    });
+    this.actionType = 'detail';
+    this.reportStatus = status;
+    this.selectedReport = selectedReport;
+
   }
 
-  openItemLogs(itemId: number): void {
-    this.selectedItemDetail = null;
-    this.itemDetailError = '';
-    this.loadingItemDetail = true;
-    this.activeLogTab = 'sms';
-    $('#itemLogsModal').modal('show');
-
-    this.service.getItemDetail(itemId).subscribe({
-      next: (detail) => {
-        this.selectedItemDetail = detail;
-        this.loadingItemDetail = false;
-      },
-      error: () => {
-        this.loadingItemDetail = false;
-        this.itemDetailError = 'Failed to load item details.';
-      }
-    });
-  }
-
-  closeItemLogs(): void {
-    $('#itemLogsModal').modal('hide');
-    this.selectedItemDetail = null;
-    this.itemDetailError = '';
-  }
 
   statusBadge(status: string): string {
     return statusBadgeClass(status);
@@ -107,5 +85,9 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
 
   objectKeys(obj: Record<string, unknown>): string[] {
     return obj ? Object.keys(obj) : [];
+  }
+  showDisplayDetail() {
+    this.actionType = 'display';
+    this.selectedReport = null;
   }
 }

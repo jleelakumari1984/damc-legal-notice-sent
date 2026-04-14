@@ -26,7 +26,10 @@ export interface NoticeRequest {
 export interface NoticeType {
     id: number;
     name: string;
-    excelMap: ProcessExcelMapping[];
+    excelMapCount: number;
+    smsMapCount: number;
+    whatsappMapCount: number;
+    mailMapCount: number;
 }
 
 export interface NoticeTypeRequest {

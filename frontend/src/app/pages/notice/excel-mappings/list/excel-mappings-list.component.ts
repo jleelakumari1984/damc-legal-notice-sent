@@ -25,7 +25,8 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
 
   constructor(
     private readonly mappingsService: NoticeExcelMappingsService,
-    private readonly datatableHelper: DatatableHelper
+    private readonly datatableHelper: DatatableHelper,
+    private readonly excelMapService: NoticeExcelMappingsService
   ) { }
 
   ngAfterViewInit(): void {
@@ -53,8 +54,10 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
           this.editMapping = mapping;
           this.editRequested.emit(mapping);
         },
-        onDelete: (mapping) => this.confirmDelete(mapping)
-      }
+        onDelete: (mapping) => this.confirmDelete(mapping),
+        onError: (message) => this.errorMessage = message
+      },
+      this.excelMapService
     ));
     this.tableInitialized = true;
   }

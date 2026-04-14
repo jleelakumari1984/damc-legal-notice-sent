@@ -1,6 +1,6 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth/auth.service';
 
@@ -19,6 +19,15 @@ export class AuthInterceptor implements HttpInterceptor {
       setHeaders: { Authorization: `Bearer ${token}` }
     });
 
-    return next.handle(cloned);
+    return next.handle(cloned).pipe(
+      catchError((error: HttpErrorResponse) => this.handleError(error))
+    );
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    if (error.status === 401) {
+      // this.authService.logout();
+    }
+    return throwError(() => error);
   }
 }

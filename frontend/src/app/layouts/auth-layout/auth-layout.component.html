@@ -21,8 +21,8 @@
         Notice</a>
       <a routerLink="/reports" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-chart-line me-1"></i>
         Report(s)</a>
-      <a routerLink="/excel-mappings" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-file-excel me-1"></i> Excel Mappings</a>
-      <a routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
+     
+      <a *ngIf="isSuperAdmin()" routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
       <a routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-wallet me-1"></i>
         Credit</a>
     </div>

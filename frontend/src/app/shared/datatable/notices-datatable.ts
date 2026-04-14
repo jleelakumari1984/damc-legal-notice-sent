@@ -45,7 +45,7 @@ export class NoticesDatatable extends DataTable {
           }
         });
       },
-      order: [[2, 'desc']],
+      order: [[5, 'desc']],
       columns: [
         { data: 'id', title: '#' },
         {
@@ -53,10 +53,32 @@ export class NoticesDatatable extends DataTable {
           render: (d: string, t: string) =>
             t === 'display' ? `<span class="fw-semibold">${esc(d)}</span>` : d
         },
+
+        {
+          data: 'excelMapCount', title: 'Mapped Excel Fields', className: 'text-nowrap',
+          render: (d: string, t: string) =>
+            t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><span class="fw-semibold">${esc(d)}</span></button>` : d
+        },
+        {
+          data: 'smsMapCount', title: 'Mapped SMS Templates', className: 'text-nowrap',
+          render: (d: string, t: string) =>
+            t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+        },
+        {
+          data: 'whatsappMapCount', title: 'Mapped WhatsApp Templates', className: 'text-nowrap',
+          render: (d: string, t: string) =>
+            t === 'display' ? `<button class="btn btn-outline-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+        },
         {
           data: 'createdAt', title: 'Created At', className: 'text-nowrap',
           render: (d: string, t: string) => (t === 'sort' || t === 'type') ? d : formatDateTime(d)
-        },
+        }, /*  {
+            data: 'mailMapCount', title: 'Mapped Mail Templates', className: 'text-nowrap',
+            render: (d: string, t: string) =>
+              t === 'display' ? `<span class="fw-semibold">${esc(d)}</span>` : d
+          },
+
+
         {
           data: null, title: 'Configs', orderable: false, searchable: false,
           className: 'text-end text-nowrap',
@@ -66,7 +88,7 @@ export class NoticesDatatable extends DataTable {
             html += `<button class="btn btn-outline-secondary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><i class="fas fa-file-excel"></i></button>`;
             return html;
           }
-        }
+        }*/
       ],
       createdRow: (row: HTMLElement, data: any) => {
         $(row).find('.dt-btn-sms').on('click', () => callbacks.onSmsConfig(data));

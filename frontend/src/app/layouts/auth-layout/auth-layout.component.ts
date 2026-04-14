@@ -16,6 +16,10 @@ export class AuthLayoutComponent {
 
   }
 
+  isSuperAdmin(): boolean {
+    return this.authService.isSuperAdmin();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
