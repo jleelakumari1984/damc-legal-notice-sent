@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MasterProcessSmsConfigDetailRepository extends JpaRepository<MasterProcessSmsConfigDetailEntity, Long> {
-   // @EntityGraph(attributePaths = {"process"})
-   // Optional<MasterProcessSmsConfigDetailEntity> findFirstByProcessIdAndStatus(Long processId, Integer status);
+
+    List<MasterProcessSmsConfigDetailEntity> findByProcessId(Long processId);
 
     @EntityGraph(attributePaths = {"hearingStage"})
     List<MasterProcessSmsConfigDetailEntity> findByProcessIdAndStatus(Long processId, Integer status);

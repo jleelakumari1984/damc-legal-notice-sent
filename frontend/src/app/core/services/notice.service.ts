@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Notice, NoticeRequest, NoticeType } from '../models/notices.model';
+import { NoticeReportRequest } from '../models/report.notice';
+import { PaginatedResponse } from '../models/datatable.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -10,9 +12,13 @@ export class NoticeService {
   private readonly api = `${environment.apiBaseUrl}/notices`;
 
   constructor(private readonly http: HttpClient) { }
- 
-  getNoticeTypes(): Observable<NoticeType[]> {
-    return this.http.get<NoticeType[]>(`${this.api}/types`);
+
+  getNoticeTypes(request?: NoticeReportRequest): Observable<PaginatedResponse<NoticeType[]>> {
+    if (!request) {
+      request = {} as NoticeReportRequest;
+      request.allData = true;
+    }
+    return this.http.post<PaginatedResponse<NoticeType[]>>(`${this.api}/types`, request);
   }
   getById(id: number): Observable<Notice> {
     return this.http.get<Notice>(`${this.api}/${id}`);

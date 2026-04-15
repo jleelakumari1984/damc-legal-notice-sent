@@ -1,17 +1,17 @@
 package com.damc.legalnotices.enums;
 
 public enum UserAccessLevelEnum {
-    SUPER_ADMIN(1),
-    ADMIN(2),
-    USER(3);
+    SUPER_ADMIN(1L),
+    ADMIN(2L),
+    USER(3L);
 
-    private final int level;
+    private final long level;
 
-    UserAccessLevelEnum(int level) {
+    UserAccessLevelEnum(long level) {
         this.level = level;
     }
 
-    public int getLevel() {
+    public long getLevel() {
         return level;
     }
 }

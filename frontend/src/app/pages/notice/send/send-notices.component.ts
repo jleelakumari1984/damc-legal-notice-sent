@@ -2,12 +2,13 @@ import { AfterViewInit, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
- 
+
 import { NoticeService } from '../../../core/services/notice.service';
 import { SendNoticesService } from '../../../core/services/send-notices.service';
 import { NoticeType } from '../../../core/models/notices.model';
 import { ExcelPreview, ExcelPreviewRow, NoticeFileData, ValidationRow } from '../../../core/models/excel.model';
 import { SendSampleRequest } from '../../../core/models/schedule.model';
+import { NoticeReportRequest } from '../../../core/models/report.notice';
 
 declare const $: any;
 
@@ -176,7 +177,7 @@ export class SendNoticesComponent implements AfterViewInit {
   private loadNoticeTypes(): void {
     this.noticeService.getNoticeTypes().subscribe({
       next: (types) => {
-        this.noticeTypes = types;
+        this.noticeTypes = types.data;
       },
       error: () => {
         this.errorMessage = 'Failed to load notice types';

@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -25,11 +29,10 @@ public class SendNonLoanMailDetailEntity {
     @Column(name = "type", length = 45)
     private String type;
 
-   
     @Column(name = "schedule_sno")
     private Long scheduleSno;
-    
-   @Column(name = "process_sno")
+
+    @Column(name = "process_sno")
     private Long processSno;
 
     @Column(name = "mail_template_sno")
@@ -56,9 +59,17 @@ public class SendNonLoanMailDetailEntity {
     @Column(name = "send_response", columnDefinition = "tinytext")
     private String sendResponse;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

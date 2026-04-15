@@ -1,5 +1,6 @@
 package com.damc.legalnotices.service.excel.impl;
 
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
 import com.damc.legalnotices.service.excel.ExcelService;
 import com.damc.legalnotices.util.ExcelParserUtil;
@@ -23,7 +24,7 @@ public class ExcelServiceImpl implements ExcelService {
     private final ExcelParserUtil excelParserUtil;
 
     @Override
-    public ExcelPreviewDto previewExcel(MultipartFile zipFile) {
+    public ExcelPreviewDto previewExcel(LoginUserDao  sessionUser, MultipartFile zipFile) {
         if (zipFile == null || zipFile.isEmpty()) {
             throw new IllegalArgumentException("File is required");
         }
@@ -34,7 +35,7 @@ public class ExcelServiceImpl implements ExcelService {
         if (!excelParserUtil.isZipFile(original)) {
             Path tempExcel = null;
             try {
-                tempExcel = Files.createTempFile("preview_", "_" + original);
+                tempExcel = Files.createTempFile("preview_" + sessionUser.getId() + "_", "_" + original);
                 Files.copy(zipFile.getInputStream(), tempExcel, StandardCopyOption.REPLACE_EXISTING);
                 return parseExcelPreview(tempExcel);
             } catch (IOException ex) {
@@ -47,10 +48,10 @@ public class ExcelServiceImpl implements ExcelService {
         Path tempZip = null;
         Path tempExtractDir = null;
         try {
-            tempZip = Files.createTempFile("preview_", "_" + original);
+            tempZip = Files.createTempFile("preview_" + sessionUser.getId() + "_", "_" + original);
             Files.copy(zipFile.getInputStream(), tempZip, StandardCopyOption.REPLACE_EXISTING);
 
-            tempExtractDir = Files.createTempDirectory("preview_extract_");
+            tempExtractDir = Files.createTempDirectory("preview_extract_" + sessionUser.getId() + "_");
             zipExtractorUtil.extract(tempZip, tempExtractDir);
 
             Path excelPath = findExcel(tempExtractDir);
@@ -64,7 +65,6 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
-    @Override
     public ExcelPreviewDto parseExcelPreview(Path excelPath) {
         try {
             return excelParserUtil.parseAsPreview(excelPath);

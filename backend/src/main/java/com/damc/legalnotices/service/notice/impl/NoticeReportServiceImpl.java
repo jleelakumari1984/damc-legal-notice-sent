@@ -19,8 +19,9 @@ import com.damc.legalnotices.repository.notification.SendLoanSmsDetailRepository
 import com.damc.legalnotices.repository.notification.SendLoanWhatsappDetailRepository;
 import com.damc.legalnotices.repository.schedule.ScheduledNoticeItemRepository;
 import com.damc.legalnotices.repository.view.ScheduleReportViewRepository;
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.service.notice.NoticeReportService;
-import com.damc.legalnotices.util.ReportEntityDaoConverter;
+import com.damc.legalnotices.util.converter.ReportEntityDaoConverter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         private final SendErrorWhatsappDetailRepository sendErrorWhatsappDetailRepository;
 
         @Override
-        public DataTableDao<List<NoticeReportDao>> getAllNoticeReports(NoticeReportDto request) {
+        public DataTableDao<List<NoticeReportDao>> getAllNoticeReports(LoginUserDao  sessionUser, NoticeReportDto request) {
                 Page<ScheduleReportViewEntity> page = scheduleReportRepository.findAll(request.getPagination());
 
                 return DataTableDao.<List<NoticeReportDao>>builder()
@@ -61,7 +62,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public NoticeReportDetailDao getNoticeReportDetail(Long noticeId, String status) {
+        public NoticeReportDetailDao getNoticeReportDetail(LoginUserDao  sessionUser, Long noticeId, String status) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
 
@@ -89,7 +90,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(Long noticeId, NoticeSmsLogReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
@@ -118,7 +119,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(Long noticeId, NoticeSmsLogReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
@@ -139,7 +140,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(Long noticeId,
+        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao  sessionUser, Long noticeId,
                         NoticeWhatsappLogReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
@@ -169,7 +170,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(Long noticeId,
+        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao  sessionUser, Long noticeId,
                         NoticeWhatsappLogReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));

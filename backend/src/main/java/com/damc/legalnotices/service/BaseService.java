@@ -1,7 +1,7 @@
 package com.damc.legalnotices.service;
 
-import com.damc.legalnotices.dao.user.SessionUserDao;
+import com.damc.legalnotices.dao.user.LoginUserDao; 
 
 public interface BaseService {
-    SessionUserDao getSessionUser();
+    LoginUserDao getSessionUser();
 }

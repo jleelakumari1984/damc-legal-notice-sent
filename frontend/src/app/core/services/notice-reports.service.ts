@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { NoticeReportDetail, NoticeReportItemDetail, NoticeReportSummary } from '../models/report.notice';
+import { NoticeReportDetail, NoticeReportItemDetail, NoticeReportRequest, NoticeReportSummary } from '../models/report.notice';
 import { SmsLogResponse, SmsLogRequest, } from '../models/sms.model';
 import { WhatsappLogResponse, WhatsappLogRequest } from '../models/whatsapp.model';
 import { PaginatedResponse } from '../models/datatable.model';
@@ -13,8 +13,8 @@ export class NoticeReportsService {
 
   constructor(private readonly http: HttpClient) { }
 
-  getAll(): Observable<NoticeReportSummary[]> {
-    return this.http.get<NoticeReportSummary[]>(this.api);
+  getAll(request: NoticeReportRequest): Observable<PaginatedResponse<NoticeReportSummary[]>> {
+    return this.http.post<PaginatedResponse<NoticeReportSummary[]>>(this.api, request);
   }
 
   getDetails(id: number, status: string): Observable<NoticeReportDetail> {

@@ -3,6 +3,7 @@ package com.damc.legalnotices.service.notice;
 import com.damc.legalnotices.dao.report.NoticeReportDetailDao;
 import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
 import com.damc.legalnotices.dto.report.NoticeSmsLogReportDto;
 import com.damc.legalnotices.dto.report.NoticeWhatsappLogReportDto;
@@ -13,15 +14,19 @@ import java.util.List;
 
 public interface NoticeReportService {
 
-    DataTableDao<List<NoticeReportDao>> getAllNoticeReports(NoticeReportDto request);
+    DataTableDao<List<NoticeReportDao>> getAllNoticeReports(LoginUserDao sessionUser, NoticeReportDto request);
 
-    NoticeReportDetailDao getNoticeReportDetail(Long noticeId, String status);
+    NoticeReportDetailDao getNoticeReportDetail(LoginUserDao sessionUser, Long noticeId, String status);
 
-    DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(Long noticeId, NoticeSmsLogReportDto request);
+    DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao sessionUser, Long noticeId,
+            NoticeSmsLogReportDto request);
 
-    DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(Long id, NoticeSmsLogReportDto request);
+    DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao sessionUser, Long id,
+            NoticeSmsLogReportDto request);
 
-    DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(Long noticeId, NoticeWhatsappLogReportDto request);
+    DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao sessionUser, Long noticeId,
+            NoticeWhatsappLogReportDto request);
 
-    DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(Long id, NoticeWhatsappLogReportDto request);
+    DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao sessionUser, Long id,
+            NoticeWhatsappLogReportDto request);
 }

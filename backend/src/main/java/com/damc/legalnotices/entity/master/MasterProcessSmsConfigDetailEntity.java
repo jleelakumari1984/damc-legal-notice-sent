@@ -11,6 +11,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Getter
 @Setter
 @Entity
@@ -25,10 +28,6 @@ public class MasterProcessSmsConfigDetailEntity {
     @JoinColumn(name = "process_sno")
     private MasterProcessTemplateDetailEntity process;
 
-    @ManyToOne
-    @JoinColumn(name = "hearing_stage_sno")
-    private MasterHearingStageEntity hearingStage;
-
     @Column(name = "sent_level")
     private Integer sentLevel;
 
@@ -41,8 +40,11 @@ public class MasterProcessSmsConfigDetailEntity {
     @Column(name = "route_id")
     private String routeId;
 
-    @Column(name = "template_path")
+    @Column(name = "template_path", updatable = false)
     private String templatePath;
+
+    @Column(name = "user_template_path", updatable = false)
+    private String userTemplatePath;
 
     @Column(name = "template_id")
     private String templateId;
@@ -56,8 +58,19 @@ public class MasterProcessSmsConfigDetailEntity {
     @Column(name = "flash_sms")
     private Integer flashSms;
 
-    @Column(name = "created_at")
+    @Column(name = "created_by", updatable = false)
+    private Long createdBy;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "status")
     private Integer status;

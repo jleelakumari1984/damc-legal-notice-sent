@@ -1,4 +1,4 @@
-package com.damc.legalnotices.util;
+package com.damc.legalnotices.util.converter;
 
 import java.util.Map;
 
@@ -73,8 +73,6 @@ public class ReportEntityDaoConverter {
                 .sendAt(e.getSendAt())
                 .sendStatus(-1)
                 .receivedStatus("ERROR")
-                .createdBy(e.getCreatedBy())
-                .createdAt(e.getCreatedAt())
                 .errorMessage(e.getErrorMessage())
                 .build();
     }
@@ -89,8 +87,6 @@ public class ReportEntityDaoConverter {
                 .ackId(e.getAckId())
                 .receivedStatus(e.getReceivedStatus())
                 .receivedAt(e.getReceivedAt())
-                .createdBy(e.getCreatedBy())
-                .createdAt(e.getCreatedAt())
                 .errorMessage(e.getErrorMessage())
                 .build();
     }

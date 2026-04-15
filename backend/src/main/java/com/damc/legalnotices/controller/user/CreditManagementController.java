@@ -32,16 +32,15 @@ public class CreditManagementController {
     @PostMapping
     public ResponseEntity<CreditTransactionDao> createCredit(
             @Valid @RequestBody CreditAdjustDto request) {
-        Long performedBy = baseService.getSessionUser().getId();
         log.info("Create credit request for userId: {} channel: {} by: {}",
-                request.getUserId(), request.getChannel(), baseService.getSessionUser().getUserDao().getDisplayName());
-        return ResponseEntity.ok(creditManagementService.createCredit(request, performedBy));
+                request.getUserId(), request.getChannel(), baseService.getSessionUser().getDisplayName());
+        return ResponseEntity.ok(creditManagementService.createCredit(baseService.getSessionUser(), request));
     }
 
     @RequiresAccess(level = UserAccessLevelEnum.SUPER_ADMIN)
     @GetMapping
     public ResponseEntity<List<CreditTransactionDao>> getAllTransactions() {
-        return ResponseEntity.ok(creditManagementService.getAllTransactions());
+        return ResponseEntity.ok(creditManagementService.getAllTransactions(baseService.getSessionUser()));
     }
 
     @RequiresAccess(level = UserAccessLevelEnum.SUPER_ADMIN)

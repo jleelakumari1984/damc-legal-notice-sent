@@ -6,8 +6,9 @@ import com.damc.legalnotices.dto.user.LoginDto;
 import com.damc.legalnotices.entity.user.LoginDetailEntity;
 import com.damc.legalnotices.repository.user.LoginDetailRepository;
 import com.damc.legalnotices.service.user.AuthService;
-import com.damc.legalnotices.util.EntityDaoConverter;
 import com.damc.legalnotices.util.JwtUtil;
+import com.damc.legalnotices.util.converter.EntityDaoConverter;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

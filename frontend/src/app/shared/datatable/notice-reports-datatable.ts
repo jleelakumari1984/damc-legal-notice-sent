@@ -3,7 +3,7 @@ import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass 
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { ProcessingStatus } from '../../core/models/schedule.model';
-import { NoticeReportSummary } from '../../core/models/report.notice';
+import { NoticeReportRequest, NoticeReportSummary } from '../../core/models/report.notice';
 
 declare const $: any;
 
@@ -23,9 +23,27 @@ export class NoticeReportsDatatable extends DataTable {
     const callbacks = this.callbacks;
     return {
       ...BASE_DT_OPTIONS,
-      ajax: (dtData: object, callback: (data: object) => void) => {
-
-        this.service.getAll().subscribe({
+      ajax: (dtParams: any, callback: (data: object) => void) => {
+        const start = Number(dtParams.start) || 0;
+        const length = Number(dtParams.length) || 25;
+        let sortField = 'createdAt';
+        let sortDir = 'desc';
+        if (dtParams.order && dtParams.order.length) {
+          const order = dtParams.order[0];
+          const colIndex = order.column;
+          sortDir = order.dir || 'desc';
+          if (dtParams.columns && dtParams.columns[colIndex]) {
+            sortField = dtParams.columns[colIndex].data || sortField;
+          }
+        }
+        var request: NoticeReportRequest = {
+          sortColumn: sortField,
+          sortDirection: sortDir,
+          dtStart: start,
+          dtLength: length,
+          dtDraw: dtParams.draw,
+        }
+        this.service.getAll(request).subscribe({
           next: (reports) => {
             callback({ data: reports }); // Load table first, then fetch notices
           },

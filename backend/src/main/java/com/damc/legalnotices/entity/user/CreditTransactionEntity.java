@@ -15,6 +15,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 @Getter
 @Setter
 @Entity
@@ -48,9 +49,10 @@ public class CreditTransactionEntity {
     @Column(name = "status", nullable = false, length = 20)
     private String status = "COMPLETED";
 
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 }

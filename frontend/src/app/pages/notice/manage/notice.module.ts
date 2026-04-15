@@ -6,9 +6,12 @@ import { NoticeRoutingModule } from './notice-routing.module';
 import { NoticeComponent } from './notice.component';
 import { NoticeFormComponent } from './notice-form/notice-form.component';
 import { NoticeExcelMappingsModule } from '../excel-mappings/notice-excel-mappings.module';
+import { SmsTemplateModule } from '../sms-template/sms-template.module';
+import { WhatsappTemplateModule } from '../whatsapp-template/whatsapp-template.module';
 
 @NgModule({
   declarations: [NoticeComponent, NoticeFormComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NoticeRoutingModule, NoticeExcelMappingsModule]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NoticeRoutingModule,
+            NoticeExcelMappingsModule, SmsTemplateModule, WhatsappTemplateModule]
 })
 export class NoticeModule { }

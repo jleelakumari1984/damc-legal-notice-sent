@@ -1,4 +1,4 @@
-package com.damc.legalnotices.exception;
+package com.damc.legalnotices.config.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.damc.legalnotices.errors.InvalidInputException;
+
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +23,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
         return buildError(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidInputException(InvalidInputException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", ex.getReason() != null ? ex.getReason() : ex.getMessage());
+        body.put("status", String.valueOf(ex.getStatusCode().value()));
+        body.put("timestamp", Instant.now().toString());
+        body.put("errors", ex.getErrorMap().toString());
+        log.error("InvalidInputException: {}", ex.getErrorMap(), ex);
+        return ResponseEntity.status(ex.getStatusCode()).body(body);
+
     }
 
     @ExceptionHandler(BadCredentialsException.class)

@@ -3,6 +3,7 @@ import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime } from './datatabl
 import { DataTable } from './base-datatable';
 import { SendNoticesService } from '../../core/services/send-notices.service';
 import { NoticeService } from '../../core/services/notice.service';
+import { NoticeReportRequest } from '../../core/models/report.notice';
 
 declare const $: any;
 
@@ -33,15 +34,34 @@ export class NoticesDatatable extends DataTable {
     const callbacks = this.callbacks;
     return {
       ...BASE_DT_OPTIONS,
-      ajax: (dtData: object, callback: (data: object) => void) => {
-        this.service.getNoticeTypes().subscribe({
-          next: (types) => {
-            callback({ data: types }); // Load table first, then fetch notices
+      ajax: (dtParams: any, callback: (data: object) => void) => {
+        const start = Number(dtParams.start) || 0;
+        const length = Number(dtParams.length) || 25;
+        let sortField = 'createdAt';
+        let sortDir = 'desc';
+        if (dtParams.order && dtParams.order.length) {
+          const order = dtParams.order[0];
+          const colIndex = order.column;
+          sortDir = order.dir || 'desc';
+          if (dtParams.columns && dtParams.columns[colIndex]) {
+            sortField = dtParams.columns[colIndex].data || sortField;
+          }
+        }
+        var request: NoticeReportRequest = {
+          sortColumn: sortField,
+          sortDirection: sortDir,
+          dtStart: start,
+          dtLength: length,
+          dtDraw: dtParams.draw,
+        }
+        this.service.getNoticeTypes(request).subscribe({
+          next: (logs) => {
+            callback({ draw: logs.draw, recordsTotal: logs.recordsTotal, recordsFiltered: logs.recordsFiltered, data: logs.data });
           },
           error: () => {
             var msg = 'Failed to load notice types';
             callbacks.onError(msg);
-            callback({ data: [] });
+            callback({ draw: request.dtDraw, recordsTotal: 0, recordsFiltered: 0, data: [] });
           }
         });
       },

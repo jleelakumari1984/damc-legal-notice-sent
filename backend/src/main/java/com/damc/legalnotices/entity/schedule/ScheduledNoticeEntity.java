@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Getter
 @Setter
 @Entity
@@ -60,18 +63,26 @@ public class ScheduledNoticeEntity {
     @Column(name = "status", nullable = false)
     private ProcessingStatus status = ProcessingStatus.EXCELUPLOADED;
 
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
 
     @Column(name = "failure_reason")
     private String failureReason;
-    
+
     @OneToMany(mappedBy = "scheduledNotice")
     private List<ScheduledNoticeItemEntity> items = new ArrayList<>();
 }

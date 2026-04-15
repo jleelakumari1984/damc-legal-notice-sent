@@ -1,17 +1,12 @@
 package com.damc.legalnotices.dao.notice;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 
 @Getter
-@Builder
-public class SmsTemplateDao {
-    private Long id;
-    private Long processId;
-    private Long hearingStageId;
-    private String hearingStageTitle;
+@SuperBuilder
+public class SmsTemplateDao extends SmsUserTemplateDao {
     private Integer sentLevel;
     private String peid;
     private String senderId;
@@ -21,6 +16,4 @@ public class SmsTemplateDao {
     private String channel;
     private Integer dcs;
     private Integer flashSms;
-    private Integer status;
-    private LocalDateTime createdAt;
 }

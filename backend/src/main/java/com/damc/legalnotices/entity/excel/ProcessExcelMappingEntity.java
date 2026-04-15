@@ -14,6 +14,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Getter
 @Setter
 @Entity
@@ -40,13 +43,24 @@ public class ProcessExcelMappingEntity {
 
     @Column(name = "is_mobile")
     private Integer isMobile;
-    
+
     @Column(name = "is_mandatory")
     private Integer isMandatory;
 
     @Column(name = "is_attachment")
     private Integer isAttachment;
 
-    @Column(name = "created_at")
+    @Column(name = "created_by", updatable = false)
+    private Long createdBy;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

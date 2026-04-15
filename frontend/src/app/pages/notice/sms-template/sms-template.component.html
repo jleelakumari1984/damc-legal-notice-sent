@@ -1,0 +1,37 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="brand-title mb-0">SMS Templates</h3>
+    <div class="d-flex gap-2">
+      <button class="btn btn-brand btn-sm" (click)="openAddForm()" *ngIf="selectedNotice">
+        + Add Template
+      </button>
+      <button class="btn btn-secondary btn-sm" (click)="onClose.emit()">Close</button>
+    </div>
+  </div>
+
+  <div class="card page-card p-4 mb-4">
+    <div class="mb-2" *ngIf="selectedNotice">
+      <span class="text-muted">Notice Type:</span>
+      <span class="fw-semibold ms-1">{{ selectedNotice.name }}</span>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible mb-3">
+      {{ successMessage }}
+      <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+    </div>
+
+    <div class="table-responsive">
+      <table id="smsTemplatesTable" class="table table-sm table-bordered align-middle mb-0 w-100"></table>
+    </div>
+  </div>
+</div>
+
+<app-sms-template-form *ngIf="isSuperAdmin" [editTemplate]="editTemplate" [noticeType]="selectedNotice"
+  (saved)="onSaved()"></app-sms-template-form>
+
+<app-sms-template-form-user *ngIf="!isSuperAdmin" [editTemplate]="editTemplate" [noticeType]="selectedNotice"
+  (saved)="onSaved()"></app-sms-template-form-user>

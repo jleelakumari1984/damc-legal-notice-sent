@@ -1,6 +1,7 @@
 package com.damc.legalnotices.service.user.impl;
 
 import com.damc.legalnotices.dao.user.CreditTransactionDao;
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.user.CreditAdjustDto;
 import com.damc.legalnotices.entity.user.CreditTransactionEntity;
 import com.damc.legalnotices.entity.user.LoginDetailEntity;
@@ -27,7 +28,7 @@ public class CreditManagementServiceImpl implements CreditManagementService {
 
     @Override
     @Transactional
-    public CreditTransactionDao createCredit(CreditAdjustDto request, Long performedByUserId) {
+    public CreditTransactionDao createCredit(LoginUserDao  sessionUser, CreditAdjustDto request) {
         LoginDetailEntity user = findUser(request.getUserId());
         CreditTransactionEntity tx = new CreditTransactionEntity();
         tx.setUser(user);
@@ -37,7 +38,7 @@ public class CreditManagementServiceImpl implements CreditManagementService {
         tx.setType(request.getType().toUpperCase());
         tx.setDescription(request.getDescription());
         tx.setStatus("COMPLETED");
-        tx.setCreatedBy(performedByUserId);
+        tx.setCreatedBy(sessionUser.getId());
         CreditTransactionEntity saved = creditTransactionRepository.save(tx);
         log.info("Credit transaction created for user {}: channel={}, credits={}, type={}",
                 user.getLoginName(), saved.getChannel(), saved.getCredits(), saved.getType());
@@ -45,7 +46,7 @@ public class CreditManagementServiceImpl implements CreditManagementService {
     }
 
     @Override
-    public List<CreditTransactionDao> getAllTransactions() {
+    public List<CreditTransactionDao> getAllTransactions(LoginUserDao  sessionUser) {
         return creditTransactionRepository.findAll().stream().map(this::toDto).toList();
     }
 

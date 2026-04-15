@@ -29,10 +29,6 @@ public class SendSmsDao {
 
     private Instant receivedAt;
 
-    private Long createdBy;
-
-    private Instant createdAt;
-
     private String errorMessage;
 
     public String getReceivedStatus() {

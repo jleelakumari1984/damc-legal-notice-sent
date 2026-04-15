@@ -20,7 +20,7 @@ import com.damc.legalnotices.dao.excel.ProcessedExcelDao;
 import com.damc.legalnotices.dao.excel.ProcessedNoticeItemDao;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
 import com.damc.legalnotices.dao.notice.NoticeValidationDao;
-import com.damc.legalnotices.dao.user.SessionUserDao;
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
 import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
 import com.damc.legalnotices.dto.notice.NoticeValidationFileDto;
@@ -43,9 +43,9 @@ import com.damc.legalnotices.repository.schedule.ScheduledNoticeRepository;
 import com.damc.legalnotices.service.notification.SmsSenderService;
 import com.damc.legalnotices.service.notification.WhatsappSenderService;
 import com.damc.legalnotices.service.schedule.NoticeScheduleService;
-import com.damc.legalnotices.util.EntityDaoConverter;
 import com.damc.legalnotices.util.ExcelParserUtil;
 import com.damc.legalnotices.util.NoticeScheduleUtil;
+import com.damc.legalnotices.util.converter.EntityDaoConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -73,11 +73,10 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     @Override
     @Transactional
-    public NoticeValidationDao scheduleNotice(Long processSno,
+    public NoticeValidationDao scheduleNotice(LoginUserDao  sessionUser, Long processSno,
             Boolean sendSms,
             Boolean sendWhatsapp,
-            MultipartFile zipFile,
-            SessionUserDao sessionuser) {
+            MultipartFile zipFile) {
         if (zipFile == null || zipFile.isEmpty()) {
             throw new IllegalArgumentException("File is required");
         }
@@ -103,11 +102,11 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
         Path directExcelPath = null;
         Path uploadDir = Path.of(storageProperties.getUploadDir()).toAbsolutePath().normalize();
         if (excelParserUtil.isZipFile(originalName)) {
-            savedFilePath = excelParserUtil.saveZipFile(zipFile);
+            savedFilePath = excelParserUtil.saveZipFile(sessionUser, zipFile);
             extractedPath = excelParserUtil.extractZip(savedFilePath);
             extractedPath = excelParserUtil.findExcel(extractedPath).getParent();
         } else {
-            savedFilePath = excelParserUtil.saveExcelFile(zipFile);
+            savedFilePath = excelParserUtil.saveExcelFile(sessionUser, zipFile);
             extractedPath = savedFilePath.getParent();
             directExcelPath = savedFilePath;
         }
@@ -120,7 +119,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
         scheduledNotice.setExtractedFolderPath(removedExtractedPath);
         scheduledNotice.setSendSms(Boolean.TRUE.equals(sendSms));
         scheduledNotice.setSendWhatsapp(Boolean.TRUE.equals(sendWhatsapp));
-        scheduledNotice.setCreatedBy(sessionuser.getId());
+        scheduledNotice.setCreatedBy(sessionUser.getId());
         scheduledNotice.setCreatedAt(LocalDateTime.now());
         scheduledNotice.setStatus(ProcessingStatus.EXCELPROCESSING);
         scheduledNotice = scheduledNoticeRepository.save(scheduledNotice);
@@ -216,6 +215,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                     .scheduledNoticeId(notice.getId())
                     .ExcelName(notice.getOriginalFileName()).build();
             try {
+
                 MasterProcessTemplateDetailEntity template = processTemplateRepository
                         .findByIdWithExcelMappings(notice.getProcessSno())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid notice type"));

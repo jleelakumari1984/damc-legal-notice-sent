@@ -1,5 +1,6 @@
 package com.damc.legalnotices.dao.user;
 
+import com.damc.legalnotices.enums.UserAccessLevelEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Builder;
@@ -17,4 +18,8 @@ public class LoginUserDao {
     private String mobileSms;
     private String mobileWhatsapp;
     private Long accessLevel;
+
+    public boolean isSuperAdmin() {
+        return accessLevel != null && accessLevel == UserAccessLevelEnum.SUPER_ADMIN.getLevel();
+    }
 }

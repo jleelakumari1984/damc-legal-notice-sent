@@ -1,20 +1,17 @@
 package com.damc.legalnotices.service.notice;
 
- 
+import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.notice.ProcessTemplateReportDao;
-import com.damc.legalnotices.dao.notice.SmsTemplateDao;
-import com.damc.legalnotices.dao.notice.WhatsAppTemplateDao;
+import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.notice.NoticeTypesRequest;
 
 import java.util.List;
 
 public interface NoticeService {
 
-        List<ProcessTemplateReportDao> getNoticeTypes();
+        DataTableDao<List<ProcessTemplateReportDao>> getNoticeTypes(LoginUserDao sessionUser,
+                        NoticeTypesRequest request);
 
-        ProcessTemplateReportDao getNoticeTypesDetail(Long id);
-
-        List<SmsTemplateDao> getSmsTemplates(Long processId);
-
-        List<WhatsAppTemplateDao> getWhatsAppTemplates(Long processId);
+        ProcessTemplateReportDao getNoticeTypesDetail(LoginUserDao sessionUser, Long id);
 
 }

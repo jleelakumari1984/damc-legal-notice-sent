@@ -1,4 +1,5 @@
 export interface PaginatedRequest {
+    allData?: boolean;
     dtDraw: number;
     dtStart: number;
     dtLength: number;

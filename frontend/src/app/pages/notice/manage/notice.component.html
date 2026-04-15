@@ -35,4 +35,12 @@
 
 
 <app-notice-form *ngIf="actionType === 'edit'" [editNotice]="editNotice" (saved)="onSaved()"></app-notice-form>
-<app-notice-excel-mappings *ngIf="actionType === 'excel'" [selectedNotice]="editNotice" [selectFrom]="'notice'" (onClose)="closeNoticeMapping()"></app-notice-excel-mappings>
+
+<app-notice-excel-mappings *ngIf="actionType === 'excel'" [selectedNotice]="editNotice" [selectFrom]="'notice'"
+  (onClose)="closeNoticeMapping()"></app-notice-excel-mappings>
+
+<app-sms-template *ngIf="actionType === 'sms'" [selectedNotice]="editNotice"
+  (onClose)="closeSmsTemplate()"></app-sms-template>
+
+<app-whatsapp-template *ngIf="actionType === 'whatsapp'" [selectedNotice]="editNotice"
+  (onClose)="closeWhatsappTemplate()"></app-whatsapp-template>

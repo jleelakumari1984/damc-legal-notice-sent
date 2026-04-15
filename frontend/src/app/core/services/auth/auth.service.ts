@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   isSuperAdmin(): boolean {
-    console.log('Checking super admin access for user:', this.user, this.accessToken);
+   // console.log('Checking super admin access for user:', this.user, this.accessToken);
     return this.getUser()?.accessLevel === 1;
   }
 

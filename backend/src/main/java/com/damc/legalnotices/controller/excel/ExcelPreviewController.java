@@ -2,6 +2,7 @@ package com.damc.legalnotices.controller.excel;
 
 import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
 import com.damc.legalnotices.dto.notice.SendSampleNoticeDto;
+import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.excel.ExcelService;
 import com.damc.legalnotices.service.schedule.NoticeScheduleService;
 
@@ -24,17 +25,19 @@ public class ExcelPreviewController {
 
     private final ExcelService excelService;
     private final NoticeScheduleService noticeSchedule;
+    private final BaseService baseService;
 
     @PostMapping(value = "/zip", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ExcelPreviewDto> previewZip(
             @RequestParam("zipFile") MultipartFile zipFile) {
         log.info("Excel preview request for file: {}", zipFile != null ? zipFile.getOriginalFilename() : "null");
-        return ResponseEntity.ok(excelService.previewExcel(zipFile));
+        return ResponseEntity.ok(excelService.previewExcel(baseService.getSessionUser(), zipFile));
     }
 
     @PostMapping("/send-sample")
     public ResponseEntity<Void> sendSample(@RequestBody SendSampleNoticeDto request) {
-        log.info("Send sample notice request for processSno: {}, mobile: {}", request.getProcessSno(), request.getMobileNumber());
+        log.info("Send sample notice request for processSno: {}, mobile: {}", request.getProcessSno(),
+                request.getMobileNumber());
         noticeSchedule.sendSampleNotice(request);
         return ResponseEntity.ok().build();
     }

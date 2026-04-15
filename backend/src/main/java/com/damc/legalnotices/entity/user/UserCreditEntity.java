@@ -14,6 +14,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Getter
 @Setter
 @Entity
@@ -38,6 +41,17 @@ public class UserCreditEntity {
     @Column(name = "mail_credits", nullable = false)
     private Long mailCredits = 0L;
 
+    @Column(name = "created_by", updatable = false)
+    private Long createdBy;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }

@@ -2,6 +2,7 @@ package com.damc.legalnotices.controller.notice;
 
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
 import com.damc.legalnotices.dto.notice.NoticeExcelMappingDto;
+import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.notice.NoticeExcelMappingService;
 
 import jakarta.validation.Valid;
@@ -25,32 +26,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeExcelMappingController {
 
+    private final BaseService baseService;
     private final NoticeExcelMappingService mappingService;
 
     @GetMapping
     public ResponseEntity<List<NoticeExcelMappingDao>> getByProcessId(@RequestParam Long processId) {
-        return ResponseEntity.ok(mappingService.getByProcessId(processId));
+        return ResponseEntity.ok(mappingService.getByProcessId(baseService.getSessionUser(), processId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoticeExcelMappingDao> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(mappingService.getById(id));
+        return ResponseEntity.ok(mappingService.getById(baseService.getSessionUser(), id));
     }
 
     @PostMapping
     public ResponseEntity<NoticeExcelMappingDao> create(@Valid @RequestBody NoticeExcelMappingDto request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(mappingService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mappingService.create(baseService.getSessionUser(), request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NoticeExcelMappingDao> update(@PathVariable Long id,
-                                                                  @Valid @RequestBody NoticeExcelMappingDto request) {
-        return ResponseEntity.ok(mappingService.update(id, request));
+            @Valid @RequestBody NoticeExcelMappingDto request) {
+        return ResponseEntity.ok(mappingService.update(baseService.getSessionUser(), id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        mappingService.delete(id);
+        mappingService.delete(baseService.getSessionUser(), id);
         return ResponseEntity.noContent().build();
     }
 }

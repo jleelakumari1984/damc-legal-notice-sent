@@ -10,8 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -51,10 +53,17 @@ public class SendErrorSmsDetailEntity {
     @Column(name = "error_message", columnDefinition = "longtext")
     private String errorMessage;
 
-    @Column(name = "created_by")
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
     @CreationTimestamp
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

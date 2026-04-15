@@ -1,6 +1,9 @@
+import { PaginatedRequest } from "./datatable.model";
 import { SmsLog } from "./sms.model";
 import { WhatsappLog } from "./whatsapp.model";
 
+export interface NoticeReportRequest extends PaginatedRequest {
+}
 export interface NoticeReportSummary {
     id: number;
     processName: string;

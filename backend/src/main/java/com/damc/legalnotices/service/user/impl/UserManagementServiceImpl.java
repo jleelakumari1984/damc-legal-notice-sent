@@ -1,5 +1,6 @@
 package com.damc.legalnotices.service.user.impl;
 
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.user.UserRequestDto;
 import com.damc.legalnotices.dto.user.UserResponseDto;
 import com.damc.legalnotices.dto.user.UserUpdateDto;
@@ -24,7 +25,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     @Transactional
-    public UserResponseDto createUser(UserRequestDto request) {
+    public UserResponseDto createUser(LoginUserDao  sessionUser, UserRequestDto request) {
         
         if (loginDetailRepository.existsByLoginName(request.getLoginName())) {
             throw new IllegalArgumentException("Login name already exists: " + request.getLoginName());
@@ -48,18 +49,18 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
-    public UserResponseDto getUserById(Long id) {
+    public UserResponseDto getUserById(LoginUserDao  sessionUser, Long id) {
         return toDto(findById(id));
     }
 
     @Override
-    public List<UserResponseDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers(LoginUserDao  sessionUser) {
         return loginDetailRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @Override
     @Transactional
-    public UserResponseDto updateUser(Long id, UserUpdateDto request) {
+    public UserResponseDto updateUser(LoginUserDao  sessionUser, Long id, UserUpdateDto request) {
         LoginDetailEntity entity = findById(id);
         if (request.getDisplayName() != null) entity.setDisplayName(request.getDisplayName());
         if (request.getUserEmail() != null) entity.setUserEmail(request.getUserEmail());
@@ -72,7 +73,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(LoginUserDao  sessionUser, Long id) {
         LoginDetailEntity entity = findById(id);
         entity.setEnabled(false);
         loginDetailRepository.save(entity);
@@ -81,7 +82,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     @Transactional
-    public void changePassword(Long id, String newPassword) {
+    public void changePassword(LoginUserDao  sessionUser, Long id, String newPassword) {
         LoginDetailEntity entity = findById(id);
         entity.setPassword(passwordEncoder.encode(newPassword));
         loginDetailRepository.save(entity);

@@ -4,7 +4,7 @@ import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dao.user.SessionUserDao;
 import com.damc.legalnotices.entity.user.LoginDetailEntity;
 import com.damc.legalnotices.repository.user.LoginDetailRepository;
-import com.damc.legalnotices.util.EntityDaoConverter;
+import com.damc.legalnotices.util.converter.EntityDaoConverter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

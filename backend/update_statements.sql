@@ -1,10 +1,19 @@
 -- =============================================================
 -- Schema Update Statements
--- Generated: 2026-04-11
--- Compared: schema.sql (existing DB) vs all JPA entities
+-- Generated: 2026-04-15
+-- Compared: schema.sql (existing DB) vs all JPA entities (full audit)
 -- =============================================================
 
--- All existing tables match their entities.
+-- Tables in schema with NO Java entity (not dropped, just unmapped):
+--   master_hearing_stages
+--   master_loan_document_types
+--   master_process_doc_config_details
+--
+-- Schema FK columns not mapped in any entity (do NOT drop without verifying data):
+--   master_process_mail_config_details.hearing_stage_sno
+--   master_process_sms_config_details.hearing_stage_sno
+--   master_process_whatsapp_config_details.hearing_stage_sno
+--
 -- The following 2 tables are defined in entities but missing from the DB.
 
 -- -------------------------------------------------------------
@@ -16,6 +25,9 @@ CREATE TABLE IF NOT EXISTS `user_credits` (
   `sms_credits`      bigint NOT NULL DEFAULT '0',
   `whatsapp_credits` bigint NOT NULL DEFAULT '0',
   `mail_credits`     bigint NOT NULL DEFAULT '0',
+  `created_by`       bigint DEFAULT NULL,
+  `created_at`       datetime(6) DEFAULT NULL,
+  `updated_by`       bigint DEFAULT NULL,
   `updated_at`       datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_user_credits_user` FOREIGN KEY (`user_id`) REFERENCES `login_details` (`sno`)
@@ -38,6 +50,43 @@ CREATE TABLE IF NOT EXISTS `credit_transactions` (
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_credit_transactions_user` FOREIGN KEY (`user_id`) REFERENCES `login_details` (`sno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- =============================================================
+-- ALTER statements: columns in entities missing from schema
+-- =============================================================
+
+-- scheduled_notices: added @UpdateTimestamp updated_at and updated_by
+ALTER TABLE `scheduled_notices`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- send_loan_sms_details: added updated_by/updated_at; drop legacy sms_ack_id
+ALTER TABLE `send_loan_sms_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_loan_sms_details` DROP COLUMN `sms_ack_id`;
+
+-- send_loan_whatsapp_details: added updated_by/updated_at; drop legacy sms_ack_id
+ALTER TABLE `send_loan_whatsapp_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_loan_whatsapp_details` DROP COLUMN `sms_ack_id`;
+
+-- send_error_sms_details: added updated_by/updated_at
+ALTER TABLE `send_error_sms_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+
+ALTER TABLE  `master_process_sms_config_details` 
+ADD COLUMN `user_template_path` TEXT NULL AFTER `template_path`,
+CHANGE COLUMN `template_path` `template_path` TEXT NULL DEFAULT NULL ;
+
+ALTER TABLE  `master_process_whatsapp_config_details` 
+ADD COLUMN `user_template_path` TEXT NULL AFTER `template_path`,
+CHANGE COLUMN `template_path` `template_path` TEXT NULL DEFAULT NULL ;
 
 -- -------------------------------------------------------------
 -- shedule_report  (ScheduleReportEntity — read-only VIEW)
@@ -85,12 +134,13 @@ CREATE OR REPLACE VIEW `process_config_report` AS
   SELECT
     mptde1_0.sno,
     mptde1_0.created_at,
+     mptde1_0.created_by,
     mptde1_0.description,
     mptde1_0.name,
     mptde1_0.step_name,
     em1_0.excel_map_count,
     sms1_0.sms_map_count,
-    wapp_0.wahtaapp_map_count,
+    wapp_0.whatsapp_map_count,
     mail_0.mail_map_count
   FROM master_process_template_details mptde1_0
   LEFT JOIN (
@@ -113,3 +163,128 @@ CREATE OR REPLACE VIEW `process_config_report` AS
     FROM master_process_mail_config_details
     GROUP BY process_sno
   ) mail_0 ON mptde1_0.sno = mail_0.process_sno;
+
+-- =============================================================
+-- ALTER statements: columns in entities missing from schema
+-- (full audit 2026-04-15)
+-- =============================================================
+
+-- -------------------------------------------------------------
+-- master_process_template_details
+-- Entity adds: created_by, updated_by, updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `master_process_template_details`
+  ADD COLUMN `created_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- master_process_sms_config_details
+-- Entity adds: created_by, updated_by, updated_at
+-- (hearing_stage_sno is in schema but not mapped in entity -- keep column)
+-- -------------------------------------------------------------
+ALTER TABLE `master_process_sms_config_details`
+  ADD COLUMN `created_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- master_process_whatsapp_config_details
+-- Entity adds: created_by, updated_by, updated_at
+-- (hearing_stage_sno is in schema but not mapped in entity -- keep column)
+-- -------------------------------------------------------------
+ALTER TABLE `master_process_whatsapp_config_details`
+  ADD COLUMN `created_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- master_process_mail_config_details
+-- Entity adds: created_by, updated_by, updated_at
+-- (hearing_stage_sno is in schema but not mapped in entity -- keep column)
+-- -------------------------------------------------------------
+ALTER TABLE `master_process_mail_config_details`
+  ADD COLUMN `created_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- process_excel_mapping
+-- Entity adds: created_by, updated_by, updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `process_excel_mapping`
+  ADD COLUMN `created_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- scheduled_notices: added updated_by / updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `scheduled_notices`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- send_loan_sms_details: add updated_by/updated_at; drop legacy sms_ack_id
+-- -------------------------------------------------------------
+ALTER TABLE `send_loan_sms_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_loan_sms_details` DROP COLUMN `sms_ack_id`;
+
+-- -------------------------------------------------------------
+-- send_loan_whatsapp_details: add updated_by/updated_at; drop legacy sms_ack_id
+-- -------------------------------------------------------------
+ALTER TABLE `send_loan_whatsapp_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_loan_whatsapp_details` DROP COLUMN `sms_ack_id`;
+
+-- -------------------------------------------------------------
+-- send_loan_mail_details: add updated_by/updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `send_loan_mail_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- send_error_sms_details: add updated_by/updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `send_error_sms_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- send_error_mail_details: add updated_by/updated_at; drop orphaned created_date
+-- (created_date is a legacy column not mapped in entity)
+-- -------------------------------------------------------------
+ALTER TABLE `send_error_mail_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_error_mail_details` DROP COLUMN `created_date`;
+
+-- -------------------------------------------------------------
+-- send_non_loan_sms_details: add updated_by/updated_at; drop legacy sms_ack_id
+-- -------------------------------------------------------------
+ALTER TABLE `send_non_loan_sms_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+ALTER TABLE `send_non_loan_sms_details` DROP COLUMN `sms_ack_id`;
+
+-- -------------------------------------------------------------
+-- send_non_loan_whatsapp_details: add updated_by/updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `send_non_loan_whatsapp_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- send_non_loan_mail_details: add updated_by/updated_at
+-- -------------------------------------------------------------
+ALTER TABLE `send_non_loan_mail_details`
+  ADD COLUMN `updated_by` bigint DEFAULT NULL,
+  ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;

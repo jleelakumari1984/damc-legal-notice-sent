@@ -17,6 +17,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 import com.damc.legalnotices.config.LocationProperties;
+import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
 import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
 import com.damc.legalnotices.errors.StopParsingException;
@@ -49,14 +50,18 @@ public class ExcelParserUtil {
     private final LocationProperties storageProperties;
     private final ZipExtractorUtil zipExtractorUtil;
 
-    public Path saveZipFile(MultipartFile zipFile) {
+    private Path getUserBasePath(LoginUserDao  sessionUser) {
+        return Paths.get(storageProperties.getUploadDir(), sessionUser.getId() + "");
+    }
+
+    public Path saveZipFile(LoginUserDao  sessionUser, MultipartFile zipFile) {
         try {
             String original = zipFile.getOriginalFilename();
             if (original == null || !original.toLowerCase().endsWith(".zip")) {
                 throw new IllegalArgumentException("Only ZIP file upload is allowed");
             }
             String randomName = UUID.randomUUID().toString();
-            Path uploadDir = Paths.get(storageProperties.getUploadDir(), randomName)
+            Path uploadDir = Paths.get(getUserBasePath(sessionUser).toString(), randomName)
                     .toAbsolutePath().normalize();
             Files.createDirectories(uploadDir);
             String fileName = randomName + "_" + original;
@@ -68,7 +73,7 @@ public class ExcelParserUtil {
         }
     }
 
-    public Path saveExcelFile(MultipartFile excelFile) {
+    public Path saveExcelFile(LoginUserDao  sessionUser, MultipartFile excelFile) {
         try {
             String original = excelFile.getOriginalFilename();
             if (original == null) {
@@ -79,7 +84,8 @@ public class ExcelParserUtil {
                 throw new IllegalArgumentException("Only Excel files (.xlsx, .xls) are allowed");
             }
             String randomName = UUID.randomUUID().toString();
-            Path uploadDir = Paths.get(storageProperties.getUploadDir(), randomName).toAbsolutePath().normalize();
+            Path uploadDir = Paths.get(getUserBasePath(sessionUser).toString(), randomName).toAbsolutePath()
+                    .normalize();
             Files.createDirectories(uploadDir);
             String fileName = randomName + "_" + original;
             Path targetPath = uploadDir.resolve(fileName);
@@ -92,7 +98,7 @@ public class ExcelParserUtil {
 
     public Path extractZip(Path zipPath) {
         try {
-            Path targetDir = Paths.get(storageProperties.getUploadDir(), "extracted")
+            Path targetDir = Paths.get(zipPath.getParent().toString(), "extracted")
                     .resolve(UUID.randomUUID().toString());
             zipExtractorUtil.extract(zipPath, targetDir);
             return targetDir;

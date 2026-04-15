@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { NoticeService } from '../../../../core/services/notice.service';
 import { SendNoticesService } from '../../../../core/services/send-notices.service';
 import { Notice, NoticeRequest, NoticeType } from '../../../../core/models/notices.model';
+import { NoticeReportRequest } from '../../../../core/models/report.notice';
 
 declare const $: any;
 
@@ -106,7 +107,7 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
 
   private loadNoticeTypes(): void {
     this.service.getNoticeTypes().subscribe({
-      next: (data) => { this.noticeTypes = data; },
+      next: (data) => { this.noticeTypes = data.data; },
       error: () => { }
     });
   }

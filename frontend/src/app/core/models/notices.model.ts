@@ -1,3 +1,4 @@
+import { PaginatedRequest } from "./datatable.model";
 import { ProcessExcelMapping } from "./excel.model";
 
 export interface Notice {
@@ -32,7 +33,7 @@ export interface NoticeType {
     mailMapCount: number;
 }
 
-export interface NoticeTypeRequest {
+export interface NoticeTypeRequest extends PaginatedRequest {
     name: string;
 }
 
@@ -57,4 +58,61 @@ export interface NoticeExcelMappingRequest {
     isMobile: number;
     isMandatory: number;
     isAttachment: number;
+}
+
+export interface SmsTemplate {
+    id: number;
+    processId: number;
+    peid: string;
+    senderId: string;
+    routeId: string;
+    userTemplateContent: string;
+    templateContent: string;
+    templateId: string;
+    channel: string;
+    dcs: number;
+    flashSms: number;
+    status: number;
+    createdAt: string;
+}
+
+export interface SmsUserTemplateRequest {
+    processId: number;
+    userTemplateContent: string;
+    status: number;
+}
+
+export interface SmsTemplateRequest extends SmsUserTemplateRequest {
+    peid: string;
+    senderId: string;
+    routeId: string;
+    templateContent: string;
+    templateId: string;
+    channel: string;
+    dcs: number;
+    flashSms: number;
+}
+
+export interface WhatsappTemplate {
+    id: number;
+    processId: number;
+    templateName: string;
+    templatePath: string;
+    userTemplateContent: string;
+    templateContent: string;
+    templateLang: string;
+    status: number;
+    createdAt: string;
+}
+
+export interface WhatsappUserTemplateRequest {
+    processId: number;
+    userTemplateContent: string;
+    status: number;
+}
+
+export interface WhatsappTemplateRequest extends WhatsappUserTemplateRequest {
+    templateName: string;
+    templateContent: string;
+    templateLang: string;
 }

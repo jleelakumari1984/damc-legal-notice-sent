@@ -9,10 +9,8 @@ import java.util.List;
 
 public interface MasterProcessWhatsappConfigDetailRepository
         extends JpaRepository<MasterProcessWhatsappConfigDetailEntity, Long> {
-    // @EntityGraph(attributePaths = { "process" })
-    // Optional<MasterProcessWhatsappConfigDetailEntity>
-    // findFirstByProcessIdAndStatus(Long processId, Integer status);
 
+    List<MasterProcessWhatsappConfigDetailEntity> findByProcessId(Long processId);
     @EntityGraph(attributePaths = { "hearingStage" })
     List<MasterProcessWhatsappConfigDetailEntity> findByProcessIdAndStatus(Long processId, Integer status);
 }

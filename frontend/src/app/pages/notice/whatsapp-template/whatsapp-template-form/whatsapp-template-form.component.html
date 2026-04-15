@@ -1,0 +1,69 @@
+<!-- WhatsApp Template Modal -->
+<div class="modal fade" id="whatsappTemplateModal" tabindex="-1" aria-labelledby="whatsappTemplateModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="whatsappTemplateModalLabel">
+            {{ editTemplate ? 'Edit' : 'Add' }} WhatsApp Template
+          </h5>
+          <button type="button" class="btn-close" (click)="cancel()"></button>
+        </div>
+
+        <div class="modal-body">
+          <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Template Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="templateName"
+                [class.is-invalid]="form.get('templateName')?.invalid && form.get('templateName')?.touched">
+              <div class="invalid-feedback">Required.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Language <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="templateLang" placeholder="e.g. en, hi"
+                [class.is-invalid]="form.get('templateLang')?.invalid && form.get('templateLang')?.touched">
+              <div class="invalid-feedback">Required.</div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Template Path</label>
+              <input type="text" class="form-control" formControlName="templatePath"
+                placeholder="Optional file/media path">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Status</label>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" formControlName="status" id="waStatusCheck">
+                <label class="form-check-label" for="waStatusCheck">Active</label>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Template Content <span class="text-danger">*</span></label>
+              <textarea class="form-control" formControlName="templateContent" rows="5"
+                [class.is-invalid]="form.get('templateContent')?.invalid && form.get('templateContent')?.touched">
+              </textarea>
+              <div class="invalid-feedback">Required.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn btn-brand" [disabled]="saving || form.invalid">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ editTemplate ? 'Update' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

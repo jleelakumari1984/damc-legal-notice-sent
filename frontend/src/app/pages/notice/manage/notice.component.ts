@@ -57,7 +57,6 @@ export class NoticeComponent implements AfterViewInit {
     this.actionType = 'sms';
     this.editNotice = notice;
     this.clearMessages();
-    this.noticeForm.open();
   }
 
   onSaved(): void {
@@ -70,6 +69,16 @@ export class NoticeComponent implements AfterViewInit {
     this.actionType = 'whatsapp';
     this.editNotice = notice;
     this.clearMessages();
+  }
+
+  closeSmsTemplate(): void {
+    this.editNotice = null;
+    this.actionType = 'display';
+  }
+
+  closeWhatsappTemplate(): void {
+    this.editNotice = null;
+    this.actionType = 'display';
   }
 
   openExcelConfig(notice: NoticeType): void {
