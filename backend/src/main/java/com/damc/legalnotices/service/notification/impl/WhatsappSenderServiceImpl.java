@@ -1,7 +1,7 @@
 package com.damc.legalnotices.service.notification.impl;
 
 import com.damc.legalnotices.config.LocationProperties;
-import com.damc.legalnotices.config.WhatsAppProperties;
+import com.damc.legalnotices.config.WhatsAppCredential;
 import com.damc.legalnotices.dto.notification.WhatsAppAttachmentDto;
 import com.damc.legalnotices.dto.notification.WhatsAppDataDto;
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
@@ -33,23 +33,21 @@ import org.springframework.util.StringUtils;
 public class WhatsappSenderServiceImpl implements WhatsappSenderService {
 
     private final LocationProperties appConfig;
-    private final WhatsAppProperties whapAppConfig;
     private final RestTemplateBuilder restTemplateBuilder;
     private final NotificationsSaveService notificationsSave;
 
-    private void validateData(WhatsAppDataDto bean) throws WhatsAppSendException {
-        if (!whapAppConfig.isLive()) {
-            if (!StringUtils.hasText(whapAppConfig.getTestMobileNumber())) {
+    private void validateData(WhatsAppDataDto bean, WhatsAppCredential credential) throws WhatsAppSendException {
+        if (!credential.isLive()) {
+            if (!StringUtils.hasText(credential.getTestMobileNumber())) {
                 throw new WhatsAppSendException("Please configure test mobile number");
             }
-            bean.setMobileNumber(whapAppConfig.getTestMobileNumber());
+            bean.setMobileNumber(credential.getTestMobileNumber());
         }
         bean.setMobileNumber(bean.getMobileNumber() == null ? "" : bean.getMobileNumber().replaceAll("[^0-9]", ""));
         if (!StringUtils.hasText(bean.getMobileNumber()) || bean.getMobileNumber().length() < 10
                 || bean.getMobileNumber().length() > 12) {
             throw new WhatsAppSendException("Invalid mobile number");
         }
-
         if (bean.getMobileNumber().length() == 10) {
             bean.setMobileNumber("91" + bean.getMobileNumber());
         }
@@ -57,15 +55,15 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
 
     @Override
     public void send(WhatsAppDataDto whatsAppData, MasterProcessTemplateDetailEntity template,
-            List<String> attachments) {
+            List<String> attachments, WhatsAppCredential credential) {
 
         if (whatsAppData.getConfig() == null) {
             throw new WhatsAppSendException("Invalid WhatsApp configuration details ");
         }
-        if (!org.springframework.util.StringUtils.hasText(whatsAppData.getConfig().getTemplatePath())) {
+        if (!StringUtils.hasText(whatsAppData.getConfig().getTemplatePath())) {
             throw new WhatsAppSendException("WhatsApp template path is empty");
         }
-        log.info("Sending WhatsApp for agreement {} using template {}  ",
+        log.info("Sending WhatsApp for agreement {} using template {}",
                 whatsAppData.getAgreementNumber(), whatsAppData.getConfig().getTemplateName());
         try {
             HtmlTemplateGenerator htmlGenerator = new HtmlTemplateGenerator(appConfig);
@@ -78,27 +76,18 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
             });
             whatsAppData.setMessage(whatsAppParams);
             whatsAppData.setComponents(components);
-            sendMessage(template.getName(), whatsAppData, attachments);
-        } catch (
-
-        WhatsAppSendException ex) {
+            sendMessage(template.getName(), whatsAppData, attachments, credential);
+        } catch (WhatsAppSendException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new WhatsAppSendException("Error while sending whatsApp " + ex.getMessage(), ex);
-        } finally {
         }
-
     }
 
-    private void sendMessage(String sendType, WhatsAppDataDto whatsAppData, List<String> attachments) {
+    private void sendMessage(String sendType, WhatsAppDataDto whatsAppData, List<String> attachments,
+            WhatsAppCredential credential) {
         try {
-            validateData(whatsAppData);
-            if (!whapAppConfig.isLive()) {
-                if (!StringUtils.hasText(whapAppConfig.getTestMobileNumber())) {
-                    throw new WhatsAppSendException("Please configure test mobile number");
-                }
-                whatsAppData.setMobileNumber(whapAppConfig.getTestMobileNumber());
-            }
+            validateData(whatsAppData, credential);
             if (!StringUtils.hasText(whatsAppData.getMessage())
                     && (whatsAppData.getComponents() == null || whatsAppData.getComponents().isEmpty())) {
                 throw new WhatsAppSendException("Message is empty or parameters empty");
@@ -107,7 +96,7 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
                 throw new WhatsAppSendException("Whatsapp mobile number is empty");
             }
             if (whatsAppData.getScheduleItemId() != null && attachments != null && !attachments.isEmpty()) {
-                String downloadUrl = whapAppConfig.getAttachmentDownloadUrl();
+                String downloadUrl = credential.getAttachmentDownloadUrl();
                 for (String attachment : attachments) {
                     Path attachmentPath = Path.of(attachment);
                     String filenameWithExt = attachmentPath.getFileName().toString();
@@ -119,28 +108,25 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
                     whatsAppData.getComponents().add(WhatsAppAttachmentDto.ofDocument(fileUrl, filename));
                 }
             }
-            String whatsAppPostData = whatsAppData.getPostData(whapAppConfig);
-            String messageUrl = whapAppConfig.getUrl();
+            String whatsAppPostData = whatsAppData.getPostData(credential);
+            String messageUrl = credential.getUrl();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> entity = new HttpEntity<String>(whatsAppPostData, headers);
+            HttpEntity<String> entity = new HttpEntity<>(whatsAppPostData, headers);
             ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(messageUrl, entity,
                     String.class);
-            log.info("WhatsApp Sent:" + messageUrl + ":" + whatsAppPostData + ":" + response.getBody());
+            log.info("WhatsApp Sent: {} : {} : {}", messageUrl, whatsAppPostData, response.getBody());
             if (StringUtils.hasText(response.getBody()) && response.getBody().contains("error")) {
                 throw new WhatsAppSendException(response.getBody());
             }
-            notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, true, response.getBody(),
-                    false,
-                    null);
-
+            notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, true, response.getBody(), false, null);
         } catch (WhatsAppSendException ex) {
             notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, false, ex.getMessage(), false, ex);
             throw ex;
         } catch (Exception ex) {
             notificationsSave.StoreWhatsAppDetails(sendType, whatsAppData, false, ex.getMessage(), false, ex);
-            throw new WhatsAppSendException("Error while sending whatsapp message" + ex.getMessage(), ex);
+            throw new WhatsAppSendException("Error while sending whatsapp message " + ex.getMessage(), ex);
         }
     }
 }

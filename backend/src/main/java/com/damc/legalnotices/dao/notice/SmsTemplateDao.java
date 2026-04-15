@@ -11,7 +11,7 @@ public class SmsTemplateDao extends SmsUserTemplateDao {
     private String peid;
     private String senderId;
     private String routeId;
-    private String templateText;
+    private String templateContent;
     private String templateId;
     private String channel;
     private Integer dcs;

@@ -2,6 +2,8 @@ package com.damc.legalnotices.controller.user;
 
 import com.damc.legalnotices.dao.user.LoginDao;
 import com.damc.legalnotices.dto.user.LoginDto;
+import com.damc.legalnotices.dto.user.SwitchSessionDto;
+import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.user.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final BaseService baseService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginDao> login(@Valid @RequestBody LoginDto requestDto) {
@@ -32,6 +35,11 @@ public class AuthController {
     @GetMapping("/status")
     public ResponseEntity<String> status() {
         return ResponseEntity.ok("Service is running");
+    }
+
+    @PostMapping("/switch-session")
+    public ResponseEntity<LoginDao> switchSession(@Valid @RequestBody SwitchSessionDto request) {
+        return ResponseEntity.ok(authService.switchSession(baseService.getSessionUser(), request));
     }
 
 }

@@ -1,0 +1,86 @@
+<div class="modal fade" id="smsViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" *ngIf="viewTemplate">
+            <div class="modal-header">
+                <h5 class="modal-title">SMS Template — {{ viewTemplate.senderId }}</h5>
+                <button type="button" class="btn-close" (click)="close()"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <div class="text-muted small mb-1">User Template Content</div>
+                        <pre class="bg-light p-3 rounded border text-wrap">{{ viewTemplate.userTemplateContent }}</pre>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3" *ngIf="isSuperAdmin">
+                    <div class="col-12" *ngIf="viewTemplate.templateContent">
+                        <div class="text-muted small mb-1">Approved Template Content</div>
+                        <pre class="bg-light p-3 rounded border  text-wrap">{{ viewTemplate.templateContent }}</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Sender ID</div>
+                        <div class="fw-semibold">{{ viewTemplate.senderId || '—' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Template ID</div>
+                        <div class="fw-semibold">{{ viewTemplate.templateId || '—' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">PEID</div>
+                        <div>{{ viewTemplate.peid || '—' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Route ID</div>
+                        <div>{{ viewTemplate.routeId || '—' }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Channel</div>
+                        <div>{{ viewTemplate.channel || '—' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">DCS</div>
+                        <div>{{ viewTemplate.dcs || '—' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Flash SMS</div>
+                        <div>
+                            <span
+                                class="badge {{viewTemplate.flashSms === 1 ? 'bg-info text-dark' : 'bg-secondary'}}">{{viewTemplate.flashSms
+                                === 1 ? 'Yes' :
+                                'No'}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <div class="text-muted small">Status</div>
+                        <span class="badge" [class.bg-success]="viewTemplate.status === 1"
+                            [class.bg-secondary]="viewTemplate.status !== 1">
+                            {{ viewTemplate.status === 1 ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">Approval</div>
+                        <span class="badge" [class.bg-success]="viewTemplate.approveStatus === 1"
+                            [class.bg-danger]="viewTemplate.approveStatus === 3"
+                            [class.bg-secondary]="viewTemplate.approveStatus === 0">
+                            {{ viewTemplate.approveStatus === 1 ? 'Approved' : viewTemplate.approveStatus === 3 ?
+                            'Rejected' : 'Pending' }}
+                        </span>
+                    </div>
+                    <div class="col-12" *ngIf="viewTemplate.rejectionReason">
+                        <div class="text-muted small">Rejection Reason</div>
+                        <div class="text-danger">{{ viewTemplate.rejectionReason }}</div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

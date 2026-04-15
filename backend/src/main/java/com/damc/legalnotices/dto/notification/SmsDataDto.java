@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.damc.legalnotices.config.SmsProperties;
+import com.damc.legalnotices.config.SmsCredential;
 import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ public class SmsDataDto {
     private Map<String, Object> props = new HashMap<String, Object>();
     private boolean sendEnabled;
 
-    public String getPostData(SmsProperties smsConfig) throws JsonProcessingException {
+    public String getPostData(SmsCredential credential) throws JsonProcessingException {
         Hashtable<String, Object> sendObject = new Hashtable<>();
         sendObject.put("username", "********************");
         sendObject.put("password", "********************");
@@ -56,8 +56,8 @@ public class SmsDataDto {
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         postMessage = ow.writeValueAsString(sendObject);
 
-        sendObject.replace("username", smsConfig.getUserName());
-        sendObject.replace("password", smsConfig.getPassword());
+        sendObject.replace("username", credential.getUserName());
+        sendObject.replace("password", credential.getPassword());
 
         return ow.writeValueAsString(sendObject);
     }

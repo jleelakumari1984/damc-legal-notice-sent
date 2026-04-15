@@ -38,7 +38,7 @@ public class ExcelPreviewController {
     public ResponseEntity<Void> sendSample(@RequestBody SendSampleNoticeDto request) {
         log.info("Send sample notice request for processSno: {}, mobile: {}", request.getProcessSno(),
                 request.getMobileNumber());
-        noticeSchedule.sendSampleNotice(request);
+        noticeSchedule.sendSampleNotice(baseService.getSessionUser(), request);
         return ResponseEntity.ok().build();
     }
 }

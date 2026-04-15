@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 public class SmsUserTemplateDao {
     private Long id;
     private Long processId;
-    private String userTemplateText;
+    private String userTemplateContent;
     private Integer status;
+    private Integer approveStatus;
     private LocalDateTime createdAt;
 }

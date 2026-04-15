@@ -5,8 +5,8 @@ import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
-import com.damc.legalnotices.dto.report.NoticeSmsLogReportDto;
-import com.damc.legalnotices.dto.report.NoticeWhatsappLogReportDto;
+import com.damc.legalnotices.dto.report.NoticeSmsLogListReportDto;
+import com.damc.legalnotices.dto.report.NoticeWhatsappLogListReportDto;
 import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.report.NoticeReportDao;
 
@@ -19,14 +19,14 @@ public interface NoticeReportService {
     NoticeReportDetailDao getNoticeReportDetail(LoginUserDao sessionUser, Long noticeId, String status);
 
     DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao sessionUser, Long noticeId,
-            NoticeSmsLogReportDto request);
+            NoticeSmsLogListReportDto request);
 
     DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao sessionUser, Long id,
-            NoticeSmsLogReportDto request);
+            NoticeSmsLogListReportDto request);
 
     DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao sessionUser, Long noticeId,
-            NoticeWhatsappLogReportDto request);
+            NoticeWhatsappLogListReportDto request);
 
     DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao sessionUser, Long id,
-            NoticeWhatsappLogReportDto request);
+            NoticeWhatsappLogListReportDto request);
 }

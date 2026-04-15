@@ -17,28 +17,31 @@
             <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
           </div>
 
+          <div *ngIf="submittedForApproval" class="alert alert-info mb-3">
+            <i class="fa fa-info-circle me-1"></i>
+            Template submitted for approval. It will be activated once reviewed by an admin.
+          </div>
+
+          <div *ngIf="isApproved" class="alert alert-success mb-3">
+            <i class="fa fa-check-circle me-1"></i>
+            This template has been <strong>approved</strong> and cannot be edited.
+          </div>
+
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Template Content <span class="text-danger">*</span></label>
               <textarea class="form-control" formControlName="userTemplateContent" rows="5"
+                [attr.readonly]="isApproved ? true : null"
                 [class.is-invalid]="form.get('userTemplateContent')?.invalid && form.get('userTemplateContent')?.touched">
               </textarea>
               <div class="invalid-feedback">Required.</div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Status</label>
-              <div class="form-check mt-2">
-                <input class="form-check-input" type="checkbox" formControlName="status" id="waUserStatusCheck">
-                <label class="form-check-label" for="waUserStatusCheck">Active</label>
-              </div>
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-          <button type="submit" class="btn btn-brand" [disabled]="saving || form.invalid">
+          <button *ngIf="!isApproved" type="submit" class="btn btn-brand" [disabled]="saving || form.invalid">
             <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
             {{ editTemplate ? 'Update' : 'Save' }}
           </button>

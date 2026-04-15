@@ -3,8 +3,9 @@ package com.damc.legalnotices.service.user.impl;
 import com.damc.legalnotices.dao.user.LoginDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.user.LoginDto;
-import com.damc.legalnotices.entity.user.LoginDetailEntity;
-import com.damc.legalnotices.repository.user.LoginDetailRepository;
+import com.damc.legalnotices.dto.user.SwitchSessionDto;
+import com.damc.legalnotices.entity.user.UserEntity;
+import com.damc.legalnotices.repository.user.UserRepository;
 import com.damc.legalnotices.service.user.AuthService;
 import com.damc.legalnotices.util.JwtUtil;
 import com.damc.legalnotices.util.converter.EntityDaoConverter;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final LoginDetailRepository loginDetailRepository;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final EntityDaoConverter entityDaoConverter;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid username or password");
         }
 
-        LoginDetailEntity loginDetail = loginDetailRepository.findByLoginNameAndEnabledTrue(requestDto.getUsername())
+        UserEntity loginDetail = userRepository.findByLoginNameAndEnabledTrue(requestDto.getUsername())
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
 
         LoginUserDao userDao = entityDaoConverter.toLoginUserDao(loginDetail);
@@ -50,5 +51,22 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(userDao);
         log.info("JWT issued for user: {}", loginDetail.getLoginName());
         return new LoginDao(token, userDao);
+    }
+
+    @Override
+    public LoginDao switchSession(LoginUserDao sessionUser, SwitchSessionDto request) {
+        boolean canSwitch = sessionUser.isAdmin()
+                || Boolean.TRUE.equals(sessionUser.getCanSwitchSession());
+        if (!canSwitch) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You do not have permission to switch sessions");
+        }
+        UserEntity targetDetail = userRepository.findByIdWithCredit(request.getTargetUserId())
+                .orElseThrow(() -> new BadCredentialsException(
+                        "Target user not found with id: " + request.getTargetUserId()));
+        LoginUserDao targetUserDao = entityDaoConverter.toLoginUserDao(targetDetail);
+        String token = jwtUtil.generateToken(targetUserDao);
+        log.info("Session switched to user: {} by: {}", targetDetail.getLoginName(), sessionUser.getLoginName());
+        return new LoginDao(token, targetUserDao);
     }
 }

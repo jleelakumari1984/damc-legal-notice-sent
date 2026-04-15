@@ -9,6 +9,7 @@
 
     <div class="d-flex flex-wrap align-items-center gap-2">
       <div class="pill"><i class="fa fa-user-circle"></i> Welcome : {{ userName }}</div>
+      <button class="btn btn-light-soft" (click)="openSwitchSession()"><i class="fa fa-exchange-alt me-1"></i> Switch Session</button>
       <button class="btn btn-light-soft" (click)="logout()"><i class="fa fa-sign-out-alt me-1"></i> Logout</button>
     </div>
   </header>
@@ -22,9 +23,11 @@
       <a routerLink="/reports" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-chart-line me-1"></i>
         Report(s)</a>
      
-      <a *ngIf="isSuperAdmin()" routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
-      <a routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-wallet me-1"></i>
-        Credit</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-wallet me-1"></i> Credit</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/template-approvals" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-check-circle me-1"></i> Template Approvals</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/sms-endpoints" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-sms me-1"></i> SMS Endpoints</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/whatsapp-endpoints" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-comment-dots me-1"></i> WhatsApp Endpoints</a>
     </div>
   </div>
 
@@ -32,3 +35,5 @@
     <router-outlet></router-outlet>
   </main>
 </div>
+
+<app-switch-session></app-switch-session>

@@ -1,8 +1,10 @@
 package com.damc.legalnotices.controller.user;
 
 import com.damc.legalnotices.annotation.RequiresAccess;
+import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.user.CreditTransactionDao;
 import com.damc.legalnotices.dto.user.CreditAdjustDto;
+import com.damc.legalnotices.dto.user.CreditTransactionListDto;
 import com.damc.legalnotices.enums.UserAccessLevelEnum;
 import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.user.CreditManagementService;
@@ -10,8 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/credits")
+@RequestMapping("/api/users/credits")
 @RequiredArgsConstructor
 public class CreditManagementController {
 
@@ -38,21 +38,25 @@ public class CreditManagementController {
     }
 
     @RequiresAccess(level = UserAccessLevelEnum.SUPER_ADMIN)
-    @GetMapping
-    public ResponseEntity<List<CreditTransactionDao>> getAllTransactions() {
-        return ResponseEntity.ok(creditManagementService.getAllTransactions(baseService.getSessionUser()));
+    @PostMapping("/trans/list")
+    public ResponseEntity<DataTableDao<List<CreditTransactionDao>>> getAllTransactions(
+            @RequestBody CreditTransactionListDto request) {
+        return ResponseEntity.ok(creditManagementService.getAllTransactions(baseService.getSessionUser(), request));
     }
 
     @RequiresAccess(level = UserAccessLevelEnum.SUPER_ADMIN)
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CreditTransactionDao>> getTransactionsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(creditManagementService.getTransactionsByUserId(userId));
+    @PostMapping("/trans/{userId}")
+    public ResponseEntity<DataTableDao<List<CreditTransactionDao>>> getTransactionsByUser(
+            @RequestBody CreditTransactionListDto request) {
+        return getAllTransactions(request);
     }
 
-    @GetMapping("/user/me")
-    public ResponseEntity<List<CreditTransactionDao>> getTransactionsByCurrentUser() {
+    @PostMapping("/trans/me")
+    public ResponseEntity<DataTableDao<List<CreditTransactionDao>>> getTransactionsByCurrentUser(
+            @RequestBody CreditTransactionListDto request) {
         Long userId = baseService.getSessionUser().getId();
-        return ResponseEntity.ok(creditManagementService.getTransactionsByUserId(userId));
+        request.setUserid(userId);
+        return getAllTransactions(request);
     }
 
 }

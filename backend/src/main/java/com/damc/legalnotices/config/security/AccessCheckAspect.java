@@ -50,9 +50,9 @@ public class AccessCheckAspect {
         long userLevel = user.getAccessLevel() == null ? Long.MAX_VALUE : user.getAccessLevel();
         UserAccessLevelEnum requiredLevel = annotation.level();
 
-        if (userLevel != requiredLevel.getLevel()) {
+        if (userLevel > requiredLevel.getLevel()) {
             log.warn("Access denied for user '{}' (level={}) — required level <= {}",
-                    user.getLoginName(), userLevel, requiredLevel);
+                    user.getLoginName(), userLevel, requiredLevel.getLevel());
             throw new AccessDeniedException(
                     "Access denied: your access level (%d) does not meet the required level (%d)"
                             .formatted(userLevel, requiredLevel.getLevel()));

@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.damc.legalnotices.config.LocationProperties;
+import com.damc.legalnotices.config.SmsCredential;
+import com.damc.legalnotices.config.SmsProperties;
+import com.damc.legalnotices.config.WhatsAppCredential;
+import com.damc.legalnotices.config.WhatsAppProperties;
 import com.damc.legalnotices.dao.excel.ProcessedExcelDao;
 import com.damc.legalnotices.dao.excel.ProcessedNoticeItemDao;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
@@ -43,6 +47,7 @@ import com.damc.legalnotices.repository.schedule.ScheduledNoticeRepository;
 import com.damc.legalnotices.service.notification.SmsSenderService;
 import com.damc.legalnotices.service.notification.WhatsappSenderService;
 import com.damc.legalnotices.service.schedule.NoticeScheduleService;
+import com.damc.legalnotices.service.user.UserCredentialService;
 import com.damc.legalnotices.util.ExcelParserUtil;
 import com.damc.legalnotices.util.NoticeScheduleUtil;
 import com.damc.legalnotices.util.converter.EntityDaoConverter;
@@ -66,6 +71,9 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     private final SmsSenderService smsSenderService;
     private final WhatsappSenderService whatsappSenderService;
+    private final UserCredentialService userCredentialService;
+    private final SmsProperties globalSmsProperties;
+    private final WhatsAppProperties globalWhatsAppProperties;
 
     private final NoticeScheduleUtil noticeScheduleUtil;
     private final ExcelParserUtil excelParserUtil;
@@ -73,7 +81,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     @Override
     @Transactional
-    public NoticeValidationDao scheduleNotice(LoginUserDao  sessionUser, Long processSno,
+    public NoticeValidationDao scheduleNotice(LoginUserDao sessionUser, Long processSno,
             Boolean sendSms,
             Boolean sendWhatsapp,
             MultipartFile zipFile) {
@@ -298,6 +306,14 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                     }
                 }
                 for (ScheduledNoticeItemEntity item : items) {
+                    SmsCredential smsCredential = Boolean.TRUE.equals(notice.getSendSms())
+                            ? userCredentialService.getSmsCredential(notice.getCreatedBy())
+                                    .orElse(SmsCredential.from(globalSmsProperties))
+                            : null;
+                    WhatsAppCredential waCredential = Boolean.TRUE.equals(notice.getSendWhatsapp())
+                            ? userCredentialService.getWhatsAppCredential(notice.getCreatedBy())
+                                    .orElse(WhatsAppCredential.from(globalWhatsAppProperties))
+                            : null;
                     try {
                         String mobileNumber = noticeScheduleUtil.getMobileNumber(item, mobileColumns);
                         Map<String, Object> props = noticeScheduleUtil.getMapProperties(item,
@@ -315,7 +331,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                                             .props(props)
                                             .config(config)
                                             .build();
-                                    smsSenderService.send(smsData, template);
+                                    smsSenderService.send(smsData, template, smsCredential);
                                 }
                             } catch (Exception e) {
                                 log.error("Error sending SMS for item id {}", item.getId(), e);
@@ -333,7 +349,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                                             .props(props)
                                             .config(config)
                                             .build();
-                                    whatsappSenderService.send(waData, template, attachments);
+                                    whatsappSenderService.send(waData, template, attachments, waCredential);
                                 }
                             } catch (Exception e) {
                                 log.error("Error building WhatsApp data for item id {}", item.getId(), e);
@@ -399,7 +415,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
     }
 
     @Override
-    public void sendSampleNotice(SendSampleNoticeDto request) {
+    public void sendSampleNotice(LoginUserDao sessionUser, SendSampleNoticeDto request) {
         if (request.getProcessSno() == null) {
             throw new IllegalArgumentException("Notice type is required");
         }
@@ -416,6 +432,8 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
         if (Boolean.TRUE.equals(request.getSendSms())) {
             try {
+                SmsCredential smsCredential = userCredentialService.getSmsCredential(sessionUser.getId())
+                        .orElse(SmsCredential.from(globalSmsProperties));
                 List<MasterProcessSmsConfigDetailEntity> smsConfigList = smsConfigRepository
                         .findByProcessIdAndStatus(request.getProcessSno(), 1);
                 if (smsConfigList.isEmpty()) {
@@ -427,7 +445,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                             .props(props)
                             .config(smsConfig)
                             .build();
-                    smsSenderService.send(smsData, template);
+                    smsSenderService.send(smsData, template, smsCredential);
                 }
 
             } catch (Exception e) {
@@ -437,6 +455,8 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
         if (Boolean.TRUE.equals(request.getSendWhatsapp())) {
             try {
+                WhatsAppCredential waCredential = userCredentialService.getWhatsAppCredential(sessionUser.getId())
+                        .orElse(WhatsAppCredential.from(globalWhatsAppProperties));
                 List<MasterProcessWhatsappConfigDetailEntity> waConfigList = whatsappConfigRepository
                         .findByProcessIdAndStatus(request.getProcessSno(), 1);
                 if (waConfigList.isEmpty()) {
@@ -448,7 +468,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                             .props(props)
                             .config(waConfig)
                             .build();
-                    whatsappSenderService.send(waData, template, Collections.emptyList());
+                    whatsappSenderService.send(waData, template, Collections.emptyList(), waCredential);
                 }
             } catch (Exception e) {
                 log.error("Error sending sample WhatsApp notice for processSno {}", request.getProcessSno(), e);

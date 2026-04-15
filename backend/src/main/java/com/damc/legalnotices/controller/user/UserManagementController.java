@@ -1,6 +1,9 @@
 package com.damc.legalnotices.controller.user;
 
 import com.damc.legalnotices.annotation.RequiresAccess;
+import com.damc.legalnotices.dao.DataTableDao;
+import com.damc.legalnotices.dto.user.UserListDto;
+import com.damc.legalnotices.dto.user.UserPasswordUpdateDto;
 import com.damc.legalnotices.dto.user.UserRequestDto;
 import com.damc.legalnotices.dto.user.UserResponseDto;
 import com.damc.legalnotices.dto.user.UserUpdateDto;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,9 +47,10 @@ public class UserManagementController {
         return ResponseEntity.ok(userManagementService.getUserById(baseService.getSessionUser(), id));
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        return ResponseEntity.ok(userManagementService.getAllUsers(baseService.getSessionUser()));
+    @PostMapping("/list")
+    public ResponseEntity<DataTableDao<List<UserResponseDto>>> getAllUsers(
+            @RequestBody UserListDto request) {
+        return ResponseEntity.ok(userManagementService.getAllUsers(baseService.getSessionUser(), request));
     }
 
     @PutMapping("/{id}")
@@ -66,8 +69,14 @@ public class UserManagementController {
 
     @PatchMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(@PathVariable Long id,
-            @RequestParam String newPassword) {
-        userManagementService.changePassword(baseService.getSessionUser(), id, newPassword);
+            @Valid @RequestBody UserPasswordUpdateDto request) {
+        userManagementService.changePassword(baseService.getSessionUser(), id, request.getPassword());
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/toggle-enabled")
+    public ResponseEntity<UserResponseDto> toggleUserStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(userManagementService.toggleUserStatus(baseService.getSessionUser(), id));
+    }
+
 }

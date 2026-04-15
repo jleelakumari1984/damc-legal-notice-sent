@@ -17,7 +17,7 @@
           </div>
 
           <div class="row g-3">
-           
+
 
             <div class="col-md-4">
               <label class="form-label">Sender ID <span class="text-danger">*</span></label>
@@ -68,14 +68,23 @@
                 <label class="form-check-label" for="statusCheck">Active</label>
               </div>
             </div>
-
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Template Content <span class="text-danger">*</span></label>
+                <textarea class="form-control" formControlName="userTemplateContent" rows="5"
+                  [class.is-invalid]="form.get('userTemplateContent')?.invalid && form.get('userTemplateContent')?.touched">
+              </textarea>
+                <div class="invalid-feedback">Required.</div>
+              </div>
+            </div>
             <div class="col-12">
-              <label class="form-label">Template Text <span class="text-danger">*</span></label>
-              <textarea class="form-control" formControlName="templateText" rows="4"
-                [class.is-invalid]="form.get('templateText')?.invalid && form.get('templateText')?.touched">
+              <label class="form-label">Approved Content <span class="text-danger">*</span></label>
+              <textarea class="form-control" formControlName="templateContent" rows="4"
+                [class.is-invalid]="form.get('templateContent')?.invalid && form.get('templateContent')?.touched">
               </textarea>
               <div class="invalid-feedback">Required.</div>
             </div>
+
           </div>
         </div>
 

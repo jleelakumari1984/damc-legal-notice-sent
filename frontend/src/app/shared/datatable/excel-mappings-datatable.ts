@@ -2,13 +2,19 @@ import { environment } from '../../../environments/environment';
 import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeExcelMappingsService } from '../../core/services/notice-excel-mappings.service';
+import { StorageService } from '../../core/services/storage.service';
 
 declare const $: any;
 
-export interface ExcelMappingsTableCallbacks {
-  onEdit: (mapping: any) => void;
-  onDelete: (mapping: any) => void;
-  onError: (message: string) => void; 
+export interface ExcelMappingsTableOptions {
+  processId: number;
+  excelMapService: NoticeExcelMappingsService;
+  storageService: StorageService;
+  callbacks: {
+    onEdit: (mapping: any) => void;
+    onDelete: (mapping: any) => void;
+    onError: (message: string) => void;
+  };
 }
 
 function flagBadge(v: number): string {
@@ -20,22 +26,17 @@ function flagLabel(v: number): string {
 }
 
 export class ExcelMappingsDatatable extends DataTable {
-  constructor(
-    private processId: number,
-    private callbacks: ExcelMappingsTableCallbacks,
-    private excelMapService: NoticeExcelMappingsService
-  ) {
+  constructor(private readonly options: ExcelMappingsTableOptions) {
     super();
   }
 
   build(): object {
-    const processId = this.processId;
-    const callbacks = this.callbacks;
+    const { processId, callbacks, excelMapService, storageService } = this.options;
     return {
       ...BASE_DT_OPTIONS,
 
       ajax: (dtData: object, callback: (data: object) => void) => {
-        this.excelMapService.getByProcessId(processId).subscribe({
+        excelMapService.getByProcessId(processId).subscribe({
           next: (types) => {
             callback({ data: types }); // Load table first, then fetch notices
           },
@@ -49,7 +50,7 @@ export class ExcelMappingsDatatable extends DataTable {
       ajax1: {
         url: `${environment.apiBaseUrl}/excel-mappings?processId=${processId}`,
         dataSrc: '',
-        beforeSend: authBeforeSend()
+        beforeSend: authBeforeSend(storageService)
       },
       columns: [
         { data: 'id', title: '#' },

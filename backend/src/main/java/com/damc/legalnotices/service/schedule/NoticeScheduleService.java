@@ -20,5 +20,5 @@ public interface NoticeScheduleService {
 
         List<ProcessedNoticeItemDao> processPendingNoticeItems();
 
-        void sendSampleNotice(SendSampleNoticeDto request);
+        void sendSampleNotice(LoginUserDao sessionUser, SendSampleNoticeDto request);
 }

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AuthService } from '../../core/services/auth/auth.service';
+import { StorageService } from '../../core/services/storage.service';
+
+declare const $: any;
 
 @Component({
   selector: 'app-auth-layout',
@@ -11,17 +13,25 @@ import { AuthService } from '../../core/services/auth/auth.service';
 export class AuthLayoutComponent {
   userName: string | undefined = undefined;
 
-  constructor(private readonly authService: AuthService, private readonly router: Router) {
-    this.userName = this.authService.getUser()?.displayName;
-
+  constructor(private readonly storageService: StorageService, private readonly router: Router) {
+    this.userName = this.storageService.getUser()?.displayName;
   }
 
   isSuperAdmin(): boolean {
-    return this.authService.isSuperAdmin();
+    return this.storageService.isSuperAdmin();
+  }
+
+  isSuperOrAdmin(): boolean {
+    return this.storageService.isSuperOrAdmin();
+  }
+
+  openSwitchSession(): void {
+    $('#switchSessionModal').modal('show');
   }
 
   logout(): void {
-    this.authService.logout();
+    this.storageService.logout();
     this.router.navigate(['/login']);
   }
 }
+

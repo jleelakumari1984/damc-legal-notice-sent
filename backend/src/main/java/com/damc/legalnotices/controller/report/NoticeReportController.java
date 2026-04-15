@@ -7,8 +7,8 @@ import com.damc.legalnotices.dao.report.NoticeReportDetailDao;
 import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
-import com.damc.legalnotices.dto.report.NoticeSmsLogReportDto;
-import com.damc.legalnotices.dto.report.NoticeWhatsappLogReportDto;
+import com.damc.legalnotices.dto.report.NoticeSmsLogListReportDto;
+import com.damc.legalnotices.dto.report.NoticeWhatsappLogListReportDto;
 import com.damc.legalnotices.dao.report.NoticeReportDao;
 import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.notice.NoticeReportService;
@@ -56,28 +56,28 @@ public class NoticeReportController {
 
     @PostMapping("/sms-logs/{id}")
     public ResponseEntity<DataTableDao<NoticeReportSmsDetailsDao>> getSmsLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeSmsLogReportDto request) {
+            @Valid @RequestBody NoticeSmsLogListReportDto request) {
         request.setAllData(false);
         return ResponseEntity.ok(noticeReportService.getSmsLogs(baseService.getSessionUser(), id, request));
     }
 
     @PostMapping("/error-sms-logs/{id}")
     public ResponseEntity<DataTableDao<NoticeReportSmsDetailsDao>> getSmsErrorLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeSmsLogReportDto request) {
+            @Valid @RequestBody NoticeSmsLogListReportDto request) {
         request.setAllData(false);
         return ResponseEntity.ok(noticeReportService.getSmsErrorLogs(baseService.getSessionUser(), id, request));
     }
 
     @PostMapping("/whats-app-logs/{id}")
     public ResponseEntity<DataTableDao<NoticeReportWhatsappDetailsDao>> getWhatsAppLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeWhatsappLogReportDto request) {
+            @Valid @RequestBody NoticeWhatsappLogListReportDto request) {
         request.setAllData(false);
         return ResponseEntity.ok(noticeReportService.getWhatsAppLogs(baseService.getSessionUser(), id, request));
     }
 
     @PostMapping("/error-whats-app-logs/{id}")
     public ResponseEntity<DataTableDao<NoticeReportWhatsappDetailsDao>> getWhatsAppErrorLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeWhatsappLogReportDto request) {
+            @Valid @RequestBody NoticeWhatsappLogListReportDto request) {
         request.setAllData(false);
         return ResponseEntity.ok(noticeReportService.getWhatsAppErrorLogs(baseService.getSessionUser(), id, request));
     }
@@ -86,7 +86,7 @@ public class NoticeReportController {
 
     @PostMapping("/download-sms-logs/{id}")
     public ResponseEntity<byte[]> downloadSmsLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeSmsLogReportDto request) {
+            @Valid @RequestBody NoticeSmsLogListReportDto request) {
         request.setAllData(true);
         List<SendSmsDao> items = noticeReportService.getSmsLogs(baseService.getSessionUser(), id, request).getData().getItems();
         byte[] csv = csvExportUtil.buildSmsCsv(items, false);
@@ -95,7 +95,7 @@ public class NoticeReportController {
 
     @PostMapping("/download-error-sms-logs/{id}")
     public ResponseEntity<byte[]> downloadErrorSmsLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeSmsLogReportDto request) {
+            @Valid @RequestBody NoticeSmsLogListReportDto request) {
         request.setAllData(true);
         List<SendSmsDao> items = noticeReportService.getSmsErrorLogs(baseService.getSessionUser(), id, request).getData().getItems();
         byte[] csv = csvExportUtil.buildSmsCsv(items, true);
@@ -104,7 +104,7 @@ public class NoticeReportController {
 
     @PostMapping("/download-whats-app-logs/{id}")
     public ResponseEntity<byte[]> downloadWhatsAppLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeWhatsappLogReportDto request) {
+            @Valid @RequestBody NoticeWhatsappLogListReportDto request) {
         request.setAllData(true);
         List<SendWhatsappDao> items = noticeReportService.getWhatsAppLogs(baseService.getSessionUser(), id, request).getData().getItems();
         byte[] csv = csvExportUtil.buildWhatsappCsv(items, false);
@@ -113,7 +113,7 @@ public class NoticeReportController {
 
     @PostMapping("/download-error-whats-app-logs/{id}")
     public ResponseEntity<byte[]> downloadErrorWhatsAppLogs(@PathVariable Long id,
-            @Valid @RequestBody NoticeWhatsappLogReportDto request) {
+            @Valid @RequestBody NoticeWhatsappLogListReportDto request) {
         request.setAllData(true);
         List<SendWhatsappDao> items = noticeReportService.getWhatsAppErrorLogs(baseService.getSessionUser(), id, request).getData().getItems();
         byte[] csv = csvExportUtil.buildWhatsappCsv(items, true);

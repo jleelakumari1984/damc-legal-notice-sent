@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { NoticeTemplateService } from '../../../../core/services/notice-template.service';
-import { WhatsappTemplate, WhatsappUserTemplateRequest, NoticeType } from '../../../../core/models/notices.model';
+import { WhatsappTemplate, WhatsappUserTemplateRequest, NoticeType, TemplateApprovedStatus } from '../../../../core/models/notices.model';
 
 declare const $: any;
 
@@ -18,6 +18,11 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
   form!: FormGroup;
   saving = false;
   errorMessage = '';
+  submittedForApproval = false;
+
+  get isApproved(): boolean {
+    return this.editTemplate?.approveStatus === TemplateApprovedStatus.APPROVED;
+  }
 
   constructor(
     private readonly fb: FormBuilder,
@@ -26,8 +31,7 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      userTemplateContent: ['', [Validators.required]],
-      status: [1]
+      userTemplateContent: ['', [Validators.required]]
     });
   }
 
@@ -36,34 +40,34 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
     if (changes['editTemplate']) {
       const t = changes['editTemplate'].currentValue as WhatsappTemplate | null;
       if (t) {
-        this.form.setValue({
-          userTemplateContent: t.userTemplateContent ?? '',
-          status: t.status ?? 1
-        });
+        this.form.setValue({ userTemplateContent: t.userTemplateContent ?? '' });
       } else {
-        this.form.reset({ userTemplateContent: '', status: 1 });
+        this.form.reset({ userTemplateContent: '' });
       }
       this.errorMessage = '';
+      this.submittedForApproval = false;
     }
   }
 
   open(): void {
+    this.submittedForApproval = false;
     $('#whatsappUserTemplateModal').modal('show');
   }
 
   cancel(): void {
-    this.form.reset({ userTemplateContent: '', status: 1 });
+    this.form.reset({ userTemplateContent: '' });
     this.errorMessage = '';
+    this.submittedForApproval = false;
     $('#whatsappUserTemplateModal').modal('hide');
   }
 
   submit(): void {
-    if (this.form.invalid || !this.noticeType) return;
+    if (this.form.invalid || !this.noticeType || this.isApproved) return;
     const v = this.form.value;
     const request: WhatsappUserTemplateRequest = {
       processId: this.noticeType.id,
       userTemplateContent: v.userTemplateContent.trim(),
-      status: v.status ? 1 : 0
+      status: 0
     };
     this.saving = true;
     this.errorMessage = '';
@@ -74,7 +78,7 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
     call$.subscribe({
       next: () => {
         this.saving = false;
-        $('#whatsappUserTemplateModal').modal('hide');
+        this.submittedForApproval = true;
         this.saved.emit();
       },
       error: () => {

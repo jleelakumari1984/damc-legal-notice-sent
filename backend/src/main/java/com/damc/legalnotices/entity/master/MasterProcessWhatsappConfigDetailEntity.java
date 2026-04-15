@@ -13,12 +13,16 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.damc.legalnotices.entity.user.UserEntity;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "master_process_whatsapp_config_details")
 public class MasterProcessWhatsappConfigDetailEntity {
+    @ManyToOne
+    @JoinColumn(name = "created_by", updatable = false, insertable = false)
+    private UserEntity createdUser;
 
     @Id
     @Column(name = "sno")
@@ -59,4 +63,13 @@ public class MasterProcessWhatsappConfigDetailEntity {
 
     @Column(name = "status")
     private Integer status;
+
+    @Column(name = "approve_status")
+    private Integer approveStatus;
+
+    @Column(name = "approved_by")
+    private Long approvedBy;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
 }

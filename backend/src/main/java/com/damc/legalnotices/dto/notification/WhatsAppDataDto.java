@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.damc.legalnotices.config.WhatsAppProperties;
+import com.damc.legalnotices.config.WhatsAppCredential;
 import com.damc.legalnotices.entity.master.MasterProcessWhatsappConfigDetailEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +48,7 @@ public class WhatsAppDataDto {
         }
     }
 
-    public String getPostData(WhatsAppProperties whatAppConfig) throws JsonProcessingException {
+    public String getPostData(WhatsAppCredential credential) throws JsonProcessingException {
         Hashtable<String, Object> sendObject = new Hashtable<>();
         sendObject.put("token", "********************");
         sendObject.put("phone", getMobileNumber());
@@ -57,7 +57,7 @@ public class WhatsAppDataDto {
         sendObject.put("components", getComponents());
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         setPostMessage(ow.writeValueAsString(sendObject));
-        sendObject.replace("token", whatAppConfig.getAccessToken());
+        sendObject.replace("token", credential.getAccessToken());
         return ow.writeValueAsString(sendObject);
     }
 }

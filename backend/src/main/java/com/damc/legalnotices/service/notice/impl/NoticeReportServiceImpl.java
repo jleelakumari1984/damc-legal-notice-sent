@@ -9,8 +9,8 @@ import com.damc.legalnotices.dao.report.NoticeReportItemDao;
 import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
-import com.damc.legalnotices.dto.report.NoticeSmsLogReportDto;
-import com.damc.legalnotices.dto.report.NoticeWhatsappLogReportDto;
+import com.damc.legalnotices.dto.report.NoticeSmsLogListReportDto;
+import com.damc.legalnotices.dto.report.NoticeWhatsappLogListReportDto;
 import com.damc.legalnotices.entity.view.ScheduleReportViewEntity;
 import com.damc.legalnotices.enums.ProcessingStatus;
 import com.damc.legalnotices.repository.notification.SendErrorSmsDetailRepository;
@@ -90,7 +90,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogListReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
@@ -119,7 +119,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogListReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
@@ -141,7 +141,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
 
         @Override
         public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao  sessionUser, Long noticeId,
-                        NoticeWhatsappLogReportDto request) {
+                        NoticeWhatsappLogListReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
@@ -171,7 +171,7 @@ public class NoticeReportServiceImpl implements NoticeReportService {
 
         @Override
         public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao  sessionUser, Long noticeId,
-                        NoticeWhatsappLogReportDto request) {
+                        NoticeWhatsappLogListReportDto request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
                 Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();

@@ -1,6 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, EMPTY } from 'rxjs';
-import { BASE_DT_OPTIONS, esc, formatDateTime, handleAjaxError, statusBadgeClass } from './datatable.utils';
+import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { SmsLogRequest } from '../../core/models/sms.model';

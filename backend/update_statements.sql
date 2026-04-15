@@ -288,3 +288,64 @@ ALTER TABLE `send_non_loan_whatsapp_details`
 ALTER TABLE `send_non_loan_mail_details`
   ADD COLUMN `updated_by` bigint DEFAULT NULL,
   ADD COLUMN `updated_at` datetime(6) DEFAULT NULL;
+
+-- =============================================================
+-- Process changes: template approval workflow
+-- =============================================================
+
+-- master_process_sms_config_details: add approval columns
+ALTER TABLE `master_process_sms_config_details`
+  ADD COLUMN `approve_status` tinyint DEFAULT NULL,
+  ADD COLUMN `approved_by`    bigint  DEFAULT NULL,
+  ADD COLUMN `approved_at`    datetime(6) DEFAULT NULL;
+
+-- master_process_whatsapp_config_details: add approval columns
+ALTER TABLE `master_process_whatsapp_config_details`
+  ADD COLUMN `approve_status` tinyint DEFAULT NULL,
+  ADD COLUMN `approved_by`    bigint  DEFAULT NULL,
+  ADD COLUMN `approved_at`    datetime(6) DEFAULT NULL;
+
+-- login_details: add can_switch_session flag
+ALTER TABLE `login_details`
+  ADD COLUMN `can_switch_session` tinyint(1) NOT NULL DEFAULT 0;
+
+
+-- -------------------------------------------------------------
+-- user_sms_credentials  (UserSmsCredentialEntity)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `user_sms_credentials` (
+  `id`                 bigint NOT NULL AUTO_INCREMENT,
+  `user_id`            bigint NOT NULL,
+  `url`                varchar(500) NOT NULL,
+  `user_name`          varchar(255) NOT NULL,
+  `password`           varchar(255) NOT NULL,
+  `is_live`            tinyint(1) NOT NULL DEFAULT 0,
+  `test_mobile_number` varchar(20) DEFAULT NULL,
+  `created_by`         bigint DEFAULT NULL,
+  `created_at`         datetime(6) DEFAULT NULL,
+  `updated_by`         bigint DEFAULT NULL,
+  `updated_at`         datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_sms_credentials_user` (`user_id`),
+  CONSTRAINT `fk_user_sms_credentials_user` FOREIGN KEY (`user_id`) REFERENCES `login_details` (`sno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- -------------------------------------------------------------
+-- user_whatsapp_credentials  (UserWhatsAppCredentialEntity)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `user_whatsapp_credentials` (
+  `id`                       bigint NOT NULL AUTO_INCREMENT,
+  `user_id`                  bigint NOT NULL,
+  `url`                      varchar(500) NOT NULL,
+  `access_token`             varchar(500) NOT NULL,
+  `attachment_download_url`  varchar(500) DEFAULT NULL,
+  `is_live`                  tinyint(1) NOT NULL DEFAULT 0,
+  `test_mobile_number`       varchar(20) DEFAULT NULL,
+  `created_by`               bigint DEFAULT NULL,
+  `created_at`               datetime(6) DEFAULT NULL,
+  `updated_by`               bigint DEFAULT NULL,
+  `updated_at`               datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_whatsapp_credentials_user` (`user_id`),
+  CONSTRAINT `fk_user_whatsapp_credentials_user` FOREIGN KEY (`user_id`) REFERENCES `login_details` (`sno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

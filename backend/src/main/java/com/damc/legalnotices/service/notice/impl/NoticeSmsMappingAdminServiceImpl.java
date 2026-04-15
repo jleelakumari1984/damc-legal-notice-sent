@@ -1,18 +1,24 @@
 package com.damc.legalnotices.service.notice.impl;
 
 import com.damc.legalnotices.config.LocationProperties;
+import com.damc.legalnotices.dao.DataTableDao;
+import com.damc.legalnotices.dao.notice.SmsPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.notice.NoticeSmsConfigDto;
+import com.damc.legalnotices.dto.notice.NoticeSmsPendingDto;
 import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
 import com.damc.legalnotices.repository.master.MasterProcessSmsConfigDetailRepository;
 import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
+import com.damc.legalnotices.enums.TemplateApproveStatus;
 import com.damc.legalnotices.service.notice.NoticeSmsMappingAdminService;
 import com.damc.legalnotices.util.converter.NoticeMappingEntityDaoConverter;
 import com.damc.legalnotices.util.validator.NoticeSmsMappingValidationUtil;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -68,6 +74,8 @@ public class NoticeSmsMappingAdminServiceImpl implements NoticeSmsMappingAdminSe
         entity.setDcs(request.getDcs());
         entity.setFlashSms(request.getFlashSms());
         entity.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        entity.setApproveStatus(TemplateApproveStatus.APPROVED.getValue());
+        entity.setApprovedBy(sessionUser.getId());
         entity.setCreatedBy(sessionUser.getId());
         return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity));
     }
@@ -104,6 +112,23 @@ public class NoticeSmsMappingAdminServiceImpl implements NoticeSmsMappingAdminSe
             throw new IllegalArgumentException("SMS config not found with id: " + id);
         }
         smsConfigRepository.deleteById(id);
+    }
+
+    @Override
+    public DataTableDao<List<SmsPendingTemplateDao>> getPendingTemplates(LoginUserDao sessionUser,
+            NoticeSmsPendingDto request) {
+        if (sessionUser.isAdmin()) {
+
+            Page<MasterProcessSmsConfigDetailEntity> page = smsConfigRepository.findPendingTemplates(request.getPagination());
+
+            return DataTableDao.<List<SmsPendingTemplateDao>>builder().draw(request.getDraw())
+                    .recordsTotal(page.getTotalElements())
+                    .recordsFiltered(page.getNumberOfElements())
+                    .data(page.getContent().stream().map(entityDaoConverter::toSmsPendingTemplateDao).toList())
+                    .build();
+        }
+        return DataTableDao.<List<SmsPendingTemplateDao>>builder().data(List.of()).build();
+
     }
 
 }

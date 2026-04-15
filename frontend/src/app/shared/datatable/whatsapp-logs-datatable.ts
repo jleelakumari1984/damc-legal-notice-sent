@@ -1,5 +1,5 @@
 import { environment } from '../../../environments/environment';
-import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
+import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { WhatsappLogRequest } from '../../core/models/whatsapp.model';

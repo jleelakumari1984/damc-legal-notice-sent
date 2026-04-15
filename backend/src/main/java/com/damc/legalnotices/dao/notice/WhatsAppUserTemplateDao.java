@@ -12,5 +12,6 @@ public class WhatsAppUserTemplateDao {
     private Long processId;
     private String userTemplateContent;
     private Integer status;
+    private Integer approveStatus;
     private LocalDateTime createdAt;
 }

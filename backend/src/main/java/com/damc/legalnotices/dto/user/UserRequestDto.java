@@ -15,9 +15,6 @@ public class UserRequestDto {
     @Size(max = 100)
     private String displayName;
 
-    @Size(max = 20)
-    private String userCode;
-
     @NotBlank
     @Size(min = 3, max = 50)
     private String loginName;

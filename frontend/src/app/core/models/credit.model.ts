@@ -1,3 +1,4 @@
+import { PaginatedRequest } from "./datatable.model";
 
 export interface Credit {
     id: number;
@@ -19,4 +20,8 @@ export interface CreditRequest {
     pricePerUnit: number;
     type: string;
     description: string;
+}
+
+export interface CreditPaginatedRequest extends PaginatedRequest {
+    userid?: number;
 }

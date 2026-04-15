@@ -4,6 +4,7 @@ import { DatatableHelper } from '../../../../shared/datatable/datatable.helper';
 import { ExcelMappingsDatatable } from '../../../../shared/datatable/excel-mappings-datatable';
 import { NoticeExcelMappingsService } from '../../../../core/services/notice-excel-mappings.service';
 import { NoticeExcelMappingResponse, NoticeType } from '../../../../core/models/notices.model';
+import { StorageService } from '../../../../core/services/storage.service';
 
 @Component({
   selector: 'app-excel-mappings-list',
@@ -26,7 +27,8 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
   constructor(
     private readonly mappingsService: NoticeExcelMappingsService,
     private readonly datatableHelper: DatatableHelper,
-    private readonly excelMapService: NoticeExcelMappingsService
+    private readonly excelMapService: NoticeExcelMappingsService,
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit(): void {
@@ -47,18 +49,19 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
 
   loadMappings(): void {
     if (!this.selectedNotice) return;
-    this.datatableHelper.initTable('#mappingsTable', new ExcelMappingsDatatable(
-      this.selectedNotice.id,
-      {
+    this.datatableHelper.initTable('#mappingsTable', new ExcelMappingsDatatable({
+      processId: this.selectedNotice.id,
+      excelMapService: this.excelMapService,
+      storageService: this.storageService,
+      callbacks: {
         onEdit: (mapping) => {
           this.editMapping = mapping;
           this.editRequested.emit(mapping);
         },
         onDelete: (mapping) => this.confirmDelete(mapping),
         onError: (message) => this.errorMessage = message
-      },
-      this.excelMapService
-    ));
+      }
+    }));
     this.tableInitialized = true;
   }
 

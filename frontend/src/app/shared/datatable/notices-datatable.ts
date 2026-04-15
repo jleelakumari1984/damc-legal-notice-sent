@@ -1,5 +1,5 @@
 import { environment } from '../../../environments/environment';
-import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
+import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { SendNoticesService } from '../../core/services/send-notices.service';
 import { NoticeService } from '../../core/services/notice.service';
@@ -7,11 +7,14 @@ import { NoticeReportRequest } from '../../core/models/report.notice';
 
 declare const $: any;
 
-export interface NoticesTableCallbacks {
-  onSmsConfig: (notice: any) => void;
-  onWhatsappConfig: (notice: any) => void;
-  onExcelConfig: (notice: any) => void;
-  onError: (message: string) => void;
+export interface NoticesTableOptions {
+  service: NoticeService;
+  callbacks: {
+    onSmsConfig: (notice: any) => void;
+    onWhatsappConfig: (notice: any) => void;
+    onExcelConfig: (notice: any) => void;
+    onError: (message: string) => void;
+  };
 }
 
 function statusBadge(status: string): string {
@@ -26,12 +29,12 @@ function statusBadge(status: string): string {
 }
 
 export class NoticesDatatable extends DataTable {
-  constructor(private callbacks: NoticesTableCallbacks, private readonly service: NoticeService) {
+  constructor(private readonly options: NoticesTableOptions) {
     super();
   }
 
   build(): object {
-    const callbacks = this.callbacks;
+    const { callbacks, service } = this.options;
     return {
       ...BASE_DT_OPTIONS,
       ajax: (dtParams: any, callback: (data: object) => void) => {
@@ -54,7 +57,7 @@ export class NoticesDatatable extends DataTable {
           dtLength: length,
           dtDraw: dtParams.draw,
         }
-        this.service.getNoticeTypes(request).subscribe({
+        service.getNoticeTypes(request).subscribe({
           next: (logs) => {
             callback({ draw: logs.draw, recordsTotal: logs.recordsTotal, recordsFiltered: logs.recordsFiltered, data: logs.data });
           },
@@ -75,17 +78,17 @@ export class NoticesDatatable extends DataTable {
         },
 
         {
-          data: 'excelMapCount', title: 'Mapped Excel Fields', className: 'text-nowrap',
+          data: 'excelMapCount', title: 'Active Excel Fields', className: 'text-nowrap',
           render: (d: string, t: string) =>
             t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
-          data: 'smsMapCount', title: 'Mapped SMS Templates', className: 'text-nowrap',
+          data: 'smsMapCount', title: 'Active SMS Templates', className: 'text-nowrap',
           render: (d: string, t: string) =>
             t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
-          data: 'whatsappMapCount', title: 'Mapped WhatsApp Templates', className: 'text-nowrap',
+          data: 'whatsappMapCount', title: 'Active WhatsApp Templates', className: 'text-nowrap',
           render: (d: string, t: string) =>
             t === 'display' ? `<button class="btn btn-outline-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },

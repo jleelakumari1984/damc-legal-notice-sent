@@ -1,12 +1,14 @@
 package com.damc.legalnotices.dto.user;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+
+import com.damc.legalnotices.enums.CreditChannelType;
+import com.damc.legalnotices.enums.CreditTransactionType;
 
 @Getter
 @Setter
@@ -15,8 +17,8 @@ public class CreditAdjustDto {
     @NotNull
     private Long userId;
 
-    @NotBlank
-    private String channel;
+    @NotNull
+    private CreditChannelType channel;
 
     @NotNull
     @Min(1)
@@ -24,8 +26,8 @@ public class CreditAdjustDto {
 
     private BigDecimal pricePerUnit;
 
-    @NotBlank
-    private String type;
+    @NotNull
+    private CreditTransactionType type;
 
     private String description;
 }

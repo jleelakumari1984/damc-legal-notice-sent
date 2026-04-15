@@ -8,39 +8,67 @@
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="modal-body">
           <div class="row g-3">
+
             <div class="col-md-6">
-              <label class="form-label">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" formControlName="name" placeholder="Full name"
-                [class.is-invalid]="form.get('name')!.invalid && form.get('name')!.touched" />
-              <div class="invalid-feedback">Name is required.</div>
+              <label class="form-label">Display Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="displayName" placeholder="Full name"
+                [class.is-invalid]="form.get('displayName')!.invalid && form.get('displayName')!.touched" />
+              <div class="invalid-feedback">Display name is required.</div>
             </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Login Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="loginName" placeholder="Username"
+                [class.is-invalid]="form.get('loginName')!.invalid && form.get('loginName')!.touched" />
+              <div class="invalid-feedback">Login name is required.</div>
+            </div>
+
+            <div class="col-md-6" *ngIf="!isEditing">
+              <label class="form-label">Password <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" formControlName="password" placeholder="Min. 6 characters"
+                [class.is-invalid]="form.get('password')!.invalid && form.get('password')!.touched" />
+              <div class="invalid-feedback">Password must be at least 6 characters.</div>
+            </div>
+
             <div class="col-md-6">
               <label class="form-label">Email <span class="text-danger">*</span></label>
-              <input type="email" class="form-control" formControlName="email" placeholder="email@example.com"
-                [class.is-invalid]="form.get('email')!.invalid && form.get('email')!.touched" />
+              <input type="email" class="form-control" formControlName="userEmail" placeholder="email@example.com"
+                [class.is-invalid]="form.get('userEmail')!.invalid && form.get('userEmail')!.touched" />
               <div class="invalid-feedback">Valid email is required.</div>
             </div>
-            <div class="col-md-4">
-              <label class="form-label">Mobile <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" formControlName="mobile" placeholder="10-digit mobile"
-                [class.is-invalid]="form.get('mobile')!.invalid && form.get('mobile')!.touched" />
+
+            <div class="col-md-6">
+              <label class="form-label">SMS Mobile <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="userMobileSms" placeholder="10-digit mobile"
+                [class.is-invalid]="form.get('userMobileSms')!.invalid && form.get('userMobileSms')!.touched" />
               <div class="invalid-feedback">Enter a valid 10-digit mobile number.</div>
             </div>
-            <div class="col-md-4">
-              <label class="form-label">Role <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="role">
-                <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+
+            <div class="col-md-6">
+              <label class="form-label">WhatsApp Mobile</label>
+              <input type="text" class="form-control" formControlName="userMobileWhatsapp" placeholder="10-digit mobile"
+                [class.is-invalid]="form.get('userMobileWhatsapp')!.invalid && form.get('userMobileWhatsapp')!.touched" />
+              <div class="invalid-feedback">Enter a valid 10-digit mobile number.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Access Level <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="accessLevel">
+                <option *ngFor="let a of accessLevels" [value]="a.value">{{ a.label }}</option>
               </select>
             </div>
-            <div class="col-md-4">
-              <label class="form-label">Status <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="status">
-                <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-              </select>
+
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" formControlName="enabled" id="enabledToggle" />
+                <label class="form-check-label" for="enabledToggle">Enabled</label>
+              </div>
             </div>
+
             <div *ngIf="errorMessage" class="col-12">
               <div class="alert alert-danger mb-0">{{ errorMessage }}</div>
             </div>
+
           </div>
         </div>
         <div class="modal-footer">

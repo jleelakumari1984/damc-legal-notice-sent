@@ -4,9 +4,11 @@ import { NoticeTemplateService } from '../../../core/services/notice-template.se
 import { SmsTemplate, NoticeType } from '../../../core/models/notices.model';
 import { SmsTemplateFormComponent } from './sms-template-form/sms-template-form.component';
 import { SmsTemplateFormUserComponent } from './sms-template-form-user/sms-template-form-user.component';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { SmsTemplateViewComponent } from './sms-template-view/sms-template-view.component';
+import { StorageService } from '../../../core/services/storage.service';
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { SmsTemplatesDatatable } from '../../../shared/datatable/sms-templates-datatable';
+import { ConfirmModalService } from '../../../shared/confirm-modal/confirm-modal.service';
 
 @Component({
   selector: 'app-sms-template',
@@ -15,10 +17,11 @@ import { SmsTemplatesDatatable } from '../../../shared/datatable/sms-templates-d
 export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(SmsTemplateFormComponent) adminForm?: SmsTemplateFormComponent;
   @ViewChild(SmsTemplateFormUserComponent) userForm?: SmsTemplateFormUserComponent;
+  @ViewChild(SmsTemplateViewComponent) viewComp?: SmsTemplateViewComponent;
 
   @Input() selectedNotice: NoticeType | null = null;
-  @Output() onClose = new EventEmitter<void>();
-
+  @Output() onClose = new EventEmitter<boolean>();
+  changeTemplate = false;
   editTemplate: SmsTemplate | null = null;
   successMessage = '';
   errorMessage = '';
@@ -27,12 +30,13 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private readonly service: NoticeTemplateService,
-    private readonly authService: AuthService,
-    private readonly dtHelper: DatatableHelper
+    private readonly storageService: StorageService,
+    private readonly dtHelper: DatatableHelper,
+    private readonly confirmService: ConfirmModalService
   ) { }
 
   get isSuperAdmin(): boolean {
-    return this.authService.isSuperAdmin();
+    return this.storageService.isSuperAdmin();
   }
 
   ngOnInit(): void {
@@ -43,7 +47,7 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedNotice'] && this.selectedNotice) {
-      this.initTable();
+      //this.initTable();
     }
   }
 
@@ -57,9 +61,14 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
       processId: this.selectedNotice.id,
       isSuperAdmin: this.isSuperAdmin,
       service: this.service,
-      onEdit: (t) => this.openEditForm(t),
-      onDelete: (t) => this.confirmDelete(t),
-      onError: (msg) => { this.errorMessage = msg; }
+      storageService: this.storageService,
+      callbacks: {
+        onEdit: (t) => this.openEditForm(t),
+        onView: (t) => this.viewComp?.open(t),
+        onToggle: (t) => this.toggleStatus(t),
+        onError: (msg) => { this.errorMessage = msg; }
+      }
+
     });
     setTimeout(() => this.dtHelper.initTable(this.tableId, dt));
   }
@@ -88,24 +97,32 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  confirmDelete(template: SmsTemplate): void {
-    if (!confirm(`Delete SMS template "${template.templateId || template.senderId}"?`)) return;
-    this.errorMessage = '';
-    this.service.deleteSmsTemplate(template.id).subscribe({
-      next: () => {
-        this.successMessage = 'Template deleted.';
-        this.reloadTable();
-      },
-      error: () => {
-        this.errorMessage = 'Failed to delete template.';
-      }
-    });
-  }
-
   onSaved(): void {
     this.successMessage = this.editTemplate ? 'Template updated.' : 'Template created.';
     this.editTemplate = null;
+    this.changeTemplate = true;
     this.reloadTable();
+  }
+
+  toggleStatus(template: SmsTemplate): void {
+    const action = template.status === 1 ? 'disable' : 'enable';
+    this.confirmService.confirm({
+      title: `${template.status === 1 ? 'Disable' : 'Enable'} Template`,
+      message: `Are you sure you want to ${action} this SMS template?`,
+      confirmLabel: template.status === 1 ? 'Disable' : 'Enable',
+      confirmClass: template.status === 1 ? 'btn-warning' : 'btn-success'
+    }).then((confirmed) => {
+      if (!confirmed) return;
+      this.clearMessages();
+      this.service.toggleSmsTemplateStatus(template.id).subscribe({
+        next: () => {
+          this.successMessage = `Template ${action}d successfully.`;
+          this.changeTemplate = true;
+          this.reloadTable();
+        },
+        error: () => { this.errorMessage = `Failed to ${action} template.`; }
+      });
+    });
   }
 
   private clearMessages(): void {

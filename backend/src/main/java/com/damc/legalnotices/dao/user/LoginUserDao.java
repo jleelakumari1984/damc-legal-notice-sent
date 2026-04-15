@@ -18,8 +18,13 @@ public class LoginUserDao {
     private String mobileSms;
     private String mobileWhatsapp;
     private Long accessLevel;
+    private Boolean canSwitchSession;
 
     public boolean isSuperAdmin() {
         return accessLevel != null && accessLevel == UserAccessLevelEnum.SUPER_ADMIN.getLevel();
+    }
+
+    public boolean isAdmin() {
+        return accessLevel != null && accessLevel <= UserAccessLevelEnum.ADMIN.getLevel();
     }
 }

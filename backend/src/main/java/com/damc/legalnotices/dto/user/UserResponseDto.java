@@ -16,5 +16,12 @@ public class UserResponseDto {
     private String userMobileWhatsapp;
     private Long accessLevel;
     private Boolean enabled;
+    private LocalDateTime createdAt;
     private LocalDateTime lastLoginDate;
+    @Builder.Default
+    private Long smsCredits = 0L;
+    @Builder.Default
+    private Long whatsappCredits = 0L;
+    @Builder.Default
+    private Long mailCredits = 0L;
 }

@@ -1,6 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ProcessingStatus } from "../../core/models/schedule.model";
+import { StorageService } from "../../core/services/storage.service";
 
 /** Escape HTML special characters to prevent XSS in rendered cell content. */
 export function esc(v: unknown): string {
@@ -14,10 +15,19 @@ export function esc(v: unknown): string {
 /** Format ISO date string as "dd MMM yyyy" (e.g. "11 Apr 2026"). */
 export function formatDate(d: string): string {
   if (!d) return '-';
-  const dt = new Date(d);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${String(dt.getDate()).padStart(2, '0')} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
+
+  try {
+    const date = new Date(d);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+    const datePipe = new DatePipe('en-US');
+    const dateFormat = datePipe.transform(date, 'dd/MM/yyyy');
+    return dateFormat || '';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
 }
 
 /** Format ISO date string as "dd MMM yyyy, hh:mm AM/PM" (e.g. "11 Apr 2026, 02:30 PM"). */
@@ -39,9 +49,9 @@ export function formatDateTime(d: string): string {
 }
 
 /** Returns a jQuery beforeSend callback that injects the JWT auth header. */
-export function authBeforeSend(): (xhr: XMLHttpRequest) => void {
+export function authBeforeSend(storageService: StorageService): (xhr: XMLHttpRequest) => void {
   return (xhr: XMLHttpRequest) => {
-    const token = localStorage.getItem('damc_token');
+    const token = storageService.getToken();
     if (token) {
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
     }

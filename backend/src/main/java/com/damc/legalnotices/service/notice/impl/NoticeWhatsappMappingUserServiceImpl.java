@@ -8,6 +8,7 @@ import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
 import com.damc.legalnotices.entity.master.MasterProcessWhatsappConfigDetailEntity;
 import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
 import com.damc.legalnotices.repository.master.MasterProcessWhatsappConfigDetailRepository;
+import com.damc.legalnotices.enums.TemplateApproveStatus;
 import com.damc.legalnotices.service.notice.NoticeWhatsappMappingUserService;
 import com.damc.legalnotices.util.converter.NoticeMappingEntityDaoConverter;
 import com.damc.legalnotices.util.validator.NoticeWhatsappMappingValidationUtil;
@@ -43,6 +44,7 @@ public class NoticeWhatsappMappingUserServiceImpl implements NoticeWhatsappMappi
         entity.setProcess(process);
         entity.setUserTemplatePath(relativeUserPath);
         entity.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        entity.setApproveStatus(TemplateApproveStatus.PENDING.getValue());
         entity.setCreatedBy(sessionUser.getId());
         return entityDaoConverter.toWhatsAppUserTemplateDao(whatsappConfigRepository.save(entity));
     }
@@ -60,6 +62,9 @@ public class NoticeWhatsappMappingUserServiceImpl implements NoticeWhatsappMappi
         Files.writeString(userTemplatePath, request.getUserTemplateContent());
         entity.setProcess(process);
         entity.setStatus(request.getStatus());
+        if (Integer.valueOf(TemplateApproveStatus.REJECTED.getValue()).equals(entity.getApproveStatus())) {
+            entity.setApproveStatus(TemplateApproveStatus.PENDING.getValue());
+        }
         entity.setUpdatedBy(sessionUser.getId());
         return entityDaoConverter.toWhatsAppUserTemplateDao(whatsappConfigRepository.save(entity));
     }

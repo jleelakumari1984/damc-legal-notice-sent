@@ -21,6 +21,7 @@ export class NoticeComponent implements AfterViewInit {
   deletingId: number | null = null;
   actionId: number | null = null;
 
+  private readonly tableId = "#noticesTable";
   successMessage = '';
   errorMessage = '';
 
@@ -34,17 +35,20 @@ export class NoticeComponent implements AfterViewInit {
   }
 
   private initTable(): void {
-    this.datatableHelper.initTable('#noticesTable', new NoticesDatatable({
-      onSmsConfig: (notice) => this.openSmsConfig(notice),
-      onWhatsappConfig: (notice) => this.openWhatsappConfig(notice),
-      onExcelConfig: (notice) => this.openExcelConfig(notice),
-      onError: (msg) => this.errorMessage = msg
-    }, this.service));
+    this.datatableHelper.initTable(this.tableId, new NoticesDatatable({
+      service: this.service,
+      callbacks: {
+        onSmsConfig: (notice) => this.openSmsConfig(notice),
+        onWhatsappConfig: (notice) => this.openWhatsappConfig(notice),
+        onExcelConfig: (notice) => this.openExcelConfig(notice),
+        onError: (msg) => this.errorMessage = msg
+      }
+    }));
   }
 
   reload(): void {
     this.clearMessages();
-    this.datatableHelper.reload('#noticesTable');
+    this.datatableHelper.reload(this.tableId);
   }
 
   openAddModal(): void {
@@ -62,7 +66,7 @@ export class NoticeComponent implements AfterViewInit {
   onSaved(): void {
     this.successMessage = this.editNotice ? 'Notice updated.' : 'Notice created.';
     this.editNotice = null;
-    this.datatableHelper.reload('#noticesTable');
+    this.datatableHelper.reload(this.tableId);
   }
 
   openWhatsappConfig(notice: NoticeType): void {
@@ -71,14 +75,20 @@ export class NoticeComponent implements AfterViewInit {
     this.clearMessages();
   }
 
-  closeSmsTemplate(): void {
+  closeSmsTemplate($event: boolean): void {
     this.editNotice = null;
     this.actionType = 'display';
+    if ($event) {
+      this.datatableHelper.reload(this.tableId);
+    }
   }
 
-  closeWhatsappTemplate(): void {
+  closeWhatsappTemplate($event: boolean): void {
     this.editNotice = null;
     this.actionType = 'display';
+    if ($event) {
+      this.datatableHelper.reload(this.tableId);
+    }
   }
 
   openExcelConfig(notice: NoticeType): void {

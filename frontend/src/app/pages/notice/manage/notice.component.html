@@ -40,7 +40,7 @@
   (onClose)="closeNoticeMapping()"></app-notice-excel-mappings>
 
 <app-sms-template *ngIf="actionType === 'sms'" [selectedNotice]="editNotice"
-  (onClose)="closeSmsTemplate()"></app-sms-template>
+  (onClose)="closeSmsTemplate($event)"></app-sms-template>
 
 <app-whatsapp-template *ngIf="actionType === 'whatsapp'" [selectedNotice]="editNotice"
-  (onClose)="closeWhatsappTemplate()"></app-whatsapp-template>
+  (onClose)="closeWhatsappTemplate($event)"></app-whatsapp-template>

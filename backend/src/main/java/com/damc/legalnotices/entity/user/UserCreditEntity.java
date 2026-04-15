@@ -30,7 +30,7 @@ public class UserCreditEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private LoginDetailEntity user;
+    private UserEntity user;
 
     @Column(name = "sms_credits", nullable = false)
     private Long smsCredits = 0L;

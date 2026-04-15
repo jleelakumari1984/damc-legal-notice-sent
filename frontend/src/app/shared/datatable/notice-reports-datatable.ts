@@ -1,5 +1,5 @@
 import { environment } from '../../../environments/environment';
-import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
+import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { ProcessingStatus } from '../../core/models/schedule.model';
@@ -7,20 +7,23 @@ import { NoticeReportRequest, NoticeReportSummary } from '../../core/models/repo
 
 declare const $: any;
 
-export interface NoticeReportsTableCallbacks {
-  onViewDetail: (id: NoticeReportSummary, status: string, itemCount: number) => void;
-  onSmsDetail: (id: NoticeReportSummary) => void;
-  onWhatsappDetail: (id: NoticeReportSummary) => void;
-  onError: (message: string) => void;
+export interface NoticeReportsTableOptions {
+  service: NoticeReportsService;
+  callbacks: {
+    onViewDetail: (id: NoticeReportSummary, status: string, itemCount: number) => void;
+    onSmsDetail: (id: NoticeReportSummary) => void;
+    onWhatsappDetail: (id: NoticeReportSummary) => void;
+    onError: (message: string) => void;
+  };
 }
 
 export class NoticeReportsDatatable extends DataTable {
-  constructor(private callbacks: NoticeReportsTableCallbacks, private service: NoticeReportsService) {
+  constructor(private readonly options: NoticeReportsTableOptions) {
     super();
   }
 
   build(): object {
-    const callbacks = this.callbacks;
+    const { callbacks, service } = this.options;
     return {
       ...BASE_DT_OPTIONS,
       ajax: (dtParams: any, callback: (data: object) => void) => {
@@ -43,7 +46,7 @@ export class NoticeReportsDatatable extends DataTable {
           dtLength: length,
           dtDraw: dtParams.draw,
         }
-        this.service.getAll(request).subscribe({
+        service.getAll(request).subscribe({
           next: (reports) => {
             callback({ data: reports }); // Load table first, then fetch notices
           },

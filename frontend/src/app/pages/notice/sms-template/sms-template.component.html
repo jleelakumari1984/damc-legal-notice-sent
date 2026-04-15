@@ -5,7 +5,7 @@
       <button class="btn btn-brand btn-sm" (click)="openAddForm()" *ngIf="selectedNotice">
         + Add Template
       </button>
-      <button class="btn btn-secondary btn-sm" (click)="onClose.emit()">Close</button>
+      <button class="btn btn-secondary btn-sm" (click)="onClose.emit(changeTemplate)">Close</button>
     </div>
   </div>
 
@@ -35,3 +35,5 @@
 
 <app-sms-template-form-user *ngIf="!isSuperAdmin" [editTemplate]="editTemplate" [noticeType]="selectedNotice"
   (saved)="onSaved()"></app-sms-template-form-user>
+
+<app-sms-template-view></app-sms-template-view>

@@ -39,11 +39,14 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
 
   private initTable(): void {
     this.datatableHelper.initTable('#noticesTable', new NoticeReportsDatatable({
-      onViewDetail: (id, status, itemCount) => this.viewDetail(id, status, itemCount),
-      onSmsDetail: (id) => this.viewSmsLogs(id),
-      onWhatsappDetail: (id) => this.viewWhatsappLogs(id),
-      onError: (msg) => this.errorMessage = msg
-    }, this.service));
+      service: this.service,
+      callbacks: {
+        onViewDetail: (id, status, itemCount) => this.viewDetail(id, status, itemCount),
+        onSmsDetail: (id) => this.viewSmsLogs(id),
+        onWhatsappDetail: (id) => this.viewWhatsappLogs(id),
+        onError: (msg) => this.errorMessage = msg
+      }
+    }));
   }
   viewSmsLogs(selectedNotice: NoticeReportSummary): void {
     if (this.actionType === 'sms' && ((this.selectedReport && this.selectedReport.id === selectedNotice.id))) {

@@ -2,8 +2,8 @@ package com.damc.legalnotices.config.security;
 
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dao.user.SessionUserDao;
-import com.damc.legalnotices.entity.user.LoginDetailEntity;
-import com.damc.legalnotices.repository.user.LoginDetailRepository;
+import com.damc.legalnotices.entity.user.UserEntity;
+import com.damc.legalnotices.repository.user.UserRepository;
 import com.damc.legalnotices.util.converter.EntityDaoConverter;
 
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final LoginDetailRepository loginDetailRepository;
+    private final UserRepository userRepository;
     private final EntityDaoConverter entityDaoConverter;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        LoginDetailEntity user = loginDetailRepository.findByLoginNameAndEnabledTrue(username)
+        UserEntity user = userRepository.findByLoginNameAndEnabledTrue(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid username"));
 
         

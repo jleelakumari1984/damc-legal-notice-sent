@@ -1,0 +1,96 @@
+<div class="modal fade" id="smsApprovalModal" tabindex="-1" aria-labelledby="smsApprovalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="smsApprovalModalLabel">
+          <i class="fa fa-sms me-2"></i>{{ isReject ? 'Reject' : 'Approve' }} SMS Template
+        </h5>
+        <button type="button" class="btn-close" (click)="cancel()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+        </div>
+
+        <div *ngIf="template" class="alert alert-light border mb-3">
+          <strong>Notice Name:</strong> {{ template.processName }}<br>
+          <strong>User Template:</strong>
+          <p class="mb-0 mt-1 text-break">{{ template.userTemplateContent }}</p>
+        </div>
+
+        <!-- Reject form -->
+        <form *ngIf="isReject" [formGroup]="rejectForm">
+          <div class="mb-3">
+            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+            <textarea class="form-control" formControlName="rejectionReason" rows="3"
+              [class.is-invalid]="rejectForm.get('rejectionReason')?.invalid && rejectForm.get('rejectionReason')?.touched">
+            </textarea>
+            <div class="invalid-feedback">Required.</div>
+          </div>
+        </form>
+
+        <!-- Approve form -->
+        <form *ngIf="!isReject" [formGroup]="approveForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Sender ID <span class="text-danger">*</span></label>
+              <input class="form-control" formControlName="senderId"
+                [class.is-invalid]="approveForm.get('senderId')?.invalid && approveForm.get('senderId')?.touched">
+              <div class="invalid-feedback">Required.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Template ID <span class="text-danger">*</span></label>
+              <input class="form-control" formControlName="templateId"
+                [class.is-invalid]="approveForm.get('templateId')?.invalid && approveForm.get('templateId')?.touched">
+              <div class="invalid-feedback">Required.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">PEID</label>
+              <input class="form-control" formControlName="peid">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Route ID</label>
+              <input class="form-control" formControlName="routeId">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Channel</label>
+              <input class="form-control" formControlName="channel">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">DCS</label>
+              <input class="form-control" type="number" formControlName="dcs">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Flash SMS</label>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" formControlName="flashSms" id="flashSmsApprovedCheck"
+                  [value]="1" [checked]="approveForm.get('flashSms')?.value === 1"
+                  (change)="approveForm.get('flashSms')?.setValue($any($event.target).checked ? 1 : 0)">
+                <label class="form-check-label" for="flashSmsApprovedCheck">Yes</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Template Content (DLT) <span class="text-danger">*</span></label>
+              <textarea class="form-control" formControlName="templateContent" rows="4"
+                [class.is-invalid]="approveForm.get('templateContent')?.invalid && approveForm.get('templateContent')?.touched">
+              </textarea>
+              <div class="invalid-feedback">Required.</div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn" [class.btn-danger]="isReject" [class.btn-success]="!isReject"
+          [disabled]="saving || (isReject ? rejectForm.invalid : approveForm.invalid)"
+          (click)="submit()">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isReject ? 'Reject' : 'Approve' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,15 +2,15 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 
-import { AuthService } from '../services/auth/auth.service';
+import { StorageService } from '../services/storage.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly storageService: StorageService) { }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getToken();
-    const tokenExpired = this.authService.isTokenExpired();
+    const token = this.storageService.getToken();
+    const tokenExpired = this.storageService.isTokenExpired();
     if (!token || tokenExpired) {
       return next.handle(req);
     }
@@ -26,7 +26,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     if (error.status === 401) {
-      // this.authService.logout();
+      // this.storageService.logout();
     }
     return throwError(() => error);
   }

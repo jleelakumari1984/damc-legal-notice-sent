@@ -73,6 +73,8 @@ export interface SmsTemplate {
     dcs: number;
     flashSms: number;
     status: number;
+    approveStatus: number;
+    rejectionReason?: string;
     createdAt: string;
 }
 
@@ -92,7 +94,24 @@ export interface SmsTemplateRequest extends SmsUserTemplateRequest {
     dcs: number;
     flashSms: number;
 }
-
+export interface SmsPendingTemplateRequest extends PaginatedRequest {
+}
+export interface SmsPendingTemplate {
+    id: number;
+    processName: string;
+    userName: string;
+    userTemplateContent: string;
+    createdAt: string;
+}
+export interface WhatsappPendingTemplateRequest extends PaginatedRequest {
+}
+export interface WhatsappPendingTemplate {
+    id: number;
+    processName: string;
+    userName: string;
+    userTemplateContent: string;
+    createdAt: string;
+}
 export interface WhatsappTemplate {
     id: number;
     processId: number;
@@ -102,6 +121,8 @@ export interface WhatsappTemplate {
     templateContent: string;
     templateLang: string;
     status: number;
+    approveStatus: number;
+    rejectionReason?: string;
     createdAt: string;
 }
 
@@ -115,4 +136,10 @@ export interface WhatsappTemplateRequest extends WhatsappUserTemplateRequest {
     templateName: string;
     templateContent: string;
     templateLang: string;
+}
+
+export enum TemplateApprovedStatus {
+    PENDING = 0,
+    APPROVED = 1,
+    REJECT = 3
 }

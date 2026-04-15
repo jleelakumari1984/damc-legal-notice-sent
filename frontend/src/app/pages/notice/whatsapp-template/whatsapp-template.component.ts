@@ -4,9 +4,11 @@ import { NoticeTemplateService } from '../../../core/services/notice-template.se
 import { WhatsappTemplate, NoticeType } from '../../../core/models/notices.model';
 import { WhatsappTemplateFormComponent } from './whatsapp-template-form/whatsapp-template-form.component';
 import { WhatsappTemplateFormUserComponent } from './whatsapp-template-form-user/whatsapp-template-form-user.component';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { WhatsappTemplateViewComponent } from './whatsapp-template-view/whatsapp-template-view.component';
+import { StorageService } from '../../../core/services/storage.service';
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { WhatsappTemplatesDatatable } from '../../../shared/datatable/whatsapp-templates-datatable';
+import { ConfirmModalService } from '../../../shared/confirm-modal/confirm-modal.service';
 
 @Component({
   selector: 'app-whatsapp-template',
@@ -15,10 +17,11 @@ import { WhatsappTemplatesDatatable } from '../../../shared/datatable/whatsapp-t
 export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(WhatsappTemplateFormComponent) adminForm?: WhatsappTemplateFormComponent;
   @ViewChild(WhatsappTemplateFormUserComponent) userForm?: WhatsappTemplateFormUserComponent;
+  @ViewChild(WhatsappTemplateViewComponent) viewComp?: WhatsappTemplateViewComponent;
 
   @Input() selectedNotice: NoticeType | null = null;
-  @Output() onClose = new EventEmitter<void>();
-
+  @Output() onClose = new EventEmitter<boolean>();
+  changeTemplate = false;
   editTemplate: WhatsappTemplate | null = null;
   successMessage = '';
   errorMessage = '';
@@ -27,12 +30,13 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private readonly service: NoticeTemplateService,
-    private readonly authService: AuthService,
-    private readonly dtHelper: DatatableHelper
+    private readonly storageService: StorageService,
+    private readonly dtHelper: DatatableHelper,
+    private readonly confirmService: ConfirmModalService
   ) { }
 
   get isSuperAdmin(): boolean {
-    return this.authService.isSuperAdmin();
+    return this.storageService.isSuperAdmin();
   }
 
   ngOnInit(): void {
@@ -43,7 +47,7 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedNotice'] && this.selectedNotice) {
-      this.initTable();
+      //  this.initTable();
     }
   }
 
@@ -57,9 +61,13 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
       processId: this.selectedNotice.id,
       isSuperAdmin: this.isSuperAdmin,
       service: this.service,
-      onEdit: (t) => this.openEditForm(t),
-      onDelete: (t) => this.confirmDelete(t),
-      onError: (msg) => { this.errorMessage = msg; }
+      storageService: this.storageService,
+      callbacks: {
+        onEdit: (t) => this.openEditForm(t),
+        onView: (t) => this.viewComp?.open(t),
+        onToggle: (t) => this.toggleStatus(t),
+        onError: (msg) => { this.errorMessage = msg; }
+      }
     });
     setTimeout(() => this.dtHelper.initTable(this.tableId, dt));
   }
@@ -88,24 +96,32 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  confirmDelete(template: WhatsappTemplate): void {
-    if (!confirm(`Delete WhatsApp template "${template.templateName || template.userTemplateContent}"?`)) return;
-    this.errorMessage = '';
-    this.service.deleteWhatsappTemplate(template.id).subscribe({
-      next: () => {
-        this.successMessage = 'Template deleted.';
-        this.reloadTable();
-      },
-      error: () => {
-        this.errorMessage = 'Failed to delete template.';
-      }
-    });
-  }
-
   onSaved(): void {
     this.successMessage = this.editTemplate ? 'Template updated.' : 'Template created.';
     this.editTemplate = null;
+    this.changeTemplate = true;
     this.reloadTable();
+  }
+
+  toggleStatus(template: WhatsappTemplate): void {
+    const action = template.status === 1 ? 'disable' : 'enable';
+    this.confirmService.confirm({
+      title: `${template.status === 1 ? 'Disable' : 'Enable'} Template`,
+      message: `Are you sure you want to ${action} this WhatsApp template?`,
+      confirmLabel: template.status === 1 ? 'Disable' : 'Enable',
+      confirmClass: template.status === 1 ? 'btn-warning' : 'btn-success'
+    }).then((confirmed) => {
+      if (!confirmed) return;
+      this.clearMessages();
+      this.service.toggleWhatsappTemplateStatus(template.id).subscribe({
+        next: () => {
+          this.successMessage = `Template ${action}d successfully.`;
+          this.changeTemplate = true;
+          this.reloadTable();
+        },
+        error: () => { this.errorMessage = `Failed to ${action} template.`; }
+      });
+    });
   }
 
   private clearMessages(): void {

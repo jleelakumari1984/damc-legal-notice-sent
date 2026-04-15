@@ -1,6 +1,8 @@
 import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeTemplateService } from '../../core/services/notice-template.service';
+import { StorageService } from '../../core/services/storage.service';
+import { TemplateApprovedStatus } from '../../core/models/notices.model';
 
 declare const $: any;
 
@@ -8,9 +10,13 @@ export interface WhatsappTemplatesDatatableOptions {
   processId: number;
   isSuperAdmin: boolean;
   service: NoticeTemplateService;
-  onEdit: (template: any) => void;
-  onDelete: (template: any) => void;
-  onError: (message: string) => void;
+  storageService: StorageService;
+  callbacks: {
+    onEdit: (template: any) => void;
+    onView: (template: any) => void;
+    onToggle: (template: any) => void;
+    onError: (message: string) => void;
+  };
 }
 
 export class WhatsappTemplatesDatatable extends DataTable {
@@ -19,7 +25,7 @@ export class WhatsappTemplatesDatatable extends DataTable {
   }
 
   build(): object {
-    const { processId, isSuperAdmin, service, onEdit, onDelete, onError } = this.options;
+    const { processId, isSuperAdmin, service, storageService, callbacks } = this.options;
 
     const adminColumns = [
       {
@@ -28,12 +34,23 @@ export class WhatsappTemplatesDatatable extends DataTable {
       },
       { data: 'templateName', title: 'Template Name', render: (d: string) => esc(d) },
       { data: 'templateLang', title: 'Language', render: (d: string) => esc(d) },
-      { data: 'templatePath', title: 'Template Path', render: (d: string) => d ? esc(d) : '<span class="text-muted">—</span>' },
       {
         data: 'status', title: 'Status',
         render: (d: number, t: string) => {
           if (t !== 'display') return d;
           return `<span class="badge ${d === 1 ? 'bg-success' : 'bg-secondary'}">${d === 1 ? 'Active' : 'Inactive'}</span>`;
+        }
+      },
+      {
+        data: 'approveStatus', title: 'Approval',
+        render: (d: number, t: string) => {
+          if (t !== 'display') return d;
+          const map: Record<number, [string, string]> = {
+            [TemplateApprovedStatus.PENDING]: ['Pending', 'bg-secondary'],
+            [TemplateApprovedStatus.APPROVED]: ['Approved', 'bg-success text-dark'],
+            [TemplateApprovedStatus.REJECT]: ['Reject', 'bg-danger']
+          };
+          return `<span class="badge ${map[d]?.[1] ?? 'bg-secondary'}">${map[d]?.[0] ?? 'Unknown'}</span>`;
         }
       },
       {
@@ -43,9 +60,16 @@ export class WhatsappTemplatesDatatable extends DataTable {
       {
         data: null, title: 'Actions', orderable: false, searchable: false,
         className: 'text-end text-nowrap',
-        render: () =>
-          `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit"><i class="fas fa-edit"></i></button>` +
-          `<button class="btn btn-outline-danger btn-sm dt-btn-delete"><i class="fas fa-trash"></i></button>`
+        render: (_: any, __: any, row: any) => {
+          const approved = row.approveStatus === TemplateApprovedStatus.APPROVED;
+          const toggleLabel = row.status === 1 ? 'Disable' : 'Enable';
+          const toggleCls = row.status === 1 ? 'btn-outline-warning' : 'btn-outline-success';
+          const actionBtn = approved
+            ? `<button class="btn btn-outline-secondary btn-sm me-1 dt-btn-view"><i class="fas fa-eye"></i></button>`
+            : `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit"><i class="fas fa-edit"></i></button>`;
+          return actionBtn +
+            `<button class="btn ${toggleCls} btn-sm dt-btn-toggle">${toggleLabel}</button>`;
+        }
       }
     ];
 
@@ -59,6 +83,18 @@ export class WhatsappTemplatesDatatable extends DataTable {
         render: (d: string) => `<span class="text-break d-inline-block" style="max-width:350px">${esc(d)}</span>`
       },
       {
+        data: 'approveStatus', title: 'Approval',
+        render: (d: number, t: string) => {
+          if (t !== 'display') return d;
+          const map: Record<number, [string, string]> = {
+            [TemplateApprovedStatus.PENDING]: ['Pending', 'bg-secondary'],
+            [TemplateApprovedStatus.APPROVED]: ['Approved', 'bg-success text-dark'],
+            [TemplateApprovedStatus.REJECT]: ['Reject', 'bg-danger']
+          };
+          return `<span class="badge ${map[d]?.[1] ?? 'bg-secondary'}">${map[d]?.[0] ?? 'Unknown'}</span>`;
+        }
+      },
+      {
         data: 'status', title: 'Status',
         render: (d: number, t: string) => {
           if (t !== 'display') return d;
@@ -72,9 +108,16 @@ export class WhatsappTemplatesDatatable extends DataTable {
       {
         data: null, title: 'Actions', orderable: false, searchable: false,
         className: 'text-end text-nowrap',
-        render: () =>
-          `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit"><i class="fas fa-edit"></i></button>` +
-          `<button class="btn btn-outline-danger btn-sm dt-btn-delete"><i class="fas fa-trash"></i></button>`
+        render: (_: any, __: any, row: any) => {
+          const approved = row.approveStatus === TemplateApprovedStatus.APPROVED;
+          const toggleLabel = row.status === 1 ? 'Disable' : 'Enable';
+          const toggleCls = row.status === 1 ? 'btn-outline-warning' : 'btn-outline-success';
+          const actionBtn = approved
+            ? `<button class="btn btn-outline-secondary btn-sm me-1 dt-btn-view"><i class="fas fa-eye"></i></button>`
+            : `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit"><i class="fas fa-edit"></i></button>`;
+          return actionBtn +
+            `<button class="btn ${toggleCls} btn-sm dt-btn-toggle">${toggleLabel}</button>`;
+        }
       }
     ];
 
@@ -84,15 +127,16 @@ export class WhatsappTemplatesDatatable extends DataTable {
         service.getWhatsappTemplates(processId).subscribe({
           next: (data) => callback({ data }),
           error: () => {
-            onError('Failed to load WhatsApp templates.');
+            callbacks.onError('Failed to load WhatsApp templates.');
             callback({ data: [] });
           }
         });
       },
       columns: isSuperAdmin ? adminColumns : userColumns,
       createdRow: (row: HTMLElement, data: any) => {
-        $(row).find('.dt-btn-edit').on('click', () => onEdit(data));
-        $(row).find('.dt-btn-delete').on('click', () => onDelete(data));
+        $(row).find('.dt-btn-edit').on('click', () => callbacks.onEdit(data));
+        $(row).find('.dt-btn-view').on('click', () => callbacks.onView(data));
+        $(row).find('.dt-btn-toggle').on('click', () => callbacks.onToggle(data));
       }
     };
   }
