@@ -10,7 +10,8 @@ import lombok.experimental.SuperBuilder;
 public class WhatsAppPendingTemplateDao {
     private Long id;
     private String userName;
-    private String processName;
+    private Long noticeId;
+    private String noticeName;
     private String userTemplateContent;
     private LocalDateTime createdAt;
 

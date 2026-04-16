@@ -4,8 +4,11 @@ import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { NoticesDatatable } from '../../../shared/datatable/notices-datatable';
 import { NoticeService } from '../../../core/services/notice.service';
 import { NoticeFormComponent } from './notice-form/notice-form.component';
-import { Notice, NoticeType } from '../../../core/models/notices.model';
+import { NoticeFilterComponent } from './notice-filter/notice-filter.component';
+import { NoticeType } from '../../../core/models/notices.model';
 import { NoticeExcelMappingsComponent } from '../excel-mappings/notice-excel-mappings.component';
+import { StorageService } from '../../../core/services/storage.service';
+import { NoticeReportFilter } from '../../../core/models/report.notice';
 
 @Component({
   selector: 'app-notice',
@@ -15,6 +18,7 @@ import { NoticeExcelMappingsComponent } from '../excel-mappings/notice-excel-map
 export class NoticeComponent implements AfterViewInit {
   @ViewChild(NoticeFormComponent) noticeForm!: NoticeFormComponent;
   @ViewChild(NoticeExcelMappingsComponent) noticeExcelMappings!: NoticeExcelMappingsComponent;
+  @ViewChild(NoticeFilterComponent) noticeFilter!: NoticeFilterComponent;
 
   editNotice: NoticeType | null = null;
   actionType: string = 'display';
@@ -22,12 +26,14 @@ export class NoticeComponent implements AfterViewInit {
   actionId: number | null = null;
 
   private readonly tableId = "#noticesTable";
+  private activeFilter: NoticeReportFilter = {};
   successMessage = '';
   errorMessage = '';
 
   constructor(
     private readonly service: NoticeService,
-    private readonly datatableHelper: DatatableHelper
+    private readonly datatableHelper: DatatableHelper,
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit(): void {
@@ -37,6 +43,8 @@ export class NoticeComponent implements AfterViewInit {
   private initTable(): void {
     this.datatableHelper.initTable(this.tableId, new NoticesDatatable({
       service: this.service,
+      storageService: this.storageService,
+      getFilters: () => this.activeFilter,
       callbacks: {
         onSmsConfig: (notice) => this.openSmsConfig(notice),
         onWhatsappConfig: (notice) => this.openWhatsappConfig(notice),
@@ -44,6 +52,11 @@ export class NoticeComponent implements AfterViewInit {
         onError: (msg) => this.errorMessage = msg
       }
     }));
+  }
+
+  onFilterChange(filter: NoticeReportFilter): void {
+    this.activeFilter = filter;
+    this.datatableHelper.reload(this.tableId);
   }
 
   reload(): void {

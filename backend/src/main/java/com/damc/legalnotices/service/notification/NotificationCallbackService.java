@@ -8,19 +8,19 @@ import com.damc.legalnotices.dao.notification.StatusReportWhatsappDao;
 public interface NotificationCallbackService {
 
     /**
-     * Process SMS delivery report callback.
+     * Notice SMS delivery report callback.
      * Expected format: {"messageid":"xxx","dlrstatus":"xxx","msisdn":"xxx",
      * "senderid":"xxx","submittime":"xxx","delivtime":"xxx","dlrcode":"xxx"}
      * Matches ack_id = messageid, sets received_status = "RECEIVED", received_at = delivtime.
      */
-    boolean processSmsDeliveryReport(String requestBody);
+    boolean noticeSmsDeliveryReport(String requestBody);
 
     /**
-     * Process WhatsApp status callback (Meta webhook).
+     * Notice WhatsApp status callback (Meta webhook).
      * Expected format: {"object":"whatsapp_business_account","entry":[...statuses with id/status/timestamp...]}
      * Matches ack_id = status.id, sets received_status = status.status, received_at = status.timestamp.
      */
-    boolean processWhatsAppDeliveryReport(String requestBody);
+    boolean noticeWhatsAppDeliveryReport(String requestBody);
 
     /**
      * Re-parse send_response for SMS records where ack_id is NULL.
@@ -34,7 +34,7 @@ public interface NotificationCallbackService {
      */
     int reParseWhatsAppMissingAckIds();
 
-    List<StatusReportSmsDao> processPendingSmsParsing();
+    List<StatusReportSmsDao> noticePendingSmsParsing();
 
-    List<StatusReportWhatsappDao> processPendingWhatsAppParsing();
+    List<StatusReportWhatsappDao> noticePendingWhatsAppParsing();
 }

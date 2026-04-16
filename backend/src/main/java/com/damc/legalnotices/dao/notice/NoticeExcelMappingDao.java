@@ -11,7 +11,7 @@ public class NoticeExcelMappingDao {
 
     private Long id;
 
-    private Long processId;
+    private Long noticeId;
 
     private String excelFieldName;
 

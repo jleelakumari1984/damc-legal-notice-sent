@@ -25,7 +25,5 @@ public class NoticeSmsApproveDto {
 
     private Integer dcs;
     private Integer flashSms;
-
-    @NotNull
-    private Integer sentLevel;
+ 
 }

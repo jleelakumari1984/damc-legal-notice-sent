@@ -9,6 +9,9 @@ import lombok.Setter;
 @Setter
 public class UserUpdateDto {
 
+    @Size(min = 3, max = 50)
+    private String loginName;
+
     @Size(max = 100)
     private String displayName;
 

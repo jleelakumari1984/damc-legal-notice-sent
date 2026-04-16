@@ -4,6 +4,7 @@ import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.notice.SmsPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsConfigDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsPendingDto;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface NoticeSmsMappingAdminService {
 
-    List<SmsTemplateDao> getByProcessId(LoginUserDao sessionUser, Long processId);
+    List<SmsTemplateDao> getByNoticeId(LoginUserDao sessionUser, Long noticeId);
 
     SmsTemplateDao getById(LoginUserDao sessionUser, Long id);
 
@@ -21,7 +22,7 @@ public interface NoticeSmsMappingAdminService {
 
     void delete(LoginUserDao sessionUser, Long id);
 
-    DataTableDao<List<SmsPendingTemplateDao>> getPendingTemplates(LoginUserDao sessionUser, NoticeSmsPendingDto request);
-
+    DataTableDao<List<SmsPendingTemplateDao>> getPendingTemplates(LoginUserDao sessionUser,
+            DatatableDto<NoticeSmsPendingDto> request);
 
 }

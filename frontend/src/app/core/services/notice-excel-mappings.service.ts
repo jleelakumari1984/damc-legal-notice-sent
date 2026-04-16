@@ -10,9 +10,9 @@ export class NoticeExcelMappingsService {
 
   constructor(private readonly http: HttpClient) { }
 
-  getByProcessId(processId: number): Observable<NoticeExcelMappingResponse[]> {
-    const params = new HttpParams().set('processId', processId.toString());
-    return this.http.get<NoticeExcelMappingResponse[]>(this.api, { params });
+  getByNoticeId(noticeId: number): Observable<NoticeExcelMappingResponse[]> {
+    const params = new HttpParams().set('noticeId', noticeId.toString());
+    return this.http.get<NoticeExcelMappingResponse[]>(`${this.api}/list`, { params });
   }
 
   getById(id: number): Observable<NoticeExcelMappingResponse> {

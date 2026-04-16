@@ -40,7 +40,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
     private final StatusReportWhatsappRepository whatsappRepository;
 
     @Override
-    public boolean processSmsDeliveryReport(String requestBody) {
+    public boolean noticeSmsDeliveryReport(String requestBody) {
         if (!StringUtils.hasText(requestBody)) {
             log.warn("SMS DLR: empty request body");
             return false;
@@ -78,13 +78,13 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
             }
 
         } catch (Exception ex) {
-            log.error("SMS DLR: error processing delivery report: {}", ex.getMessage(), ex);
+            log.error("SMS DLR: error noticeing delivery report: {}", ex.getMessage(), ex);
         }
         return updated;
     }
 
     @Override
-    public boolean processWhatsAppDeliveryReport(String requestBody) {
+    public boolean noticeWhatsAppDeliveryReport(String requestBody) {
         if (!StringUtils.hasText(requestBody)) {
             log.warn("WhatsApp callback: empty request body");
             return false;
@@ -137,7 +137,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
                 }
             }
         } catch (Exception ex) {
-            log.error("WhatsApp callback: error processing status update: {}", ex.getMessage(), ex);
+            log.error("WhatsApp callback: error noticeing status update: {}", ex.getMessage(), ex);
         }
         return updated;
     }
@@ -199,13 +199,13 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
     }
 
     @Override
-    public List<StatusReportSmsDao> processPendingSmsParsing() {
+    public List<StatusReportSmsDao> noticePendingSmsParsing() {
         List<StatusReportSmsEntity> pendingRecords = smsRepository.findByProcessDateIsNull();
 
         List<StatusReportSmsDao> updatedRecords = new java.util.ArrayList<>();
         for (StatusReportSmsEntity record : pendingRecords) {
 
-            boolean updated = processSmsDeliveryReport(record.getRequestBody());
+            boolean updated = noticeSmsDeliveryReport(record.getRequestBody());
             if (updated) {
                 record.setCompleteDate(LocalDateTime.now());
                 record.setProcessDate(LocalDateTime.now());
@@ -218,7 +218,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
     }
 
     @Override
-    public List<StatusReportWhatsappDao> processPendingWhatsAppParsing() {
+    public List<StatusReportWhatsappDao> noticePendingWhatsAppParsing() {
         List<StatusReportWhatsappEntity> pendingRecords = whatsappRepository.findByProcessDateIsNull();
         List<StatusReportWhatsappDao> updatedRecords = new java.util.ArrayList<>();
         for (StatusReportWhatsappEntity record : pendingRecords) {
@@ -226,7 +226,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
             // For example, if requestBody is JSON, you can use a JSON parser to extract
             // ack_id
 
-            boolean updated = processWhatsAppDeliveryReport(record.getRequestBody());
+            boolean updated = noticeWhatsAppDeliveryReport(record.getRequestBody());
 
             record.setCompleteDate(LocalDateTime.now());
             record.setProcessDate(LocalDateTime.now());

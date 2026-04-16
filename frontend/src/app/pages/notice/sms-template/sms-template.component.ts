@@ -1,28 +1,30 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 import { NoticeTemplateService } from '../../../core/services/notice-template.service';
-import { SmsTemplate, NoticeType } from '../../../core/models/notices.model';
-import { SmsTemplateFormComponent } from './sms-template-form/sms-template-form.component';
+import { SmsTemplate, NoticeType, SmsPendingTemplate } from '../../../core/models/notices.model';
 import { SmsTemplateFormUserComponent } from './sms-template-form-user/sms-template-form-user.component';
 import { SmsTemplateViewComponent } from './sms-template-view/sms-template-view.component';
 import { StorageService } from '../../../core/services/storage.service';
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { SmsTemplatesDatatable } from '../../../shared/datatable/sms-templates-datatable';
 import { ConfirmModalService } from '../../../shared/confirm-modal/confirm-modal.service';
+import { SmsApprovalFormComponent } from '../../template-approvals/sms-approval-form/sms-approval-form.component';
 
 @Component({
   selector: 'app-sms-template',
   templateUrl: './sms-template.component.html'
 })
 export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
-  @ViewChild(SmsTemplateFormComponent) adminForm?: SmsTemplateFormComponent;
   @ViewChild(SmsTemplateFormUserComponent) userForm?: SmsTemplateFormUserComponent;
   @ViewChild(SmsTemplateViewComponent) viewComp?: SmsTemplateViewComponent;
+  @ViewChild(SmsApprovalFormComponent) smsApprovalForm!: SmsApprovalFormComponent;
 
   @Input() selectedNotice: NoticeType | null = null;
   @Output() onClose = new EventEmitter<boolean>();
+
   changeTemplate = false;
   editTemplate: SmsTemplate | null = null;
+  showApproval = false;
   successMessage = '';
   errorMessage = '';
 
@@ -58,7 +60,7 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
   private initTable(): void {
     if (!this.selectedNotice) return;
     const dt = new SmsTemplatesDatatable({
-      processId: this.selectedNotice.id,
+      noticeId: this.selectedNotice.id,
       isSuperAdmin: this.isSuperAdmin,
       service: this.service,
       storageService: this.storageService,
@@ -66,13 +68,26 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
         onEdit: (t) => this.openEditForm(t),
         onView: (t) => this.viewComp?.open(t),
         onToggle: (t) => this.toggleStatus(t),
+        onApprove: (t) => this.openApprovalForm(t, false),
+        onReject: (t) => this.openApprovalForm(t, true),
         onError: (msg) => { this.errorMessage = msg; }
       }
 
     });
     setTimeout(() => this.dtHelper.initTable(this.tableId, dt));
   }
-
+  openApprovalForm(t: SmsTemplate, isReject: boolean): void {
+    const template: SmsPendingTemplate = {
+      id: t.id,
+      noticeId: t.noticeId,
+      noticeName: this.selectedNotice?.name ?? '',
+      userName: '',
+      userTemplateContent: t.userTemplateContent,
+      createdAt: t.createdAt
+    };
+    this.showApproval = true;
+    this.smsApprovalForm.open(template, isReject,true);
+  }
   reloadTable(): void {
     this.dtHelper.reload(this.tableId);
   }
@@ -80,26 +95,28 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
   openAddForm(): void {
     this.editTemplate = null;
     this.clearMessages();
-    if (this.isSuperAdmin) {
-      this.adminForm?.open();
-    } else {
-      this.userForm?.open();
-    }
+    this.userForm?.open();
   }
 
   openEditForm(template: SmsTemplate): void {
     this.editTemplate = template;
     this.clearMessages();
-    if (this.isSuperAdmin) {
-      this.adminForm?.open();
-    } else {
-      this.userForm?.open();
-    }
+    this.userForm?.open();
+  }
+  onApproved(): void {
+    this.showApproval = false;
+    this.successMessage = 'Template approval updated.';
+    this.editTemplate = null;
+    this.changeTemplate = true;
+    this.reloadTable();
   }
 
-  onSaved(): void {
+  onApprovalCancelled(): void {
+    this.showApproval = false;
+  }
+  onSaved(savedData: SmsTemplate): void {
     this.successMessage = this.editTemplate ? 'Template updated.' : 'Template created.';
-    this.editTemplate = null;
+    this.editTemplate = savedData;
     this.changeTemplate = true;
     this.reloadTable();
   }

@@ -30,8 +30,8 @@ public class NoticeExcelMappingController {
     private final NoticeExcelMappingService mappingService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<NoticeExcelMappingDao>> getByProcessId(@RequestParam Long processId) {
-        return ResponseEntity.ok(mappingService.getByProcessId(baseService.getSessionUser(), processId));
+    public ResponseEntity<List<NoticeExcelMappingDao>> getByNoticeId(@RequestParam Long noticeId) {
+        return ResponseEntity.ok(mappingService.getByNoticeId(baseService.getSessionUser(), noticeId));
     }
 
     @GetMapping("/{id}")

@@ -15,9 +15,9 @@ export class SendNoticesService {
   constructor(private readonly http: HttpClient) { }
 
 
-  scheduleNotice(processSno: number, sendSms: boolean, sendWhatsapp: boolean, file: File): Observable<ValidationResponse> {
+  scheduleNotice(noticeSno: number, sendSms: boolean, sendWhatsapp: boolean, file: File): Observable<ValidationResponse> {
     const formData = new FormData();
-    formData.append('processSno', processSno.toString());
+    formData.append('noticeSno', noticeSno.toString());
     formData.append('sendSms', String(sendSms));
     formData.append('sendWhatsapp', String(sendWhatsapp));
     formData.append('zipFile', file);

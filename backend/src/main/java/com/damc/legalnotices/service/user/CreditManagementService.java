@@ -3,6 +3,7 @@ package com.damc.legalnotices.service.user;
 import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.user.CreditTransactionDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.user.CreditAdjustDto;
 import com.damc.legalnotices.dto.user.CreditTransactionListDto;
 
@@ -12,5 +13,6 @@ public interface CreditManagementService {
 
     CreditTransactionDao createCredit(LoginUserDao sessionUser, CreditAdjustDto request);
 
-    DataTableDao<List<CreditTransactionDao>> getAllTransactions(LoginUserDao sessionUser, CreditTransactionListDto request);
+    DataTableDao<List<CreditTransactionDao>> getAllTransactions(LoginUserDao sessionUser,
+            DatatableDto<CreditTransactionListDto> request);
 }

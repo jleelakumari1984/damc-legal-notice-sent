@@ -1,4 +1,66 @@
-<div class="modal fade" id="whatsappApprovalModal" tabindex="-1" aria-labelledby="whatsappApprovalModalLabel" aria-hidden="true">
+﻿<ng-template #formBody>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <div *ngIf="template" class="border mb-3 p-3">
+    <div class="ts-5"><strong>Notice Name:</strong> {{ template.noticeName }}</div>
+    <strong>User Template:</strong>
+    <p class="mb-0 mt-1 text-break alert alert-light">{{ template.userTemplateContent }}</p>
+  </div>
+
+  <!-- Reject form -->
+  <form *ngIf="isReject" [formGroup]="rejectForm">
+    <div class="mb-3">
+      <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+      <textarea class="form-control" formControlName="rejectionReason" rows="3"
+        [class.is-invalid]="rejectForm.get('rejectionReason')?.invalid && rejectForm.get('rejectionReason')?.touched">
+      </textarea>
+      <div class="invalid-feedback">Required.</div>
+    </div>
+  </form>
+
+  <!-- Approve form -->
+  <form *ngIf="!isReject" [formGroup]="approveForm">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Template Name <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="templateName"
+          [class.is-invalid]="approveForm.get('templateName')?.invalid && approveForm.get('templateName')?.touched">
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Language <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="templateLang"
+          [class.is-invalid]="approveForm.get('templateLang')?.invalid && approveForm.get('templateLang')?.touched">
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Template Path</label>
+        <input class="form-control" formControlName="templatePath">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Template Content <span class="text-danger">*</span></label>
+        <div *ngIf="excelFields.length > 0" class="mb-2">
+          <small class="text-muted d-block mb-1">Click a field to insert into template:</small>
+          <span *ngFor="let f of excelFields" class="badge bg-secondary me-1 mb-1" style="cursor:pointer"
+            (click)="insertField(f.excelFieldName)" title="Insert {{'{{'}}{{f.excelFieldName}}{{'}}'}}">
+            {{ f.excelFieldName }}
+          </span>
+        </div>
+        <textarea #approveContentArea class="form-control" formControlName="templateContent" rows="4"
+          [class.is-invalid]="approveForm.get('templateContent')?.invalid && approveForm.get('templateContent')?.touched">
+        </textarea>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Modal mode -->
+<div *ngIf="!inline" class="modal fade" id="whatsappApprovalModal" tabindex="-1"
+  aria-labelledby="whatsappApprovalModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -7,69 +69,58 @@
         </h5>
         <button type="button" class="btn-close" (click)="cancel()"></button>
       </div>
-
       <div class="modal-body">
-        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-3">
-          {{ errorMessage }}
-          <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
-        </div>
-
-        <div *ngIf="template" class="alert alert-light border mb-3">
-          <strong>Notice Name:</strong> {{ template.processName }}<br>
-          <strong>User Template:</strong>
-          <p class="mb-0 mt-1 text-break">{{ template.userTemplateContent }}</p>
-        </div>
-
-        <!-- Reject form -->
-        <form *ngIf="isReject" [formGroup]="rejectForm">
-          <div class="mb-3">
-            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
-            <textarea class="form-control" formControlName="rejectionReason" rows="3"
-              [class.is-invalid]="rejectForm.get('rejectionReason')?.invalid && rejectForm.get('rejectionReason')?.touched">
-            </textarea>
-            <div class="invalid-feedback">Required.</div>
-          </div>
-        </form>
-
-        <!-- Approve form -->
-        <form *ngIf="!isReject" [formGroup]="approveForm">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Template Name <span class="text-danger">*</span></label>
-              <input class="form-control" formControlName="templateName"
-                [class.is-invalid]="approveForm.get('templateName')?.invalid && approveForm.get('templateName')?.touched">
-              <div class="invalid-feedback">Required.</div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Language <span class="text-danger">*</span></label>
-              <input class="form-control" formControlName="templateLang"
-                [class.is-invalid]="approveForm.get('templateLang')?.invalid && approveForm.get('templateLang')?.touched">
-              <div class="invalid-feedback">Required.</div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Template Path</label>
-              <input class="form-control" formControlName="templatePath">
-            </div>
-            <div class="col-12">
-              <label class="form-label">Template Content <span class="text-danger">*</span></label>
-              <textarea class="form-control" formControlName="templateContent" rows="4"
-                [class.is-invalid]="approveForm.get('templateContent')?.invalid && approveForm.get('templateContent')?.touched">
-              </textarea>
-              <div class="invalid-feedback">Required.</div>
-            </div>
-          </div>
-        </form>
+        <ng-container *ngTemplateOutlet="formBody"></ng-container>
       </div>
-
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
         <button type="button" class="btn" [class.btn-danger]="isReject" [class.btn-success]="!isReject"
-          [disabled]="saving || (isReject ? rejectForm.invalid : approveForm.invalid)"
-          (click)="submit()">
+          [disabled]="saving || (isReject ? rejectForm.invalid : approveForm.invalid)" (click)="submit()">
           <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
           {{ isReject ? 'Reject' : 'Approve' }}
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Inline mode -->
+<div *ngIf="inline && template" class="container-fluid">
+
+  <div class="card">
+    <div class="card-body table-responsive">
+      <table id="waPendingTable" class="table table-bordered table-sm w-100"></table>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="brand-title mb-0">
+          <i class="fa fa-comment-dots me-2"></i>{{ isReject ? 'Reject' : 'Approve' }} WhatsApp Template Notice <span
+            class="text-danger">{{ template.noticeName }}</span> for User <span class="text-danger">{{ template.userName
+            }}</span>
+        </h3>
+        <div class="d-flex gap-2">
+          <button class="btn btn-secondary btn-sm" (click)="cancel()">Cancel</button>
+          <button class="btn btn-sm" [class.btn-danger]="isReject" [class.btn-success]="!isReject"
+            [disabled]="saving || (isReject ? rejectForm.invalid : approveForm.invalid)" (click)="submit()">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isReject ? 'Reject' : 'Approve' }}
+          </button>
+        </div>
+      </div>
+      <div class="card page-card p-4">
+        <ng-container *ngTemplateOutlet="formBody"></ng-container>
+      </div>
+      <div class="d-flex justify-content-end align-items-center mt-3">
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-secondary btn-sm" (click)="cancel()">Cancel</button>
+          <button class="btn btn-sm" [class.btn-danger]="isReject" [class.btn-success]="!isReject"
+            [disabled]="saving || (isReject ? rejectForm.invalid : approveForm.invalid)" (click)="submit()">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isReject ? 'Reject' : 'Approve' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

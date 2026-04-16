@@ -15,6 +15,7 @@ export interface UserResponse {
   loginName: string;
   userEmail: string;
   accessLevel: number;
+  canSwitchSession: boolean;
 }
 export interface LoginResponse {
   accessToken: string;
@@ -36,6 +37,10 @@ export class AuthService {
   }
 
   loginAs(userId: number): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login-as/${userId}`, {});
+    return this.http.post<LoginResponse>(`${this.apiUrl}/switch-session`, { targetUserId: userId }).pipe(
+      tap((response) => {
+        this.storageService.setSession(response.accessToken, response.user);
+      })
+    );
   }
 }

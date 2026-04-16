@@ -1,11 +1,12 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
 import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { NoticeReportsDatatable } from '../../../shared/datatable/notice-reports-datatable';
 
 import { statusBadgeClass } from '../../../shared/datatable/datatable.utils';
-import { NoticeReportDetail, NoticeReportItemDetail, NoticeReportSummary } from '../../../core/models/report.notice';
+import { NoticeReportDetail, NoticeReportFilter, NoticeReportItemDetail, NoticeReportSummary } from '../../../core/models/report.notice';
 import { NoticeReportsService } from '../../../core/services/notice-reports.service';
+import { ReportFilterComponent } from './report-filter/report-filter.component';
 
 declare const $: any;
 
@@ -15,6 +16,7 @@ declare const $: any;
   styleUrls: ['./notice-reports.component.css']
 })
 export class NoticeReportsComponent implements OnInit, AfterViewInit {
+  @ViewChild(ReportFilterComponent) reportFilter!: ReportFilterComponent;
 
   selectedReport: NoticeReportSummary | null = null;
   errorMessage = '';
@@ -25,6 +27,8 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
   loadingItemDetail = false;
   itemDetailError = '';
   activeLogTab: 'sms' | 'whatsapp' | 'error' = 'sms';
+
+  private activeFilter: NoticeReportFilter = {};
 
   constructor(
     private readonly service: NoticeReportsService,
@@ -40,6 +44,7 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
   private initTable(): void {
     this.datatableHelper.initTable('#noticesTable', new NoticeReportsDatatable({
       service: this.service,
+      getFilters: () => this.activeFilter,
       callbacks: {
         onViewDetail: (id, status, itemCount) => this.viewDetail(id, status, itemCount),
         onSmsDetail: (id) => this.viewSmsLogs(id),
@@ -47,6 +52,11 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
         onError: (msg) => this.errorMessage = msg
       }
     }));
+  }
+
+  onFilterChange(filter: NoticeReportFilter): void {
+    this.activeFilter = filter;
+    this.datatableHelper.reload('#noticesTable');
   }
   viewSmsLogs(selectedNotice: NoticeReportSummary): void {
     if (this.actionType === 'sms' && ((this.selectedReport && this.selectedReport.id === selectedNotice.id))) {

@@ -98,7 +98,7 @@ public class NoticationCallbackUtil {
                 .requestBody(entity.getRequestBody())
                 .status(entity.getStatus())
                 .createdDate(entity.getCreatedDate())
-                .processDate(entity.getProcessDate())
+                .noticeDate(entity.getProcessDate())
                 .completeDate(entity.getCompleteDate())
                 .description(entity.getDescription())
                 .build();
@@ -112,7 +112,7 @@ public class NoticationCallbackUtil {
                 .requestBody(entity.getRequestBody())
                 .status(entity.getStatus())
                 .createdDate(entity.getCreatedDate())
-                .processDate(entity.getProcessDate())
+                .noticeDate(entity.getProcessDate())
                 .completeDate(entity.getCompleteDate())
                 .description(entity.getDescription())
                 .build();

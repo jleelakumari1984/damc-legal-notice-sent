@@ -1,14 +1,16 @@
-import { environment } from '../../../environments/environment';
 import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
-import { SendNoticesService } from '../../core/services/send-notices.service';
 import { NoticeService } from '../../core/services/notice.service';
-import { NoticeReportRequest } from '../../core/models/report.notice';
+import { NoticeReportFilter } from '../../core/models/report.notice';
+import { StorageService } from '../../core/services/storage.service';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
 export interface NoticesTableOptions {
   service: NoticeService;
+  storageService: StorageService;
+  getFilters?: () => NoticeReportFilter;
   callbacks: {
     onSmsConfig: (notice: any) => void;
     onWhatsappConfig: (notice: any) => void;
@@ -34,7 +36,7 @@ export class NoticesDatatable extends DataTable {
   }
 
   build(): object {
-    const { callbacks, service } = this.options;
+    const { callbacks, service, storageService } = this.options;
     return {
       ...BASE_DT_OPTIONS,
       ajax: (dtParams: any, callback: (data: object) => void) => {
@@ -50,12 +52,14 @@ export class NoticesDatatable extends DataTable {
             sortField = dtParams.columns[colIndex].data || sortField;
           }
         }
-        var request: NoticeReportRequest = {
+        const filters = this.options.getFilters ? this.options.getFilters() : {};
+        var request: PaginatedRequest<NoticeReportFilter> = {
           sortColumn: sortField,
           sortDirection: sortDir,
           dtStart: start,
           dtLength: length,
           dtDraw: dtParams.draw,
+          filter: filters
         }
         service.getNoticeTypes(request).subscribe({
           next: (logs) => {
@@ -68,7 +72,7 @@ export class NoticesDatatable extends DataTable {
           }
         });
       },
-      order: [[5, 'desc']],
+      order: [[storageService.isSuperOrAdmin() ? 6 : 5, 'desc']],
       columns: [
         { data: 'id', title: '#' },
         {
@@ -76,21 +80,27 @@ export class NoticesDatatable extends DataTable {
           render: (d: string, t: string) =>
             t === 'display' ? `<span class="fw-semibold">${esc(d)}</span>` : d
         },
-
+        //createdUserName
+        {
+          data: 'createdUserName', title: 'Created By', className: 'text-nowrap',
+          visible: storageService.isSuperOrAdmin(),
+          render: (d: string, t: string) =>
+            t === 'display' ? `<span class="fw-semibold">${esc(d)}</span>` : d
+        },
         {
           data: 'excelMapCount', title: 'Active Excel Fields', className: 'text-nowrap',
           render: (d: string, t: string) =>
-            t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><span class="fw-semibold">${esc(d)}</span></button>` : d
+            t === 'display' ? `<button class="btn btn-primary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
           data: 'smsMapCount', title: 'Active SMS Templates', className: 'text-nowrap',
           render: (d: string, t: string) =>
-            t === 'display' ? `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+            t === 'display' ? `<button class="btn btn-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
           data: 'whatsappMapCount', title: 'Active WhatsApp Templates', className: 'text-nowrap',
           render: (d: string, t: string) =>
-            t === 'display' ? `<button class="btn btn-outline-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+            t === 'display' ? `<button class="btn btn-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
           data: 'createdAt', title: 'Created At', className: 'text-nowrap',
@@ -106,9 +116,9 @@ export class NoticesDatatable extends DataTable {
           data: null, title: 'Configs', orderable: false, searchable: false,
           className: 'text-end text-nowrap',
           render: (d: null, t: string, row: any) => {
-            let html = `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><i class="fas fa-sms"></i></button>`;
-            html += `<button class="btn btn-outline-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><i class="fab fa-whatsapp"></i></button>`;
-            html += `<button class="btn btn-outline-secondary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><i class="fas fa-file-excel"></i></button>`;
+            let html = `<button class="btn btn-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><i class="fas fa-sms"></i></button>`;
+            html += `<button class="btn btn-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><i class="fab fa-whatsapp"></i></button>`;
+            html += `<button class="btn btn-secondary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><i class="fas fa-file-excel"></i></button>`;
             return html;
           }
         }*/

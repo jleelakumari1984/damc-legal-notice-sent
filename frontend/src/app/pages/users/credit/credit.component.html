@@ -1,4 +1,4 @@
-<div class="container py-4">
+<div class=" py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <ng-container *ngIf="!userId; else embeddedTitle">
       <h3 class="brand-title mb-0">Credit Management</h3>
@@ -8,7 +8,7 @@
     </ng-template>
     <div class="d-flex gap-2">
 
-      <button class="btn btn-outline-secondary btn-sm" (click)="reload()">Refresh</button>
+      <button class="btn btn-secondary btn-sm" (click)="reload()">Refresh</button>
       <button class="btn btn-brand btn-sm" (click)="openAddModal()">+ Add Record</button>
       <button class="btn btn-secondary btn-sm" *ngIf="userId" (click)="close.emit()">Close</button>
     </div>

@@ -1,7 +1,6 @@
 package com.damc.legalnotices.controller.notification;
 
 import com.damc.legalnotices.service.notification.NotificationCallbackService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,17 +28,18 @@ public class NotificationCallbackController {
     /**
      * POST: SMS gateway sends DLR as JSON body.
      * {"messageid":"xxx","dlrstatus":"xxx","msisdn":"xxx","senderid":"xxx",
-     *  "submittime":"xxx","delivtime":"xxx","dlrcode":"xxx"}
+     * "submittime":"xxx","delivtime":"xxx","dlrcode":"xxx"}
      */
     @PostMapping("/sms-dlr")
     public ResponseEntity<Map<String, String>> smsDlrPost(@RequestBody String body) {
         log.info("SMS DLR POST received: {}", body);
-        callbackService.processSmsDeliveryReport(body);
+        callbackService.noticeSmsDeliveryReport(body);
         return ResponseEntity.ok(Map.of("status", "success"));
     }
 
     /**
-     * GET: SMS gateway sends DLR as query params (some providers use HTTP GET callbacks).
+     * GET: SMS gateway sends DLR as query params (some providers use HTTP GET
+     * callbacks).
      */
     @GetMapping("/sms-dlr")
     public ResponseEntity<Map<String, String>> smsDlrGet(
@@ -61,8 +61,8 @@ public class NotificationCallbackController {
                     "dlrcode", dlrcode != null ? dlrcode : "");
             String body = objectMapper.writeValueAsString(params);
             log.info("SMS DLR GET received, mapped to: {}", body);
-            callbackService.processSmsDeliveryReport(body);
-        } catch (JsonProcessingException ex) {
+            callbackService.noticeSmsDeliveryReport(body);
+        } catch (Exception ex) {
             log.error("SMS DLR GET: failed to map params to JSON", ex);
         }
         return ResponseEntity.ok(Map.of("status", "success"));
@@ -87,14 +87,14 @@ public class NotificationCallbackController {
 
     /**
      * POST: Meta sends WhatsApp status updates.
-     * {"object":"whatsapp_business_account","entry":[...statuses with id/status/timestamp...]}
+     * {"object":"whatsapp_business_account","entry":[...statuses with
+     * id/status/timestamp...]}
      */
     @PostMapping("/whatsapp")
     public ResponseEntity<Map<String, String>> whatsAppCallback(@RequestBody String body) {
         log.info("WhatsApp status callback POST received: {}", body);
-        callbackService.processWhatsAppDeliveryReport(body);
+        callbackService.noticeWhatsAppDeliveryReport(body);
         return ResponseEntity.ok(Map.of("status", "success"));
     }
 
-   
 }

@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Notice, NoticeRequest, NoticeType } from '../models/notices.model';
-import { NoticeReportRequest } from '../models/report.notice';
-import { PaginatedResponse } from '../models/datatable.model';
+import { NoticeRequest, NoticeType } from '../models/notices.model';
+import { NoticeReportFilter } from '../models/report.notice';
+import { PaginatedRequest, PaginatedResponse } from '../models/datatable.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -13,27 +13,24 @@ export class NoticeService {
 
   constructor(private readonly http: HttpClient) { }
 
-  getNoticeTypes(request?: NoticeReportRequest): Observable<PaginatedResponse<NoticeType[]>> {
+  getNoticeTypes(request?: PaginatedRequest<NoticeReportFilter>): Observable<PaginatedResponse<NoticeType[]>> {
     if (!request) {
-      request = {} as NoticeReportRequest;
+      request = {} as PaginatedRequest<NoticeReportFilter>;
+      request.filter = {};
       request.allData = true;
     }
     return this.http.post<PaginatedResponse<NoticeType[]>>(`${this.api}/types`, request);
   }
-  getById(id: number): Observable<Notice> {
-    return this.http.get<Notice>(`${this.api}/${id}`);
+  getById(id: number): Observable<NoticeType> {
+    return this.http.get<NoticeType>(`${this.api}/${id}`);
   }
 
-  create(request: NoticeRequest): Observable<Notice> {
-    return this.http.post<Notice>(this.api, request);
+  create(request: NoticeRequest): Observable<NoticeType> {
+    return this.http.post<NoticeType>(`${this.api}/types/create`, request);
   }
 
-  update(id: number, request: NoticeRequest): Observable<Notice> {
-    return this.http.put<Notice>(`${this.api}/${id}`, request);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/${id}`);
+  update(id: number, request: NoticeRequest): Observable<NoticeType> {
+    return this.http.put<NoticeType>(`${this.api}/types/${id}`, request);
   }
 
   retry(id: number): Observable<void> {

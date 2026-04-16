@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class WhatsAppUserTemplateDao {
     private Long id;
-    private Long processId;
+    private Long noticeId;
     private String userTemplateContent;
     private Integer status;
     private Integer approveStatus;

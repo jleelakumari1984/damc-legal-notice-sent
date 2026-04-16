@@ -1,0 +1,29 @@
+<div class="modal fade" id="noticeFilterModal" tabindex="-1" aria-labelledby="noticeFilterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="noticeFilterModalLabel">
+          <i class="fa fa-filter me-2"></i>Filter Notices
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Notice Name</label>
+            <input class="form-control" [(ngModel)]="name" placeholder="Search by name..."
+              (keyup.enter)="apply()">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="reset()">
+          <i class="fa fa-times me-1"></i>Reset
+        </button>
+        <button type="button" class="btn btn-brand" (click)="apply()">
+          <i class="fa fa-search me-1"></i>Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

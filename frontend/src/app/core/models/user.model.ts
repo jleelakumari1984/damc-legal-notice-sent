@@ -1,5 +1,3 @@
-import { PaginatedRequest } from "./datatable.model";
-
 export interface User {
     id: number;
     displayName: string;
@@ -27,6 +25,8 @@ export interface UserRequest {
     enabled: boolean;
 }
 
-export interface UserPaginatedRequest extends PaginatedRequest {
-
+export interface UserFilter {
+    search?: string;
+    accessLevel?: number | null;
+    enabled?: boolean | null;
 }

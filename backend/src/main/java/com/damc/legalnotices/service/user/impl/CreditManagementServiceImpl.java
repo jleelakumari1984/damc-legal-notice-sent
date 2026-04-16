@@ -3,6 +3,7 @@ package com.damc.legalnotices.service.user.impl;
 import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.user.CreditTransactionDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.user.CreditAdjustDto;
 import com.damc.legalnotices.dto.user.CreditTransactionListDto;
 import com.damc.legalnotices.entity.user.UserCreditEntity;
@@ -15,6 +16,7 @@ import com.damc.legalnotices.service.user.CreditManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,13 +69,16 @@ public class CreditManagementServiceImpl implements CreditManagementService {
 
     @Override
     public DataTableDao<List<CreditTransactionDao>> getAllTransactions(LoginUserDao sessionUser,
-            CreditTransactionListDto request) {
+            DatatableDto<CreditTransactionListDto> request) {
         Page<UserCreditTransactionEntity> page = null;
-        if (request.getUserid() != null && request.getUserid() > 0L) {
-            findUser(request.getUserid());
-            page = userCreditTransactionRepository.findByUserId(request.getUserid(), request.getPagination());
+        Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged()
+                : request.getPagination("id");
+        if (request.getFilter() != null && request.getFilter().getUserid() != null
+                && request.getFilter().getUserid() > 0L) {
+            findUser(request.getFilter().getUserid());
+            page = userCreditTransactionRepository.findByUserId(request.getFilter().getUserid(), pageable);
         } else {
-            page = userCreditTransactionRepository.findAll(request.getPagination());
+            page = userCreditTransactionRepository.findAll(pageable);
         }
         return DataTableDao.<List<CreditTransactionDao>>builder()
                 .draw(request.getDraw())

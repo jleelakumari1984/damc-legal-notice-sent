@@ -13,6 +13,7 @@ import { WhatsappApprovalFormComponent } from './whatsapp-approval-form/whatsapp
     SmsApprovalFormComponent,
     WhatsappApprovalFormComponent
   ],
+  exports: [SmsApprovalFormComponent, WhatsappApprovalFormComponent],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TemplateApprovalsRoutingModule]
 })
 export class TemplateApprovalsModule {}

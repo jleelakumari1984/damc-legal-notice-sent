@@ -2,6 +2,7 @@ import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeTemplateService } from '../../core/services/notice-template.service';
 import { WhatsappPendingTemplate, WhatsappPendingTemplateRequest, WhatsappTemplate } from '../../core/models/notices.model';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
@@ -28,7 +29,7 @@ export class WhatsappPendingDatatable extends DataTable {
                 render: (_: any, __: any, ___: any, meta: any) => meta.row + 1
             },
             { data: 'userName', title: 'Request user', render: (d: string) => String(d) },
-            { data: 'processName', title: 'Notice', render: (d: string) => String(d) },
+            { data: 'noticeName', title: 'Notice', render: (d: string) => String(d) },
             {
                 data: 'userTemplateContent', title: 'User Template',
                 render: (d: string) => `<span class="text-break d-inline-block" style="max-width:300px">${esc(d)}</span>`
@@ -41,8 +42,8 @@ export class WhatsappPendingDatatable extends DataTable {
                 data: null, title: 'Actions', orderable: false, searchable: false,
                 className: 'text-end text-nowrap',
                 render: () =>
-                    `<button class="btn btn-outline-success btn-sm me-1 dt-btn-approve"><i class="fas fa-check me-1"></i>Approve</button>` +
-                    `<button class="btn btn-outline-danger btn-sm dt-btn-reject"><i class="fas fa-times me-1"></i>Reject</button>`
+                    `<button class="btn btn-success btn-sm me-1 dt-btn-approve"><i class="fas fa-check me-1"></i>Approve</button>` +
+                    `<button class="btn btn-danger btn-sm dt-btn-reject"><i class="fas fa-times me-1"></i>Reject</button>`
             }
         ];
 
@@ -61,12 +62,13 @@ export class WhatsappPendingDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: WhatsappPendingTemplateRequest = {
+                var request: PaginatedRequest<WhatsappPendingTemplateRequest> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,
                     dtLength: length,
                     dtDraw: dtParams.draw,
+                    filter: {}
                 }
                 service.getPendingWhatsappTemplates(request).subscribe({
                     next: (users) => {

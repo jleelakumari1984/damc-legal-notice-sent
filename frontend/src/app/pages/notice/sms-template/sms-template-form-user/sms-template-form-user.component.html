@@ -30,7 +30,19 @@
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Template Content <span class="text-danger">*</span></label>
-              <textarea class="form-control" formControlName="userTemplateContent" rows="5"
+
+              <div *ngIf="excelFields.length > 0 && !isApproved" class="mb-2">
+                <small class="text-muted d-block mb-1">Click a field to insert into template:</small>
+                <span *ngFor="let f of excelFields"
+                  class="badge bg-secondary me-1 mb-1 cursor-pointer"
+                  style="cursor:pointer"
+                  (click)="insertField(f.excelFieldName)"
+                  title="Insert {{'{{'}}{{f.excelFieldName}}{{'}}'}}">
+                  {{ f.excelFieldName }}
+                </span>
+              </div>
+
+              <textarea #contentArea class="form-control" formControlName="userTemplateContent" rows="5"
                 [attr.readonly]="isApproved ? true : null"
                 [class.is-invalid]="form.get('userTemplateContent')?.invalid && form.get('userTemplateContent')?.touched">
               </textarea>

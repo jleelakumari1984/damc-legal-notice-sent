@@ -2,6 +2,7 @@ import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datata
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { SmsLogRequest } from '../../core/models/sms.model';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
@@ -50,13 +51,13 @@ export class SmsLogsDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: SmsLogRequest = {
+                var request: PaginatedRequest<SmsLogRequest> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,
                     dtLength: length,
                     dtDraw: dtParams.draw,
-                    status: status
+                    filter: { status: status }
                 }
                 const source$ = service.getSmsLogs(reportId, request);
                 source$.subscribe({

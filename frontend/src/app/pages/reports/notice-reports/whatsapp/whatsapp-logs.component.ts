@@ -51,7 +51,7 @@ export class WhatsappLogsComponent implements OnInit, AfterViewInit {
     const request = {
       sortColumn: 'sendAt', sortDirection: 'desc',
       dtStart: 0, dtLength: -1, dtDraw: 1,
-      status: this.reportStatus
+      filter: { status: this.reportStatus }
     };
     const source$ = this.service.exportWhatsappLogs(this.selectedReport.id, request);
     source$.subscribe({

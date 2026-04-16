@@ -8,7 +8,7 @@ import { SendNoticesService } from '../../../core/services/send-notices.service'
 import { NoticeType } from '../../../core/models/notices.model';
 import { ExcelPreview, ExcelPreviewRow, NoticeFileData, ValidationRow } from '../../../core/models/excel.model';
 import { SendSampleRequest } from '../../../core/models/schedule.model';
-import { NoticeReportRequest } from '../../../core/models/report.notice';
+import { NoticeReportFilter } from '../../../core/models/report.notice';
 
 declare const $: any;
 
@@ -46,7 +46,7 @@ export class SendNoticesComponent implements AfterViewInit {
   }
 
   readonly form = this.fb.group({
-    processSno: ['', Validators.required],
+    noticeSno: ['', Validators.required],
     sendSms: [true],
     sendWhatsapp: [true],
     scheduleDate: [new Date().toISOString().split('T')[0]]
@@ -120,7 +120,7 @@ export class SendNoticesComponent implements AfterViewInit {
     this.sampleSuccess = '';
     this.sampleError = '';
     const request: SendSampleRequest = {
-      processSno: this.selectedNoticeType.id,
+      noticeSno: this.selectedNoticeType.id,
       mobileNumber: this.sampleMobile.trim(),
       sendSms: this.sampleSendSms,
       sendWhatsapp: this.sampleSendWhatsapp,
@@ -148,7 +148,7 @@ export class SendNoticesComponent implements AfterViewInit {
       return;
     }
 
-    const processSno = Number(this.form.value.processSno);
+    const noticeSno = Number(this.form.value.noticeSno);
     const sendSms = !!this.form.value.sendSms;
     const sendWhatsapp = !!this.form.value.sendWhatsapp;
 
@@ -158,7 +158,7 @@ export class SendNoticesComponent implements AfterViewInit {
     }
 
     this.loading = true;
-    this.service.scheduleNotice(processSno, sendSms, sendWhatsapp, this.selectedFile).subscribe({
+    this.service.scheduleNotice(noticeSno, sendSms, sendWhatsapp, this.selectedFile).subscribe({
       next: (response) => {
         this.loading = false;
         const fileData: NoticeFileData = response.fileData ?? { columnNames: [], rows: [] };

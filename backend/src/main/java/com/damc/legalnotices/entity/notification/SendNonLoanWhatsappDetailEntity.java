@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,12 +17,21 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
+import com.damc.legalnotices.entity.master.MasterProcessWhatsappConfigDetailEntity;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "send_non_loan_whatsapp_details")
 public class SendNonLoanWhatsappDetailEntity {
+    @ManyToOne
+    @JoinColumn(name = "process_sno", insertable = false, updatable = false)
+    private MasterProcessTemplateDetailEntity process;
 
+    @ManyToOne
+    @JoinColumn(name = "whatsapp_template_sno", insertable = false, updatable = false)
+    private MasterProcessWhatsappConfigDetailEntity whatsappConfig;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sno")

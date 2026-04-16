@@ -1,7 +1,7 @@
 package com.damc.legalnotices.repository.schedule;
 
 import com.damc.legalnotices.entity.schedule.ScheduledNoticeEntity;
-import com.damc.legalnotices.enums.ProcessingStatus;
+import com.damc.legalnotices.enums.NoticeScheduleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,17 +18,17 @@ public interface ScheduledNoticeRepository extends JpaRepository<ScheduledNotice
     @Query("SELECT n FROM ScheduledNoticeEntity n JOIN FETCH n.process WHERE n.id = :id")
     Optional<ScheduledNoticeEntity> findByIdWithProcess(@Param("id") Long id);
     
-    List<ScheduledNoticeEntity> findTop50ByStatusOrderByCreatedAtAsc(ProcessingStatus status);
+    List<ScheduledNoticeEntity> findTop50ByStatusOrderByCreatedAtAsc(NoticeScheduleStatus status);
 
     @Modifying
-    @Query(value = "UPDATE scheduled_notices SET identifier = :identifier, status = :processingStatus WHERE status = :pendingStatus ORDER BY created_at ASC LIMIT 10", nativeQuery = true)
+    @Query(value = "UPDATE scheduled_notices SET identifier = :identifier, status = :NoticeScheduleStatus WHERE status = :pendingStatus ORDER BY created_at ASC LIMIT 10", nativeQuery = true)
     int claimPendingForExcelParsing(@Param("identifier") long identifier,
-            @Param("processingStatus") String processingStatus,
+            @Param("NoticeScheduleStatus") String NoticeScheduleStatus,
             @Param("pendingStatus") String pendingStatus);
 
-    List<ScheduledNoticeEntity> findByStatus(ProcessingStatus status);
+    List<ScheduledNoticeEntity> findByStatus(NoticeScheduleStatus status);
 
-    List<ScheduledNoticeEntity> findByStatusIn(List<ProcessingStatus> statuses);
+    List<ScheduledNoticeEntity> findByStatusIn(List<NoticeScheduleStatus> statuses);
 
     List<ScheduledNoticeEntity> findByIdentifier(long identifier);
 }

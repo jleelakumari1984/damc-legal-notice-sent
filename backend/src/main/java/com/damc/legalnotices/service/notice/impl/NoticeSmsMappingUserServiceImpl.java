@@ -10,6 +10,7 @@ import com.damc.legalnotices.repository.master.MasterProcessSmsConfigDetailRepos
 import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
 import com.damc.legalnotices.enums.TemplateApproveStatus;
 import com.damc.legalnotices.service.notice.NoticeSmsMappingUserService;
+import com.damc.legalnotices.util.TemplateUtil;
 import com.damc.legalnotices.util.converter.NoticeMappingEntityDaoConverter;
 import com.damc.legalnotices.util.validator.NoticeSmsMappingValidationUtil;
 
@@ -25,28 +26,30 @@ public class NoticeSmsMappingUserServiceImpl implements NoticeSmsMappingUserServ
 
     private final LocationProperties appConfig;
     private final MasterProcessSmsConfigDetailRepository smsConfigRepository;
-    private final MasterProcessTemplateDetailRepository processTemplateRepository;
+    private final MasterProcessTemplateDetailRepository noticeTemplateRepository;
     private final NoticeMappingEntityDaoConverter entityDaoConverter;
+    private final TemplateUtil templateUtil;
 
     @Override
     public SmsUserTemplateDao create(LoginUserDao sessionUser, NoticeSmsConfigDto request) throws Exception {
         NoticeSmsMappingValidationUtil.validateUserTemplate(request);
-        MasterProcessTemplateDetailEntity process = processTemplateRepository.findById(request.getProcessId())
+        MasterProcessTemplateDetailEntity notice = noticeTemplateRepository.findById(request.getNoticeId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Process template not found with id: " + request.getProcessId()));
-        long timestamp = System.currentTimeMillis();
-        var relativeUserPath = entityDaoConverter.getUserNoticePath(process, sessionUser)
-                + "/SmsUserTemplate_" + timestamp + ".html";
-        Path userTemplatePath = Path.of(appConfig.getTemplateLocation(), relativeUserPath);
+                        "Notice template not found with id: " + request.getNoticeId()));
+        var noticePath = templateUtil.getUserNoticePath(notice, sessionUser, "sms");
+        var relativeUserPath = noticePath + "/SmsUserTemplate";
+        var relativePath = noticePath + "/SmsTemplate";
+        Path userTemplatePath = Path.of(appConfig.getTemplateLocation(), relativeUserPath + ".html");
         Files.createDirectories(userTemplatePath.getParent());
         Files.writeString(userTemplatePath, request.getUserTemplateContent());
         MasterProcessSmsConfigDetailEntity entity = new MasterProcessSmsConfigDetailEntity();
-        entity.setProcess(process);
+        entity.setProcess(notice);
         entity.setUserTemplatePath(relativeUserPath);
-        entity.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        entity.setTemplatePath(relativePath);
+        entity.setStatus(request.getStatus() != null ? request.getStatus() : 0);
         entity.setApproveStatus(TemplateApproveStatus.PENDING.getValue());
         entity.setCreatedBy(sessionUser.getId());
-        return entityDaoConverter.toSmsUserTemplateDao(smsConfigRepository.save(entity));
+        return entityDaoConverter.toSmsUserTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 
     @Override
@@ -54,18 +57,18 @@ public class NoticeSmsMappingUserServiceImpl implements NoticeSmsMappingUserServ
         NoticeSmsMappingValidationUtil.validateUserTemplate(request);
         MasterProcessSmsConfigDetailEntity entity = smsConfigRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("SMS config not found with id: " + id));
-        MasterProcessTemplateDetailEntity process = processTemplateRepository.findById(request.getProcessId())
+        MasterProcessTemplateDetailEntity notice = noticeTemplateRepository.findById(request.getNoticeId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Process template not found with id: " + request.getProcessId()));
-        Path userTemplatePath = Path.of(appConfig.getTemplateLocation(), entity.getUserTemplatePath());
+                        "Notice template not found with id: " + request.getNoticeId()));
+        Path userTemplatePath = Path.of(appConfig.getTemplateLocation(), entity.getUserTemplatePath() + ".html");
         Files.writeString(userTemplatePath, request.getUserTemplateContent());
-        entity.setProcess(process);
-        entity.setStatus(request.getStatus());
+        entity.setProcess(notice);
+        entity.setStatus(request.getStatus() != null ? request.getStatus() : entity.getStatus());
         if (Integer.valueOf(TemplateApproveStatus.REJECTED.getValue()).equals(entity.getApproveStatus())) {
             entity.setApproveStatus(TemplateApproveStatus.PENDING.getValue());
         }
         entity.setUpdatedBy(sessionUser.getId());
-        return entityDaoConverter.toSmsUserTemplateDao(smsConfigRepository.save(entity));
+        return entityDaoConverter.toSmsUserTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 
 }

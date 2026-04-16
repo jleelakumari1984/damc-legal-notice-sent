@@ -33,12 +33,11 @@ public class NoticeSmsApprovalServiceImpl implements NoticeSmsApprovalService {
         entity.setChannel(dto.getChannel());
         entity.setDcs(dto.getDcs());
         entity.setFlashSms(dto.getFlashSms());
-        entity.setSentLevel(dto.getSentLevel());
         entity.setApproveStatus(TemplateApproveStatus.APPROVED.getValue());
         entity.setApprovedBy(sessionUser.getId());
         entity.setApprovedAt(LocalDateTime.now());
         entity.setUpdatedBy(sessionUser.getId());
-        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity));
+        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class NoticeSmsApprovalServiceImpl implements NoticeSmsApprovalService {
         }
         entity.setUpdatedBy(sessionUser.getId());
         entity.setUpdatedAt(LocalDateTime.now());
-        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity));
+        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 
     @Override
@@ -63,6 +62,6 @@ public class NoticeSmsApprovalServiceImpl implements NoticeSmsApprovalService {
         entity.setApproveStatus(TemplateApproveStatus.REJECTED.getValue());
         entity.setUpdatedBy(sessionUser.getId());
         entity.setUpdatedAt(LocalDateTime.now());
-        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity));
+        return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 }

@@ -2,12 +2,13 @@ package com.damc.legalnotices.util.converter;
 
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
-import com.damc.legalnotices.dao.notice.ProcessTemplateReportDao;
+import com.damc.legalnotices.dao.notice.NoticeTemplateReportDao;
 import com.damc.legalnotices.dao.schedule.ScheduledNoticeDao;
 import com.damc.legalnotices.entity.user.UserEntity;
 import com.damc.legalnotices.entity.view.ProcessConfigReportViewEntity;
+import com.damc.legalnotices.entity.master.MasterProcessExcelMappingEntity;
 import com.damc.legalnotices.entity.schedule.ScheduledNoticeEntity;
-import com.damc.legalnotices.entity.excel.ProcessExcelMappingEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +35,8 @@ public class EntityDaoConverter {
         public ScheduledNoticeDao toScheduledNoticeDao(ScheduledNoticeEntity notice) {
                 return ScheduledNoticeDao.builder()
                                 .id(notice.getId())
-                                .processSno(notice.getProcessSno())
-                                .processName(notice.getProcess() != null ? notice.getProcess().getStepName() : null)
+                                .noticeSno(notice.getProcessSno())
+                                .noticeName(notice.getProcess() != null ? notice.getProcess().getStepName() : null)
                                 .originalFileName(notice.getOriginalFileName())
                                 .zipFilePath(notice.getZipFilePath())
                                 .extractedFolderPath(notice.getExtractedFolderPath())
@@ -46,31 +47,33 @@ public class EntityDaoConverter {
                                 .build();
         }
 
-        public ProcessTemplateReportDao toProcessTemplateReportDao(
-                        ProcessConfigReportViewEntity processConfigReportViewEntity) {
-                return ProcessTemplateReportDao.builder()
-                                .id(processConfigReportViewEntity.getSno())
-                                .name(processConfigReportViewEntity.getStepName())
-                                .createdAt(processConfigReportViewEntity.getCreatedAt())
-                                .excelMapCount(processConfigReportViewEntity.getExcelMapCount() == null ? 0
-                                                : processConfigReportViewEntity.getExcelMapCount())
-                                .smsMapCount(processConfigReportViewEntity.getSmsMapCount() == null ? 0
-                                                : processConfigReportViewEntity.getSmsMapCount())
-                                .whatsappMapCount(processConfigReportViewEntity.getWhatsappMapCount() == null ? 0
-                                                : processConfigReportViewEntity.getWhatsappMapCount())
-                                .mailMapCount(processConfigReportViewEntity.getMailMapCount() == null ? 0
-                                                : processConfigReportViewEntity.getMailMapCount())
+        public NoticeTemplateReportDao toNoticeTemplateReportDao(
+                        ProcessConfigReportViewEntity e) {
+                return NoticeTemplateReportDao.builder()
+                                .id(e.getSno())
+                                .name(e.getStepName())
+                                .description(e.getDescription())
+                                .createdAt(e.getCreatedAt())
+                                .createdUserName(e.getCreatedUserName())
+                                .excelMapCount(e.getExcelMapCount() == null ? 0
+                                                : e.getExcelMapCount())
+                                .smsMapCount(e.getSmsMapCount() == null ? 0
+                                                : e.getSmsMapCount())
+                                .whatsappMapCount(e.getWhatsappMapCount() == null ? 0
+                                                : e.getWhatsappMapCount())
+                                .mailMapCount(e.getMailMapCount() == null ? 0
+                                                : e.getMailMapCount())
                                 .build();
         }
 
-        public NoticeExcelMappingDao toProcessExcelMappingDao(ProcessExcelMappingEntity processexcelmapping1) {
+        public NoticeExcelMappingDao toNoticeExcelMappingDao(MasterProcessExcelMappingEntity noticeexcelmapping1) {
                 return NoticeExcelMappingDao.builder()
-                                .id(processexcelmapping1.getId())
-                                .excelFieldName(processexcelmapping1.getExcelFieldName())
-                                .dbFieldName(processexcelmapping1.getDbFieldName())
-                                .isMandatory(processexcelmapping1.getIsMandatory())
-                                .isAttachment(processexcelmapping1.getIsAttachment())
-                                .isKey(processexcelmapping1.getIsKey())
+                                .id(noticeexcelmapping1.getId())
+                                .excelFieldName(noticeexcelmapping1.getExcelFieldName())
+                                .dbFieldName(noticeexcelmapping1.getDbFieldName())
+                                .isMandatory(noticeexcelmapping1.getIsMandatory())
+                                .isAttachment(noticeexcelmapping1.getIsAttachment())
+                                .isKey(noticeexcelmapping1.getIsKey())
                                 .build();
         }
 

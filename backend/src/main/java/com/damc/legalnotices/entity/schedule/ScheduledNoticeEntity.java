@@ -1,7 +1,7 @@
 package com.damc.legalnotices.entity.schedule;
 
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
-import com.damc.legalnotices.enums.ProcessingStatus;
+import com.damc.legalnotices.enums.NoticeScheduleStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,7 +61,7 @@ public class ScheduledNoticeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ProcessingStatus status = ProcessingStatus.EXCELUPLOADED;
+    private NoticeScheduleStatus status = NoticeScheduleStatus.EXCELUPLOADED;
 
     @Column(name = "created_by", updatable = false)
     private Long createdBy;

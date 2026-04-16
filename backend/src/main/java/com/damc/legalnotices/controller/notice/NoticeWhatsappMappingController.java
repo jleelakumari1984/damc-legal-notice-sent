@@ -17,6 +17,7 @@ import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.notice.WhatsAppPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.WhatsAppTemplateDao;
 import com.damc.legalnotices.dao.notice.WhatsAppUserTemplateDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.notice.NoticeWhatsappApproveDto;
 import com.damc.legalnotices.dto.notice.NoticeWhatsappConfigDto;
 import com.damc.legalnotices.dto.notice.NoticeWhatsappPendingDto;
@@ -40,8 +41,8 @@ public class NoticeWhatsappMappingController {
     private final NoticeWhatsappApprovalService approvalService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<WhatsAppTemplateDao>> getByProcessId(@RequestParam Long processId) {
-        return ResponseEntity.ok(adminService.getByProcessId(baseService.getSessionUser(), processId));
+    public ResponseEntity<List<WhatsAppTemplateDao>> getByNoticeId(@RequestParam Long noticeId) {
+        return ResponseEntity.ok(adminService.getByNoticeId(baseService.getSessionUser(), noticeId));
     }
 
     @GetMapping("/{id}")
@@ -50,27 +51,22 @@ public class NoticeWhatsappMappingController {
     }
 
     @PostMapping("/pending")
-    public ResponseEntity<DataTableDao<List<WhatsAppPendingTemplateDao>>> getPendingTemplates(@Valid @RequestBody NoticeWhatsappPendingDto request) {
-        return ResponseEntity.ok(adminService.getPendingTemplates(baseService.getSessionUser(),request));
+    public ResponseEntity<DataTableDao<List<WhatsAppPendingTemplateDao>>> getPendingTemplates(
+            @Valid @RequestBody DatatableDto<NoticeWhatsappPendingDto> request) {
+        return ResponseEntity.ok(adminService.getPendingTemplates(baseService.getSessionUser(), request));
     }
 
     @PostMapping
     public ResponseEntity<WhatsAppUserTemplateDao> createAdmin(@Valid @RequestBody NoticeWhatsappConfigDto request)
             throws Exception {
-
-        if (!baseService.getSessionUser().isAdmin()) {
-            return ResponseEntity.ok(userService.create(baseService.getSessionUser(), request));
-        }
-        return ResponseEntity.ok(adminService.create(baseService.getSessionUser(), request));
+        return ResponseEntity.ok(userService.create(baseService.getSessionUser(), request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<WhatsAppUserTemplateDao> updateAdmin(@PathVariable Long id,
             @Valid @RequestBody NoticeWhatsappConfigDto request) throws Exception {
-        if (!baseService.getSessionUser().isAdmin()) {
-            return ResponseEntity.ok(userService.update(baseService.getSessionUser(), id, request));
-        }
-        return ResponseEntity.ok(adminService.update(baseService.getSessionUser(), id, request));
+        return ResponseEntity.ok(userService.update(baseService.getSessionUser(), id, request));
+
     }
 
     @PatchMapping("/approve/{id}")

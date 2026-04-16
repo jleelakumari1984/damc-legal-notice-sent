@@ -1,0 +1,44 @@
+<div class="modal fade" id="reportFilterModal" tabindex="-1" aria-labelledby="reportFilterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportFilterModalLabel">
+          <i class="fa fa-filter me-2"></i>Filter Reports
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Notice Name</label>
+            <input class="form-control" [(ngModel)]="noticeName"
+              placeholder="Search by notice name..." (keyup.enter)="apply()">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="status">
+              <option value="">All</option>
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control" [(ngModel)]="fromDate">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control" [(ngModel)]="toDate">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="reset()">
+          <i class="fa fa-times me-1"></i>Reset
+        </button>
+        <button type="button" class="btn btn-brand" (click)="apply()">
+          <i class="fa fa-search me-1"></i>Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,9 @@
 package com.damc.legalnotices.entity.master;
 
-import com.damc.legalnotices.entity.excel.ProcessExcelMappingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -22,9 +23,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class MasterProcessTemplateDetailEntity {
 
     @OneToMany(mappedBy = "process")
-    private List<ProcessExcelMappingEntity> excelMappings;
+    private List<MasterProcessExcelMappingEntity> excelMappings;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sno")
     private Long id;
 
@@ -37,7 +39,7 @@ public class MasterProcessTemplateDetailEntity {
     @Column(name = "description")
     private String description;
 
-   @Column(name = "created_by", updatable = false)
+    @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
     @CreationTimestamp

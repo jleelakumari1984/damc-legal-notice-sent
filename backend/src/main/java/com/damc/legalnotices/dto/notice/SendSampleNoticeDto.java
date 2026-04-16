@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SendSampleNoticeDto {
-    private Long processSno;
+    private Long noticeSno;
     private String mobileNumber;
     private Boolean sendSms;
     private Boolean sendWhatsapp;

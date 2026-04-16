@@ -13,6 +13,7 @@ import com.damc.legalnotices.util.converter.EntityDaoConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +49,9 @@ public class AuthServiceImpl implements AuthService {
         LoginUserDao userDao = entityDaoConverter.toLoginUserDao(loginDetail);
         // User springUser = new User(loginDetail.getLoginName(),
         // loginDetail.getPassword(), Collections.emptyList());
+        if (userDao.isAdmin()) {
+            userDao.setCanSwitchSession(true);
+        }
         String token = jwtUtil.generateToken(userDao);
         log.info("JWT issued for user: {}", loginDetail.getLoginName());
         return new LoginDao(token, userDao);
@@ -58,13 +62,13 @@ public class AuthServiceImpl implements AuthService {
         boolean canSwitch = sessionUser.isAdmin()
                 || Boolean.TRUE.equals(sessionUser.getCanSwitchSession());
         if (!canSwitch) {
-            throw new org.springframework.security.access.AccessDeniedException(
-                    "You do not have permission to switch sessions");
+            throw new AccessDeniedException("You do not have permission to switch sessions");
         }
         UserEntity targetDetail = userRepository.findByIdWithCredit(request.getTargetUserId())
                 .orElseThrow(() -> new BadCredentialsException(
                         "Target user not found with id: " + request.getTargetUserId()));
         LoginUserDao targetUserDao = entityDaoConverter.toLoginUserDao(targetDetail);
+        targetUserDao.setCanSwitchSession(true); // allow switching back to original session
         String token = jwtUtil.generateToken(targetUserDao);
         log.info("Session switched to user: {} by: {}", targetDetail.getLoginName(), sessionUser.getLoginName());
         return new LoginDao(token, targetUserDao);

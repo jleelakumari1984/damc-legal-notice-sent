@@ -28,12 +28,11 @@ public class NoticeWhatsappApprovalServiceImpl implements NoticeWhatsappApproval
                 .orElseThrow(() -> new IllegalArgumentException("WhatsApp config not found with id: " + id));
         entity.setTemplateName(dto.getTemplateName());
         entity.setTemplateLang(dto.getTemplateLang());
-        entity.setSentLevel(dto.getSentLevel());
         entity.setApproveStatus(TemplateApproveStatus.APPROVED.getValue());
         entity.setApprovedBy(sessionUser.getId());
         entity.setApprovedAt(LocalDateTime.now());
         entity.setUpdatedBy(sessionUser.getId());
-        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity));
+        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity), sessionUser);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class NoticeWhatsappApprovalServiceImpl implements NoticeWhatsappApproval
         }
         entity.setUpdatedBy(sessionUser.getId());
         entity.setUpdatedAt(LocalDateTime.now());
-        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity));
+        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity), sessionUser);
     }
 
     @Override
@@ -59,6 +58,6 @@ public class NoticeWhatsappApprovalServiceImpl implements NoticeWhatsappApproval
         entity.setUpdatedBy(sessionUser.getId());
         entity.setUpdatedAt(LocalDateTime.now());
         entity.setUpdatedBy(sessionUser.getId());
-        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity));
+        return entityDaoConverter.toWhatsAppTemplateDao(whatsappConfigRepository.save(entity), sessionUser);
     }
 }

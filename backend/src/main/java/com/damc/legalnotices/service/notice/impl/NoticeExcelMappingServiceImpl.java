@@ -3,11 +3,11 @@ package com.damc.legalnotices.service.notice.impl;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.notice.NoticeExcelMappingDto;
+import com.damc.legalnotices.entity.master.MasterProcessExcelMappingEntity;
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
-import com.damc.legalnotices.entity.excel.ProcessExcelMappingEntity;
+import com.damc.legalnotices.repository.master.MasterProcessExcelMappingRepository;
 import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
 import com.damc.legalnotices.service.notice.NoticeExcelMappingService;
-import com.damc.legalnotices.repository.excel.ProcessExcelMappingRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService {
 
-    private final ProcessExcelMappingRepository mappingRepository;
-    private final MasterProcessTemplateDetailRepository processTemplateRepository;
+    private final MasterProcessExcelMappingRepository mappingRepository;
+    private final MasterProcessTemplateDetailRepository noticeTemplateRepository;
 
     @Override
-    public List<NoticeExcelMappingDao> getByProcessId(LoginUserDao sessionUser, Long processId) {
-        return mappingRepository.findByProcessId(processId)
+    public List<NoticeExcelMappingDao> getByNoticeId(LoginUserDao sessionUser, Long noticeId) {
+        return mappingRepository.findByProcessId(noticeId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -32,18 +32,18 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
 
     @Override
     public NoticeExcelMappingDao getById(LoginUserDao sessionUser, Long id) {
-        ProcessExcelMappingEntity entity = mappingRepository.findById(id)
+        MasterProcessExcelMappingEntity entity = mappingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Excel mapping not found with id: " + id));
         return toResponse(entity);
     }
 
     @Override
     public NoticeExcelMappingDao create(LoginUserDao sessionUser, NoticeExcelMappingDto request) {
-        MasterProcessTemplateDetailEntity process = processTemplateRepository.findById(request.getProcessId())
+        MasterProcessTemplateDetailEntity notice = noticeTemplateRepository.findById(request.getNoticeId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Process template not found with id: " + request.getProcessId()));
-        ProcessExcelMappingEntity entity = new ProcessExcelMappingEntity();
-        entity.setProcess(process);
+                        "Notice template not found with id: " + request.getNoticeId()));
+        MasterProcessExcelMappingEntity entity = new MasterProcessExcelMappingEntity();
+        entity.setProcess(notice);
         entity.setExcelFieldName(request.getExcelFieldName());
         entity.setDbFieldName(request.getDbFieldName());
         entity.setIsKey(request.getIsKey());
@@ -57,12 +57,12 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
 
     @Override
     public NoticeExcelMappingDao update(LoginUserDao sessionUser, Long id, NoticeExcelMappingDto request) {
-        ProcessExcelMappingEntity entity = mappingRepository.findById(id)
+        MasterProcessExcelMappingEntity entity = mappingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Excel mapping not found with id: " + id));
-        MasterProcessTemplateDetailEntity process = processTemplateRepository.findById(request.getProcessId())
+        MasterProcessTemplateDetailEntity notice = noticeTemplateRepository.findById(request.getNoticeId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Process template not found with id: " + request.getProcessId()));
-        entity.setProcess(process);
+                        "Notice template not found with id: " + request.getNoticeId()));
+        entity.setProcess(notice);
         entity.setExcelFieldName(request.getExcelFieldName());
         entity.setDbFieldName(request.getDbFieldName());
         entity.setIsKey(request.getIsKey());
@@ -82,10 +82,10 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
         mappingRepository.deleteById(id);
     }
 
-    private NoticeExcelMappingDao toResponse(ProcessExcelMappingEntity entity) {
+    private NoticeExcelMappingDao toResponse(MasterProcessExcelMappingEntity entity) {
         return NoticeExcelMappingDao.builder()
                 .id(entity.getId())
-                .processId(entity.getProcess() != null ? entity.getProcess().getId() : null)
+                .noticeId(entity.getProcess() != null ? entity.getProcess().getId() : null)
                 .excelFieldName(entity.getExcelFieldName())
                 .dbFieldName(entity.getDbFieldName())
                 .isKey(entity.getIsKey())

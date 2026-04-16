@@ -10,8 +10,8 @@ export class NoticeWhatsappMappingsService {
 
   constructor(private readonly http: HttpClient) { }
 
-  getByProcessId(processId: number): Observable<NoticeExcelMappingResponse[]> {
-    const params = new HttpParams().set('processId', processId.toString());
+  getByNoticeId(noticeId: number): Observable<NoticeExcelMappingResponse[]> {
+    const params = new HttpParams().set('noticeId', noticeId.toString());
     return this.http.get<NoticeExcelMappingResponse[]>(this.api, { params });
   }
 

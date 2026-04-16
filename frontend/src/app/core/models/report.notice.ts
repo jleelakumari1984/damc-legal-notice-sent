@@ -1,12 +1,15 @@
-import { PaginatedRequest } from "./datatable.model";
 import { SmsLog } from "./sms.model";
 import { WhatsappLog } from "./whatsapp.model";
 
-export interface NoticeReportRequest extends PaginatedRequest {
+export interface NoticeReportFilter {
+    noticeName?: string;
+    status?: string;
+    fromDate?: Date;
+    toDate?: Date;
 }
 export interface NoticeReportSummary {
     id: number;
-    processName: string;
+    noticeName: string;
     originalFileName: string;
     zipFilePath: string;
     extractedFolderPath: string;

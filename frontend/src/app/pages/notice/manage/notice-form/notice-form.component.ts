@@ -3,9 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { NoticeService } from '../../../../core/services/notice.service';
-import { SendNoticesService } from '../../../../core/services/send-notices.service';
-import { Notice, NoticeRequest, NoticeType } from '../../../../core/models/notices.model';
-import { NoticeReportRequest } from '../../../../core/models/report.notice';
+import { NoticeRequest, NoticeType } from '../../../../core/models/notices.model';
 
 declare const $: any;
 
@@ -17,7 +15,6 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() editNotice: NoticeType | null = null;
   @Output() saved = new EventEmitter<void>();
 
-  noticeTypes: NoticeType[] = [];
   saving = false;
   errorMessage = '';
 
@@ -33,26 +30,21 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(255)]],
-      processSno: ['', Validators.required],
-      sendSms: [false],
-      sendWhatsapp: [false]
+      description: ['', [Validators.required, Validators.maxLength(500)]],
     });
-    this.loadNoticeTypes();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.form) return;
     if (changes['editNotice']) {
-      const notice = changes['editNotice'].currentValue as Notice | null;
+      const notice = changes['editNotice'].currentValue as NoticeType | null;
       if (notice) {
         this.form.setValue({
-          title: notice.title,
-          processSno: notice.processSno,
-          sendSms: notice.sendSms,
-          sendWhatsapp: notice.sendWhatsapp
+          title: notice.name,
+          description: notice.description
         });
       } else {
-        this.form.reset({ title: '', processSno: '', sendSms: false, sendWhatsapp: false });
+        this.form.reset({ title: '', description: '' });
       }
       this.errorMessage = '';
     }
@@ -67,7 +59,7 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   cancel(): void {
-    this.form.reset({ title: '', processSno: '', sendSms: false, sendWhatsapp: false });
+    this.form.reset({ title: '', description: '' });
     this.errorMessage = '';
     $('#noticeModal').modal('hide');
   }
@@ -75,10 +67,8 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
   submit(): void {
     if (this.form.invalid) return;
     const request: NoticeRequest = {
-      title: this.form.value.title.trim(),
-      processSno: Number(this.form.value.processSno),
-      sendSms: !!this.form.value.sendSms,
-      sendWhatsapp: !!this.form.value.sendWhatsapp
+      name: this.form.value.title.trim(),
+      description: this.form.value.description.trim()
     };
     this.saving = true;
     this.errorMessage = '';
@@ -90,7 +80,7 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
     call.subscribe({
       next: () => {
         this.saving = false;
-        this.form.reset({ title: '', processSno: '', sendSms: false, sendWhatsapp: false });
+        this.form.reset({ title: '' });
         $('#noticeModal').modal('hide');
         this.saved.emit();
       },
@@ -103,12 +93,5 @@ export class NoticeFormComponent implements OnInit, OnChanges, OnDestroy {
 
   get isEditing(): boolean {
     return !!this.editNotice;
-  }
-
-  private loadNoticeTypes(): void {
-    this.service.getNoticeTypes().subscribe({
-      next: (data) => { this.noticeTypes = data.data; },
-      error: () => { }
-    });
   }
 }

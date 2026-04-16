@@ -1,7 +1,7 @@
 package com.damc.legalnotices.service.notification.impl;
 
 import com.damc.legalnotices.config.LocationProperties;
-import com.damc.legalnotices.config.SmsCredential;
+import com.damc.legalnotices.dao.user.UserSmsCredentialDao;
 import com.damc.legalnotices.dto.notification.SmsDataDto;
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
 import com.damc.legalnotices.errors.SmsSendException;
@@ -27,7 +27,7 @@ public class SmsSenderServiceImpl implements SmsSenderService {
     private final NotificationsSaveService notificationsSave;
 
     @Override
-    public void send(SmsDataDto smsData, MasterProcessTemplateDetailEntity template, SmsCredential credential) {
+    public void send(SmsDataDto smsData, MasterProcessTemplateDetailEntity template, UserSmsCredentialDao credential) {
         try {
             if (smsData.getConfig() == null) {
                 throw new SmsSendException("Invalid Sms configuration details ");
@@ -48,7 +48,7 @@ public class SmsSenderServiceImpl implements SmsSenderService {
         }
     }
 
-    private void sendMessage(String sendType, SmsDataDto smsData, SmsCredential credential) {
+    private void sendMessage(String sendType, SmsDataDto smsData, UserSmsCredentialDao credential) {
         try {
             checkValidData(smsData, credential);
             String smsPostData = smsData.getPostData(credential);
@@ -66,11 +66,11 @@ public class SmsSenderServiceImpl implements SmsSenderService {
         }
     }
 
-    private void checkValidData(SmsDataDto sms, SmsCredential credential) {
+    private void checkValidData(SmsDataDto sms, UserSmsCredentialDao credential) {
         if (!StringUtils.hasText(sms.getMessage())) {
             throw new SmsSendException("no SMS Body ");
         }
-        if (!credential.isLive()) {
+        if (credential.getLive() == null || !credential.getLive()) {
             if (!StringUtils.hasText(credential.getTestMobileNumber())) {
                 throw new SmsSendException("Please configure test mobile number");
             }

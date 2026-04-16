@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,11 +17,22 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
+import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "send_error_sms_details")
 public class SendErrorSmsDetailEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "process_sno", insertable = false, updatable = false)
+    private MasterProcessTemplateDetailEntity process;
+
+    @ManyToOne
+    @JoinColumn(name = "sms_template_sno", insertable = false, updatable = false)
+    private MasterProcessSmsConfigDetailEntity smsConfig;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

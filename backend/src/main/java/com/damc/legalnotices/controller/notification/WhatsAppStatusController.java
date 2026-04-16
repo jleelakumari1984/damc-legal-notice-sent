@@ -61,7 +61,7 @@ public class WhatsAppStatusController {
             if (StringUtils.hasText(queryString) || StringUtils.hasText(requestBody)) {
                 result.put("status", "success");
                 entity = whatsAppStatusService.saveData(queryString, requestBody);
-                callbackService.processWhatsAppDeliveryReport(requestBody);
+                callbackService.noticeWhatsAppDeliveryReport(requestBody);
                 entity.setCompleteDate(LocalDateTime.now());
                 entity.setStatus("complete");
                 whatsAppStatusService.saveData(entity);

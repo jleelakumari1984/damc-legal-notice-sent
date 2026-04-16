@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { NoticeTemplateService } from '../../../../core/services/notice-template.service';
-import { WhatsappTemplate, WhatsappUserTemplateRequest, NoticeType, TemplateApprovedStatus } from '../../../../core/models/notices.model';
+import { NoticeExcelMappingsService } from '../../../../core/services/notice-excel-mappings.service';
+import { WhatsappTemplate, WhatsappUserTemplateRequest, NoticeType, TemplateApprovedStatus, NoticeExcelMappingResponse } from '../../../../core/models/notices.model';
 
 declare const $: any;
 
@@ -13,12 +14,15 @@ declare const $: any;
 export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
   @Input() editTemplate: WhatsappTemplate | null = null;
   @Input() noticeType: NoticeType | null = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<WhatsappTemplate>();
+
+  @ViewChild('contentArea') contentArea!: ElementRef<HTMLTextAreaElement>;
 
   form!: FormGroup;
   saving = false;
   errorMessage = '';
   submittedForApproval = false;
+  excelFields: NoticeExcelMappingResponse[] = [];
 
   get isApproved(): boolean {
     return this.editTemplate?.approveStatus === TemplateApprovedStatus.APPROVED;
@@ -26,7 +30,8 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly service: NoticeTemplateService
+    private readonly service: NoticeTemplateService,
+    private readonly excelMappingsService: NoticeExcelMappingsService
   ) { }
 
   ngOnInit(): void {
@@ -51,7 +56,32 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
 
   open(): void {
     this.submittedForApproval = false;
+    if (this.noticeType) {
+      this.excelMappingsService.getByNoticeId(this.noticeType.id).subscribe({
+        next: (fields) => { this.excelFields = fields; },
+        error: () => { this.excelFields = []; }
+      });
+    }
     $('#whatsappUserTemplateModal').modal('show');
+  }
+
+  insertField(fieldName: string): void {
+    const tag = `{{${fieldName}}}`;
+    const el = this.contentArea?.nativeElement;
+    if (!el) {
+      const current = this.form.get('userTemplateContent')?.value ?? '';
+      this.form.get('userTemplateContent')?.setValue(current + tag);
+      return;
+    }
+    const start = el.selectionStart ?? el.value.length;
+    const end = el.selectionEnd ?? el.value.length;
+    const newValue = el.value.substring(0, start) + tag + el.value.substring(end);
+    this.form.get('userTemplateContent')?.setValue(newValue);
+    setTimeout(() => {
+      el.selectionStart = start + tag.length;
+      el.selectionEnd = start + tag.length;
+      el.focus();
+    });
   }
 
   cancel(): void {
@@ -65,7 +95,7 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
     if (this.form.invalid || !this.noticeType || this.isApproved) return;
     const v = this.form.value;
     const request: WhatsappUserTemplateRequest = {
-      processId: this.noticeType.id,
+      noticeId: this.noticeType.id,
       userTemplateContent: v.userTemplateContent.trim(),
       status: 0
     };
@@ -76,10 +106,11 @@ export class WhatsappTemplateFormUserComponent implements OnInit, OnChanges {
       : this.service.createWhatsappTemplate(request);
 
     call$.subscribe({
-      next: () => {
+      next: (data: WhatsappTemplate) => {
+        this.editTemplate = data
         this.saving = false;
         this.submittedForApproval = true;
-        this.saved.emit();
+        this.saved.emit(this.editTemplate);
       },
       error: () => {
         this.saving = false;

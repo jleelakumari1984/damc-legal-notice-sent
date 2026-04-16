@@ -1,7 +1,9 @@
 package com.damc.legalnotices.controller.user;
 
+import com.damc.legalnotices.dto.user.LoginNameCheckDto;
 import com.damc.legalnotices.annotation.RequiresAccess;
 import com.damc.legalnotices.dao.DataTableDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.user.UserListDto;
 import com.damc.legalnotices.dto.user.UserPasswordUpdateDto;
 import com.damc.legalnotices.dto.user.UserRequestDto;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.List;
 
 @Slf4j
@@ -49,7 +52,7 @@ public class UserManagementController {
 
     @PostMapping("/list")
     public ResponseEntity<DataTableDao<List<UserResponseDto>>> getAllUsers(
-            @RequestBody UserListDto request) {
+            @RequestBody DatatableDto<UserListDto> request) {
         return ResponseEntity.ok(userManagementService.getAllUsers(baseService.getSessionUser(), request));
     }
 
@@ -77,6 +80,12 @@ public class UserManagementController {
     @PatchMapping("/{id}/toggle-enabled")
     public ResponseEntity<UserResponseDto> toggleUserStatus(@PathVariable Long id) {
         return ResponseEntity.ok(userManagementService.toggleUserStatus(baseService.getSessionUser(), id));
+    }
+
+    @PostMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> loginNameExists(@Valid @RequestBody LoginNameCheckDto request) {
+        boolean exists = userManagementService.loginNameExists(request.getLoginName(), request.getExcludeId());
+        return ResponseEntity.ok(Map.of("exists", exists));
     }
 
 }

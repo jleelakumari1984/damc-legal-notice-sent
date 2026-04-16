@@ -69,7 +69,7 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
   submit(): void {
     if (this.form.invalid || !this.noticeType) return;
     const request: NoticeExcelMappingRequest = {
-      processId: this.noticeType.id,
+      noticeId: this.noticeType.id,
       excelFieldName: this.form.value.excelFieldName.trim(),
       dbFieldName: this.form.value.dbFieldName.trim(),
       isKey: this.form.value.isKey ? 1 : 0,

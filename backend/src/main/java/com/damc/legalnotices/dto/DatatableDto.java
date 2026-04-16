@@ -10,28 +10,37 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DatatableDto {
+public class DatatableDto<T> {
     private boolean allData;
     private int dtStart;
     private int dtLength;
     private int dtDraw;
     private String sortColumn;
     private String sortDirection;
+    private T filter;
 
     @JsonIgnore
-    public Pageable getPagination() {
+    public boolean isAllData() {
+        return allData;
+    }
 
+    @JsonIgnore
+    public Pageable getPagination(String defaultSortColumn) {
+        if (allData) {
+            return Pageable.unpaged();
+        }
         int length = dtLength <= 0 ? 10 : dtLength;
         int start = dtStart <= 0 ? 0 : dtStart;
-        String sortColumn = getSortColumn();
         String sortDirection = this.sortDirection != null ? this.sortDirection : "DESC";
         if (length <= 10)
             length = 10;
         if (length > 1000)
             length = 1000;
         int page = start / length;
-        Pageable pageable = PageRequest.of(page, length, Sort.by(Sort.Direction.fromString(sortDirection), sortColumn));
-        return pageable;
+        if (sortColumn == null || sortColumn.isBlank()) {
+            return PageRequest.of(page, length, Sort.by(Sort.Direction.fromString(sortDirection), defaultSortColumn));
+        }
+        return PageRequest.of(page, length, Sort.by(Sort.Direction.fromString(sortDirection), sortColumn));
     }
 
     public int getDraw() {

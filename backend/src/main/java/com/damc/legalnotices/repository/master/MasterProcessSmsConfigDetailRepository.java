@@ -15,9 +15,16 @@ public interface MasterProcessSmsConfigDetailRepository
     @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE   p.id = :processId")
     List<MasterProcessSmsConfigDetailEntity> findByProcessId(Long processId);
 
-    @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.status = :status and p.id = :processId")
-    List<MasterProcessSmsConfigDetailEntity> findByProcessIdAndStatus(Long processId, Integer status);
+    @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE   p.id = :processId and e.createdBy = :createdBy")
+    List<MasterProcessSmsConfigDetailEntity> findByProcessIdAndCreatedBy(Long processId, Long createdBy);
+
+    @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.status = :status and p.id = :processId and e.approveStatus = :approveStatus")
+    List<MasterProcessSmsConfigDetailEntity> findByProcessIdAndStatusAndApprovedStatus(Long processId, Integer status,
+            Integer approveStatus);
 
     @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.approveStatus = 0")
     Page<MasterProcessSmsConfigDetailEntity> findPendingTemplates(Pageable pageable);
+
+    @Query("SELECT e FROM MasterProcessSmsConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.approveStatus = 0 and e.createdBy = :userId")
+    Page<MasterProcessSmsConfigDetailEntity> findPendingTemplatesByCreatedBy(Long userId, Pageable pagination);
 }

@@ -3,18 +3,21 @@ import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDate } from './datatable.ut
 import { DataTable } from './base-datatable';
 import { StorageService } from '../../core/services/storage.service';
 import { UserService } from '../../core/services/user.service';
-import { UserPaginatedRequest } from '../../core/models/user.model';
+import { UserFilter } from '../../core/models/user.model';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
 export interface UsersTableOptions {
   storageService: StorageService;
   userService: UserService;
+  getFilters?: () => UserFilter;
   callbacks: {
     onEdit: (user: any) => void;
     onToggle: (user: any) => void;
     onCredits: (user: any) => void;
     onPassword: (user: any) => void;
+    onEndpoints: (user: any) => void;
     onError: (message: string) => void;
   };
 }
@@ -41,12 +44,14 @@ export class UsersDatatable extends DataTable {
             sortField = dtParams.columns[colIndex].data || sortField;
           }
         }
-        var request: UserPaginatedRequest = {
+        const filters = this.options.getFilters ? this.options.getFilters() : {};
+        var request: PaginatedRequest<UserFilter> = {
           sortColumn: sortField,
           sortDirection: sortDir,
           dtStart: start,
           dtLength: length,
           dtDraw: dtParams.draw,
+          filter: filters
         }
         userService.getAll(request).subscribe({
           next: (users) => {
@@ -108,12 +113,15 @@ export class UsersDatatable extends DataTable {
           defaultContent: '',
           className: 'text-end text-nowrap',
           render: (d: any, t: any, row: any) => {
-            const toggleLabel = row.enabled ? 'Disable' : 'Enable';
-            const toggleCls = row.enabled ? 'btn-outline-warning' : 'btn-outline-success';
-            return `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit">Edit</button>` +
-              `<button class="btn ${toggleCls} btn-sm me-1 dt-btn-toggle">${toggleLabel}</button>` +
-              `<button class="btn btn-outline-secondary btn-sm me-1 dt-btn-password">Password</button>` +
-              `<button class="btn btn-outline-info btn-sm dt-btn-credits">Credits</button>`;
+            const toggleLabel = row.enabled ? '<i class="fa-solid fa-toggle-off fs-6"></i>' : '<i class="fa-solid fa-toggle-on fs-6"></i>';
+            const toggleTitle = row.enabled ? 'Disable' : 'Enable';
+            const toggleCls = row.enabled ? 'btn-danger' : 'btn-success';
+            return `<button class="btn btn-primary btn-sm me-1 dt-btn-edit" title='Edit User'><i class="fas fa-edit fs-6"> </i></button>` +
+              `<button class="btn ${toggleCls} btn-sm me-1 dt-btn-toggle" title='${toggleTitle} User'>${toggleLabel}</button>` +
+              `<button class="btn btn-secondary btn-sm me-1 dt-btn-password" title='Change Password'><i class="fa-solid fa-key fs-6"></i></button>` +
+              `<button class="btn btn-info btn-sm dt-btn-credits" title='Manage Credits'><i class="fa-solid fa-wallet fs-6"></i></button>
+              <button class="btn btn-warning btn-sm dt-btn-endpoints" title='Manage Endpoints'><i class="fa-solid fa-network-wired fs-6"></i></button>
+              `;
           }
         }
       ],
@@ -122,6 +130,7 @@ export class UsersDatatable extends DataTable {
         $(row).find('.dt-btn-toggle').on('click', () => callbacks.onToggle(data));
         $(row).find('.dt-btn-password').on('click', () => callbacks.onPassword(data));
         $(row).find('.dt-btn-credits').on('click', () => callbacks.onCredits(data));
+        $(row).find('.dt-btn-endpoints').on('click', () => callbacks.onEndpoints(data));
       }
     };
   }

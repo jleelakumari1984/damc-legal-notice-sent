@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 public class NoticeExcelMappingDto {
 
-    @NotNull(message = "processId is required")
-    private Long processId;
+    @NotNull(message = "noticeId is required")
+    private Long noticeId;
 
     @NotBlank(message = "excelFieldName is required")
     private String excelFieldName;

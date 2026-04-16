@@ -1,4 +1,4 @@
-<div class="container-fluid py-3">
+<div class="container-fluid py-3 pb-0">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="mb-0"><i class="fa fa-check-circle me-2"></i>Template Approvals</h5>
   </div>
@@ -8,20 +8,21 @@
     <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
   </div>
 
-  <ul class="nav nav-tabs mb-3">
+  <ul class="nav nav-tabs  ">
     <li class="nav-item">
-      <button class="nav-link" [class.active]="activeTab === 'sms'" (click)="activeTab = 'sms'">
+      <button class="nav-link" [class.active]="activeTab === 'sms'" (click)="activeTab = 'sms';showApproval=false">
         <i class="fa fa-sms me-1"></i> SMS Templates
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" [class.active]="activeTab === 'whatsapp'" (click)="activeTab = 'whatsapp'">
+      <button class="nav-link" [class.active]="activeTab === 'whatsapp'"
+        (click)="activeTab = 'whatsapp';showApproval=false">
         <i class="fa fa-comment-dots me-1"></i> WhatsApp Templates
       </button>
     </li>
   </ul>
 
-  <div [hidden]="activeTab !== 'sms'">
+  <div [hidden]="activeTab !== 'sms'|| showApproval">
     <div class="card">
       <div class="card-body table-responsive">
         <table id="smsPendingTable" class="table table-bordered table-sm w-100"></table>
@@ -29,7 +30,7 @@
     </div>
   </div>
 
-  <div [hidden]="activeTab !== 'whatsapp'">
+  <div [hidden]="activeTab !== 'whatsapp' || showApproval">
     <div class="card">
       <div class="card-body table-responsive">
         <table id="waPendingTable" class="table table-bordered table-sm w-100"></table>
@@ -38,5 +39,7 @@
   </div>
 </div>
 
-<app-sms-approval-form #smsApprovalForm (done)="reloadBoth()"></app-sms-approval-form>
-<app-whatsapp-approval-form #whatsappApprovalForm (done)="reloadBoth()"></app-whatsapp-approval-form>
+<app-sms-approval-form *ngIf="activeTab == 'sms'" #smsApprovalForm (done)="reloadBoth()" [inline]=" showApproval"
+  (cancelled)="onApprovalCancelled()"></app-sms-approval-form>
+<app-whatsapp-approval-form *ngIf="activeTab == 'whatsapp'" #whatsappApprovalForm (done)="reloadBoth()" [inline]=" showApproval"
+  (cancelled)="onApprovalCancelled()"></app-whatsapp-approval-form>

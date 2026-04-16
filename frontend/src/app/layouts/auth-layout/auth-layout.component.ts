@@ -24,6 +24,9 @@ export class AuthLayoutComponent {
   isSuperOrAdmin(): boolean {
     return this.storageService.isSuperOrAdmin();
   }
+  canChangeSession(): boolean {
+    return this.storageService.isSuperOrAdmin() || this.storageService.getUser()?.canSwitchSession || false;
+  }
 
   openSwitchSession(): void {
     $('#switchSessionModal').modal('show');

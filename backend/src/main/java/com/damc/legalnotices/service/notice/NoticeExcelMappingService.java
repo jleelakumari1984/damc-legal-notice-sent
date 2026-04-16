@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface NoticeExcelMappingService {
 
-    List<NoticeExcelMappingDao> getByProcessId(LoginUserDao  sessionUser, Long processId);
+    List<NoticeExcelMappingDao> getByNoticeId(LoginUserDao  sessionUser, Long noticeId);
 
     NoticeExcelMappingDao getById(LoginUserDao  sessionUser, Long id);
 

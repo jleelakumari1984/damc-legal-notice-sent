@@ -17,6 +17,7 @@ import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.notice.SmsPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.notice.SmsUserTemplateDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsApproveDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsConfigDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsPendingDto;
@@ -40,9 +41,9 @@ public class NoticeSmsMappingController {
     private final NoticeSmsApprovalService approvalService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<SmsTemplateDao>> getByProcessId(@RequestParam Long processId) {
+    public ResponseEntity<List<SmsTemplateDao>> getByNoticeId(@RequestParam Long noticeId) {
 
-        return ResponseEntity.ok(adminService.getByProcessId(baseService.getSessionUser(), processId));
+        return ResponseEntity.ok(adminService.getByNoticeId(baseService.getSessionUser(), noticeId));
     }
 
     @GetMapping("/{id}")
@@ -51,28 +52,21 @@ public class NoticeSmsMappingController {
     }
 
     @PostMapping("/pending")
-    public ResponseEntity<DataTableDao<List<SmsPendingTemplateDao>>> getPendingTemplates(@Valid @RequestBody NoticeSmsPendingDto request) {
-        return ResponseEntity.ok(adminService.getPendingTemplates(baseService.getSessionUser(),request));
+    public ResponseEntity<DataTableDao<List<SmsPendingTemplateDao>>> getPendingTemplates(
+            @Valid @RequestBody DatatableDto<NoticeSmsPendingDto> request) {
+        return ResponseEntity.ok(adminService.getPendingTemplates(baseService.getSessionUser(), request));
     }
 
     @PostMapping
     public ResponseEntity<SmsUserTemplateDao> createAdmin(@Valid @RequestBody NoticeSmsConfigDto request)
             throws Exception {
-
-        if (!baseService.getSessionUser().isAdmin()) {
-            return ResponseEntity.ok(userService.create(baseService.getSessionUser(), request));
-        }
-        return ResponseEntity.ok(adminService.create(baseService.getSessionUser(), request));
+        return ResponseEntity.ok(userService.create(baseService.getSessionUser(), request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SmsUserTemplateDao> updateAdmin(@PathVariable Long id,
             @Valid @RequestBody NoticeSmsConfigDto request) throws Exception {
-
-        if (!baseService.getSessionUser().isAdmin()) {
-            return ResponseEntity.ok(userService.update(baseService.getSessionUser(), id, request));
-        }
-        return ResponseEntity.ok(adminService.update(baseService.getSessionUser(), id, request));
+        return ResponseEntity.ok(userService.update(baseService.getSessionUser(), id, request));
     }
 
     @PatchMapping("/approve/{id}")

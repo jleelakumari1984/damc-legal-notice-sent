@@ -10,14 +10,13 @@ import java.util.Map;
 
 public final class NoticeSmsMappingValidationUtil {
 
-    private NoticeSmsMappingValidationUtil() {}
+    private NoticeSmsMappingValidationUtil() {
+    }
 
     public static void validateAdminTemplate(NoticeSmsConfigDto request) {
         Map<String, List<String>> errorMap = new HashMap<>();
         if (request.getTemplateContent() == null || request.getTemplateContent().isBlank())
             errorMap.computeIfAbsent("templateContent", k -> new ArrayList<>()).add("Template content is required");
-        if (request.getSentLevel() == null)
-            errorMap.computeIfAbsent("sentLevel", k -> new ArrayList<>()).add("Sent level is required");
         if (request.getPeid() == null || request.getPeid().isBlank())
             errorMap.computeIfAbsent("peid", k -> new ArrayList<>()).add("PEID (principal entity ID) is required");
         if (request.getSenderId() == null || request.getSenderId().isBlank())

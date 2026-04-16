@@ -3,7 +3,8 @@ import { authBeforeSend, BASE_DT_OPTIONS, esc, formatDateTime } from './datatabl
 import { DataTable } from './base-datatable';
 import { StorageService } from '../../core/services/storage.service';
 import { CreditService } from '../../core/services/credit.service';
-import { CreditPaginatedRequest } from '../../core/models/credit.model';
+import { CreditFilter } from '../../core/models/credit.model';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
@@ -48,13 +49,13 @@ export class CreditsDatatable extends DataTable {
             sortField = dtParams.columns[colIndex].data || sortField;
           }
         }
-        var request: CreditPaginatedRequest = {
+        var request: PaginatedRequest<CreditFilter> = {
           sortColumn: sortField,
           sortDirection: sortDir,
           dtStart: start,
           dtLength: length,
           dtDraw: dtParams.draw,
-          userid: userId
+          filter: { userid: userId }
         }
         creditService.getAll(request).subscribe({
           next: (users) => {

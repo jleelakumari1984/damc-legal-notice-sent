@@ -1,0 +1,46 @@
+<div class="modal fade" id="userFilterModal" tabindex="-1" aria-labelledby="userFilterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userFilterModalLabel">
+          <i class="fa fa-filter me-2"></i>Filter Users
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Search</label>
+            <input class="form-control" [(ngModel)]="search"
+              placeholder="Name, email, mobile..." (keyup.enter)="apply()">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Access Level</label>
+            <select class="form-select" [(ngModel)]="accessLevel">
+              <option [ngValue]="null">All</option>
+              <option [ngValue]="1">Super Admin</option>
+              <option [ngValue]="2">Admin</option>
+              <option [ngValue]="3">User</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="enabled">
+              <option [ngValue]="null">All</option>
+              <option [ngValue]="true">Active</option>
+              <option [ngValue]="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="reset()">
+          <i class="fa fa-times me-1"></i>Reset
+        </button>
+        <button type="button" class="btn btn-brand" (click)="apply()">
+          <i class="fa fa-search me-1"></i>Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,8 +4,9 @@ import { DatatableHelper } from '../../shared/datatable/datatable.helper';
 import { UsersDatatable } from '../../shared/datatable/users-datatable';
 import { UserService } from '../../core/services/user.service';
 import { UserFormComponent } from './user-form/user-form.component';
+import { UserFilterComponent } from './user-filter/user-filter.component';
 import { StorageService } from '../../core/services/storage.service';
-import { User } from '../../core/models/user.model';
+import { User, UserFilter } from '../../core/models/user.model';
 import { ConfirmModalService } from '../../shared/confirm-modal/confirm-modal.service';
 
 declare const $: any;
@@ -17,13 +18,15 @@ declare const $: any;
 })
 export class UsersComponent implements AfterViewInit {
   @ViewChild(UserFormComponent) userForm!: UserFormComponent;
+  @ViewChild(UserFilterComponent) userFilter!: UserFilterComponent;
 
   selectedUser: User | null = null;
-  actionType: 'add' | 'edit' | 'credit' | 'view' = 'view';
+  actionType: 'add' | 'edit' | 'credit' | 'endpoints' | 'view' = 'view';
   newPassword = '';
   passwordSubmitting = false;
   passwordError = '';
 
+  private activeFilter: UserFilter = {};
   successMessage = '';
   errorMessage = '';
 
@@ -42,19 +45,30 @@ export class UsersComponent implements AfterViewInit {
     this.datatableHelper.initTable('#usersTable', new UsersDatatable({
       storageService: this.storageService,
       userService: this.service,
+      getFilters: () => this.activeFilter,
       callbacks: {
         onEdit: (user) => this.openEditModal(user),
         onToggle: (user) => this.toggleUserEnabled(user),
         onCredits: (user) => this.openCredits(user),
         onPassword: (user) => this.openPasswordModal(user),
+        onEndpoints: (user) => this.openEndpoints(user),
         onError: (msg) => this.errorMessage = msg
       }
     }));
   }
 
+  onFilterChange(filter: UserFilter): void {
+    this.activeFilter = filter;
+    this.datatableHelper.reload('#usersTable');
+  }
+
   reload(): void {
     this.clearMessages();
     this.datatableHelper.reload('#usersTable');
+  }
+  openEndpoints(user: User): void {
+    this.selectedUser = user;
+    this.actionType = 'endpoints';
   }
 
   openAddModal(): void {

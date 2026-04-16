@@ -8,11 +8,12 @@ import com.damc.legalnotices.dao.report.NoticeReportDao;
 import com.damc.legalnotices.dao.report.NoticeReportItemDao;
 import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
 import com.damc.legalnotices.dto.report.NoticeSmsLogListReportDto;
 import com.damc.legalnotices.dto.report.NoticeWhatsappLogListReportDto;
 import com.damc.legalnotices.entity.view.ScheduleReportViewEntity;
-import com.damc.legalnotices.enums.ProcessingStatus;
+import com.damc.legalnotices.enums.NoticeScheduleStatus;
 import com.damc.legalnotices.repository.notification.SendErrorSmsDetailRepository;
 import com.damc.legalnotices.repository.notification.SendErrorWhatsappDetailRepository;
 import com.damc.legalnotices.repository.notification.SendLoanSmsDetailRepository;
@@ -48,8 +49,26 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         private final SendErrorWhatsappDetailRepository sendErrorWhatsappDetailRepository;
 
         @Override
-        public DataTableDao<List<NoticeReportDao>> getAllNoticeReports(LoginUserDao  sessionUser, NoticeReportDto request) {
-                Page<ScheduleReportViewEntity> page = scheduleReportRepository.findAll(request.getPagination());
+        public DataTableDao<List<NoticeReportDao>> getAllNoticeReports(LoginUserDao sessionUser,
+                        DatatableDto<NoticeReportDto> request) {
+                NoticeReportDto filter = request.getFilter();
+                 Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
+                Page<ScheduleReportViewEntity> page;
+                if (filter != null) {
+                        Long userId = filter.getUserId();
+                        String noticeName = (filter.getNoticeName() != null && !filter.getNoticeName().isBlank())
+                                        ? filter.getNoticeName().trim()
+                                        : null;
+                        String status = (filter.getStatus() != null && !filter.getStatus().isBlank())
+                                        ? filter.getStatus().trim()
+                                        : null;
+                        page = scheduleReportRepository.findAllFiltered(
+                                        userId, noticeName, status,
+                                        filter.getFromDate(), filter.getToDate(),
+                                        pageable);
+                } else {
+                        page = scheduleReportRepository.findAll(pageable);
+                }
 
                 return DataTableDao.<List<NoticeReportDao>>builder()
                                 .draw(request.getDraw())
@@ -62,18 +81,18 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public NoticeReportDetailDao getNoticeReportDetail(LoginUserDao  sessionUser, Long noticeId, String status) {
+        public NoticeReportDetailDao getNoticeReportDetail(LoginUserDao sessionUser, Long noticeId, String status) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
 
                 List<NoticeReportItemDao> items;
                 if (status != null && !status.isBlank()) {
-                        ProcessingStatus processingStatus = ProcessingStatus.valueOf(status.toUpperCase());
-                        if (processingStatus == null) {
+                        NoticeScheduleStatus noticeingStatus = NoticeScheduleStatus.valueOf(status.toUpperCase());
+                        if (noticeingStatus == null) {
                                 throw new IllegalArgumentException("Invalid status value: " + status);
                         }
                         items = scheduledNoticeItemRepository
-                                        .findByScheduledNoticeIdAndStatus(noticeId, processingStatus).stream()
+                                        .findByScheduledNoticeIdAndStatus(noticeId, noticeingStatus).stream()
                                         .map(reportEntityDaoConverter::toReportItemDto)
                                         .toList();
                 } else {
@@ -90,13 +109,14 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogListReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsLogs(LoginUserDao sessionUser, Long noticeId,
+                        DatatableDto<NoticeSmsLogListReportDto> request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
-                Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
+                 Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
 
                 Page<SendSmsDao> page;
-                String status = request.getStatus();
+                String status = request.getFilter() != null ? request.getFilter().getStatus() : null;
                 if (status != null && !status.isBlank()) {
                         page = sendLoanSmsDetailRepository
                                         .findByScheduleSnoAndReceivedStatus(noticeId, status, pageable)
@@ -119,10 +139,11 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao  sessionUser, Long noticeId, NoticeSmsLogListReportDto request) {
+        public DataTableDao<NoticeReportSmsDetailsDao> getSmsErrorLogs(LoginUserDao sessionUser, Long noticeId,
+                        DatatableDto<NoticeSmsLogListReportDto> request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
-                Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
+                 Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
 
                 Page<SendSmsDao> page = sendErrorSmsDetailRepository
                                 .findByScheduleSno(noticeId, pageable)
@@ -140,14 +161,14 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao  sessionUser, Long noticeId,
-                        NoticeWhatsappLogListReportDto request) {
+        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppLogs(LoginUserDao sessionUser, Long noticeId,
+                        DatatableDto<NoticeWhatsappLogListReportDto> request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
-                Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
+                 Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
 
                 Page<SendWhatsappDao> page;
-                String status = request.getStatus();
+                String status = request.getFilter() != null ? request.getFilter().getStatus() : null;
                 if (status != null && !status.isBlank()) {
                         page = sendLoanWhatsappDetailRepository
                                         .findByScheduleSnoAndReceivedStatus(noticeId, status, pageable)
@@ -170,11 +191,12 @@ public class NoticeReportServiceImpl implements NoticeReportService {
         }
 
         @Override
-        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao  sessionUser, Long noticeId,
-                        NoticeWhatsappLogListReportDto request) {
+        public DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao sessionUser,
+                        Long noticeId,
+                        DatatableDto<NoticeWhatsappLogListReportDto> request) {
                 ScheduleReportViewEntity notice = scheduleReportRepository.findById(noticeId)
                                 .orElseThrow(() -> new IllegalArgumentException("Notice not found: " + noticeId));
-                Pageable pageable = request.isAllData() ? Pageable.unpaged() : request.getPagination();
+                 Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
 
                 Page<SendWhatsappDao> page = sendErrorWhatsappDetailRepository
                                 .findByScheduleSno(noticeId, pageable)

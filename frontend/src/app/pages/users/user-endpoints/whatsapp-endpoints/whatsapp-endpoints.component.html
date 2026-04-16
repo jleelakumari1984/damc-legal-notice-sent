@@ -1,0 +1,78 @@
+<div class="py-3">
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-success"></div>
+  </div>
+
+  <div *ngIf="!loading">
+
+    <div *ngIf="loadError" class="alert alert-danger alert-dismissible mb-3">
+      {{ loadError }}
+      <button type="button" class="btn-close" (click)="loadError = ''"></button>
+    </div>
+
+    <div *ngIf="saveSuccess" class="alert alert-success alert-dismissible mb-3">
+      WhatsApp credential saved successfully.
+      <button type="button" class="btn-close" (click)="saveSuccess = false"></button>
+    </div>
+
+    <div *ngIf="saveError" class="alert alert-danger alert-dismissible mb-3">
+      {{ saveError }}
+      <button type="button" class="btn-close" (click)="saveError = ''"></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fa fa-comment-dots me-2"></i>WhatsApp Credential</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label">API URL <span class="text-danger">*</span></label>
+              <input class="form-control" formControlName="url" placeholder="https://whatsapp-provider.com/api"
+                [class.is-invalid]="form.get('url')?.invalid && form.get('url')?.touched">
+              <div class="invalid-feedback">Required.</div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Access Token
+                <small class="text-muted ms-1">{{ credential ? '(leave blank to keep existing)' : '' }}</small>
+              </label>
+              <input class="form-control" type="password" formControlName="accessToken" autocomplete="new-password">
+              <div class="form-text"><i class="fa fa-lock me-1"></i>Stored securely and never displayed.</div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Attachment Download URL</label>
+              <input class="form-control" formControlName="attachmentDownloadUrl"
+                placeholder="https://whatsapp-provider.com/attachments">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Test Mobile Number</label>
+              <input class="form-control" formControlName="testMobileNumber" placeholder="e.g. 9999999999">
+            </div>
+
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" formControlName="live" id="waCredLive">
+                <label class="form-check-label" for="waCredLive">Live Mode</label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+          <button type="submit" class="btn btn-brand" [disabled]="saving || form.invalid">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ credential ? 'Update' : 'Save' }}
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+</div>

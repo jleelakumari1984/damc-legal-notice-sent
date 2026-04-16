@@ -1,9 +1,9 @@
 package com.damc.legalnotices.service.notification.impl;
 
 import com.damc.legalnotices.config.LocationProperties;
-import com.damc.legalnotices.config.WhatsAppCredential;
-import com.damc.legalnotices.dto.notification.WhatsAppAttachmentDto;
+import com.damc.legalnotices.dao.user.UserWhatsAppCredentialDao;
 import com.damc.legalnotices.dto.notification.WhatsAppDataDto;
+import com.damc.legalnotices.dto.notification.WhatsAppApiRequestDto.WhatsAppComponentDto;
 import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
 import com.damc.legalnotices.errors.WhatsAppSendException;
 import com.damc.legalnotices.service.notification.NotificationsSaveService;
@@ -36,8 +36,8 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
     private final RestTemplateBuilder restTemplateBuilder;
     private final NotificationsSaveService notificationsSave;
 
-    private void validateData(WhatsAppDataDto bean, WhatsAppCredential credential) throws WhatsAppSendException {
-        if (!credential.isLive()) {
+    private void validateData(WhatsAppDataDto bean, UserWhatsAppCredentialDao credential) throws WhatsAppSendException {
+        if (credential.getLive() == null || !credential.getLive()) {
             if (!StringUtils.hasText(credential.getTestMobileNumber())) {
                 throw new WhatsAppSendException("Please configure test mobile number");
             }
@@ -55,7 +55,7 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
 
     @Override
     public void send(WhatsAppDataDto whatsAppData, MasterProcessTemplateDetailEntity template,
-            List<String> attachments, WhatsAppCredential credential) {
+            List<String> attachments, UserWhatsAppCredentialDao credential) {
 
         if (whatsAppData.getConfig() == null) {
             throw new WhatsAppSendException("Invalid WhatsApp configuration details ");
@@ -72,8 +72,9 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-            List<Object> components = objectMapper.readValue(whatsAppParams, new TypeReference<List<Object>>() {
-            });
+            List<WhatsAppComponentDto> components = objectMapper.readValue(whatsAppParams,
+                    new TypeReference<List<WhatsAppComponentDto>>() {
+                    });
             whatsAppData.setMessage(whatsAppParams);
             whatsAppData.setComponents(components);
             sendMessage(template.getName(), whatsAppData, attachments, credential);
@@ -85,7 +86,7 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
     }
 
     private void sendMessage(String sendType, WhatsAppDataDto whatsAppData, List<String> attachments,
-            WhatsAppCredential credential) {
+            UserWhatsAppCredentialDao credential) {
         try {
             validateData(whatsAppData, credential);
             if (!StringUtils.hasText(whatsAppData.getMessage())
@@ -105,7 +106,7 @@ public class WhatsappSenderServiceImpl implements WhatsappSenderService {
                             : filenameWithExt;
                     String fileUrl = downloadUrl + whatsAppData.getScheduleItemId() + "/"
                             + attachmentPath.getFileName();
-                    whatsAppData.getComponents().add(WhatsAppAttachmentDto.ofDocument(fileUrl, filename));
+                    whatsAppData.getComponents().add(WhatsAppComponentDto.ofDocument(fileUrl, filename));
                 }
             }
             String whatsAppPostData = whatsAppData.getPostData(credential);

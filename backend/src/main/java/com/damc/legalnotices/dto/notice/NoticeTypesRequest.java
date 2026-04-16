@@ -1,17 +1,16 @@
 package com.damc.legalnotices.dto.notice;
 
-import com.damc.legalnotices.dto.DatatableDto;
+import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class NoticeTypesRequest extends DatatableDto {
+public class NoticeTypesRequest {
     private String status;
-
-    @Override
-    public String getSortColumn() {
-        return super.getSortColumn() == null ? "createdAt" : super.getSortColumn();
-    }
+    private Long userId;
+    private String noticeName;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
 }

@@ -36,7 +36,7 @@ public class ExcelPreviewController {
 
     @PostMapping("/send-sample")
     public ResponseEntity<Void> sendSample(@RequestBody SendSampleNoticeDto request) {
-        log.info("Send sample notice request for processSno: {}, mobile: {}", request.getProcessSno(),
+        log.info("Send sample notice request for noticeSno: {}, mobile: {}", request.getNoticeSno(),
                 request.getMobileNumber());
         noticeSchedule.sendSampleNotice(baseService.getSessionUser(), request);
         return ResponseEntity.ok().build();

@@ -1,11 +1,8 @@
-import { PaginatedRequest } from "./datatable.model";
-import { ProcessExcelMapping } from "./excel.model";
-
-export interface Notice {
+export interface NoticeReport {
     id: number;
     title: string;
-    processSno: number;
-    processName: string;
+    noticeSno: number;
+    noticeName: string;
     status: string;
     sendSms: boolean;
     sendWhatsapp: boolean;
@@ -18,29 +15,25 @@ export interface Notice {
 }
 
 export interface NoticeRequest {
-    title: string;
-    processSno: number;
-    sendSms: boolean;
-    sendWhatsapp: boolean;
+    name: string;
+    description: string;
 }
 
 export interface NoticeType {
     id: number;
     name: string;
+    description: string;
+    createdUserName: string;
     excelMapCount: number;
     smsMapCount: number;
     whatsappMapCount: number;
     mailMapCount: number;
 }
 
-export interface NoticeTypeRequest extends PaginatedRequest {
-    name: string;
-}
-
 
 export interface NoticeExcelMappingResponse {
     id: number;
-    processId: number;
+    noticeId: number;
     excelFieldName: string;
     dbFieldName: string;
     isKey: number;
@@ -51,7 +44,7 @@ export interface NoticeExcelMappingResponse {
 }
 
 export interface NoticeExcelMappingRequest {
-    processId: number;
+    noticeId: number;
     excelFieldName: string;
     dbFieldName: string;
     isKey: number;
@@ -62,7 +55,7 @@ export interface NoticeExcelMappingRequest {
 
 export interface SmsTemplate {
     id: number;
-    processId: number;
+    noticeId: number;
     peid: string;
     senderId: string;
     routeId: string;
@@ -75,11 +68,12 @@ export interface SmsTemplate {
     status: number;
     approveStatus: number;
     rejectionReason?: string;
-    createdAt: string;
+    createdAt: Date;
+    ownTemplate: boolean;
 }
 
 export interface SmsUserTemplateRequest {
-    processId: number;
+    noticeId: number;
     userTemplateContent: string;
     status: number;
 }
@@ -94,27 +88,29 @@ export interface SmsTemplateRequest extends SmsUserTemplateRequest {
     dcs: number;
     flashSms: number;
 }
-export interface SmsPendingTemplateRequest extends PaginatedRequest {
+export interface SmsPendingTemplateRequest {
 }
 export interface SmsPendingTemplate {
     id: number;
-    processName: string;
+    noticeId: number;
+    noticeName: string;
     userName: string;
     userTemplateContent: string;
-    createdAt: string;
+    createdAt: Date;
 }
-export interface WhatsappPendingTemplateRequest extends PaginatedRequest {
+export interface WhatsappPendingTemplateRequest {
 }
 export interface WhatsappPendingTemplate {
     id: number;
-    processName: string;
+    noticeId: number;
+    noticeName: string;
     userName: string;
     userTemplateContent: string;
-    createdAt: string;
+    createdAt: Date;
 }
 export interface WhatsappTemplate {
     id: number;
-    processId: number;
+    noticeId: number;
     templateName: string;
     templatePath: string;
     userTemplateContent: string;
@@ -123,11 +119,12 @@ export interface WhatsappTemplate {
     status: number;
     approveStatus: number;
     rejectionReason?: string;
-    createdAt: string;
+    createdAt: Date;
+    ownTemplate: boolean;
 }
 
 export interface WhatsappUserTemplateRequest {
-    processId: number;
+    noticeId: number;
     userTemplateContent: string;
     status: number;
 }

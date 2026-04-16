@@ -50,7 +50,7 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
   loadMappings(): void {
     if (!this.selectedNotice) return;
     this.datatableHelper.initTable('#mappingsTable', new ExcelMappingsDatatable({
-      processId: this.selectedNotice.id,
+      noticeId: this.selectedNotice.id,
       excelMapService: this.excelMapService,
       storageService: this.storageService,
       callbacks: {

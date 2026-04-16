@@ -1,6 +1,6 @@
 package com.damc.legalnotices.entity.schedule;
 
-import com.damc.legalnotices.enums.ProcessingStatus;
+import com.damc.legalnotices.enums.NoticeScheduleStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,7 +42,7 @@ public class ScheduledNoticeItemEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ProcessingStatus status = ProcessingStatus.PENDING;
+    private NoticeScheduleStatus status = NoticeScheduleStatus.PENDING;
 
     @Column(name = "failure_reason")
     private String failureReason;

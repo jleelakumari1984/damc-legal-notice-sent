@@ -48,7 +48,7 @@ export class SmsLogsComponent implements OnInit, AfterViewInit {
     const request = {
       sortColumn: 'sendAt', sortDirection: 'desc',
       dtStart: 0, dtLength: -1, dtDraw: 1,
-      status: this.reportStatus
+      filter: { status: this.reportStatus }
     };
     const source$ = this.activeTab === 'ERROR'
       ? this.service.exportErrorSmsLogs(this.selectedReport.id, request)

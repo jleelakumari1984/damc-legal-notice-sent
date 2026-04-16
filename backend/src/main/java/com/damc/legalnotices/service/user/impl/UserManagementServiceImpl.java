@@ -2,6 +2,7 @@ package com.damc.legalnotices.service.user.impl;
 
 import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.user.UserListDto;
 import com.damc.legalnotices.dto.user.UserRequestDto;
 import com.damc.legalnotices.dto.user.UserResponseDto;
@@ -17,6 +18,7 @@ import com.damc.legalnotices.util.converter.UserEntityDaoConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,8 +69,21 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
-    public DataTableDao<List<UserResponseDto>> getAllUsers(LoginUserDao sessionUser, UserListDto request) {
-        Page<UserEntity> page = userRepository.findAllWithCredits(request.getPagination());
+    public DataTableDao<List<UserResponseDto>> getAllUsers(LoginUserDao sessionUser,
+            DatatableDto<UserListDto> request) {
+        UserListDto filter = request.getFilter();
+        Page<UserEntity> page;
+        Pageable pageable = request == null || request.isAllData() ? Pageable.unpaged() : request.getPagination("id");
+        if (filter != null
+                && (filter.getSearch() != null || filter.getAccessLevel() != null || filter.getEnabled() != null)) {
+            String search = (filter.getSearch() != null && !filter.getSearch().isBlank()) ? filter.getSearch().trim()
+                    : null;
+            page = userRepository.findAllWithCreditsFiltered(search, filter.getAccessLevel(), filter.getEnabled(),
+                    pageable);
+
+        } else {
+            page = userRepository.findAllWithCredits(pageable);
+        }
         return DataTableDao.<List<UserResponseDto>>builder()
                 .draw(request.getDraw())
                 .recordsTotal(page.getTotalElements())
@@ -78,9 +93,23 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
+    public boolean loginNameExists(String loginName, Long excludeId) {
+        if (excludeId != null) {
+            return userRepository.existsByLoginNameAndIdNot(loginName, excludeId);
+        }
+        return userRepository.existsByLoginName(loginName);
+    }
+
+    @Override
     @Transactional
     public UserResponseDto updateUser(LoginUserDao sessionUser, Long id, UserUpdateDto request) {
         UserEntity entity = findById(id);
+        if (request.getLoginName() != null) {
+            if (userRepository.existsByLoginNameAndIdNot(request.getLoginName(), id)) {
+                throw new IllegalArgumentException("Login name already exists: " + request.getLoginName());
+            }
+            entity.setLoginName(request.getLoginName());
+        }
         if (request.getDisplayName() != null)
             entity.setDisplayName(request.getDisplayName());
         if (request.getUserEmail() != null)

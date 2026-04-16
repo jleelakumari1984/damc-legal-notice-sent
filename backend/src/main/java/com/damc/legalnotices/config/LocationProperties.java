@@ -17,6 +17,9 @@ public class LocationProperties {
     @NotNull
     private String templateLocation;
 
+    @NotNull
+    private String endPoints;
+
     private int poiMaxByteArrayOverride = Integer.MAX_VALUE;
 
     private int previewMaxRows = 100;

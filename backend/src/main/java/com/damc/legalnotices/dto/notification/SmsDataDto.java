@@ -1,14 +1,11 @@
 package com.damc.legalnotices.dto.notification;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.damc.legalnotices.config.SmsCredential;
+import com.damc.legalnotices.dao.user.UserSmsCredentialDao;
 import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -21,7 +18,7 @@ import lombok.Setter;
 @Builder
 public class SmsDataDto {
     private MasterProcessSmsConfigDetailEntity config;
-    
+
     private String agreementNumber;
 
     private Long scheduleId;
@@ -38,27 +35,23 @@ public class SmsDataDto {
     private Map<String, Object> props = new HashMap<String, Object>();
     private boolean sendEnabled;
 
-    public String getPostData(SmsCredential credential) throws JsonProcessingException {
-        Hashtable<String, Object> sendObject = new Hashtable<>();
-        sendObject.put("username", "********************");
-        sendObject.put("password", "********************");
-
-        sendObject.put("from", config.getSenderId());
-        sendObject.put("pe_id", config.getPeid());
-        sendObject.put("template_id", config.getTemplateId());
-        sendObject.put("coding", config.getDcs() + "");
-        sendObject.put("flash", config.getFlashSms() + "");
-        sendObject.put("text", getMessage());
-        List<String> mobileNumbers = new ArrayList<>();
-        mobileNumbers.add(getMobileNumber());
-        sendObject.put("to", mobileNumbers);
-
+    public String getPostData(UserSmsCredentialDao credential) throws Exception {
+        SmsApiRequestDto smsApiRequestDao = SmsApiRequestDto.builder()
+                .username("********************")
+                .password("********************")
+                .from(config.getSenderId())
+                .peId(config.getPeid())
+                .templateId(config.getTemplateId())
+                .coding(config.getDcs() + "")
+                .flash(config.getFlashSms() + "")
+                .text(getMessage())
+                .to(List.of(getMobileNumber()))
+                .build();
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        postMessage = ow.writeValueAsString(sendObject);
+        postMessage = ow.writeValueAsString(smsApiRequestDao);
+        smsApiRequestDao.setUsername(credential.getUserName());
+        smsApiRequestDao.setPassword(credential.getPassword());
 
-        sendObject.replace("username", credential.getUserName());
-        sendObject.replace("password", credential.getPassword());
-
-        return ow.writeValueAsString(sendObject);
+        return ow.writeValueAsString(smsApiRequestDao);
     }
 }

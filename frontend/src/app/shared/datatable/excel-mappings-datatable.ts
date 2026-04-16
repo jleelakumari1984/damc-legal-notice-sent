@@ -7,7 +7,7 @@ import { StorageService } from '../../core/services/storage.service';
 declare const $: any;
 
 export interface ExcelMappingsTableOptions {
-  processId: number;
+  noticeId: number;
   excelMapService: NoticeExcelMappingsService;
   storageService: StorageService;
   callbacks: {
@@ -31,12 +31,12 @@ export class ExcelMappingsDatatable extends DataTable {
   }
 
   build(): object {
-    const { processId, callbacks, excelMapService, storageService } = this.options;
+    const { noticeId, callbacks, excelMapService, storageService } = this.options;
     return {
       ...BASE_DT_OPTIONS,
 
       ajax: (dtData: object, callback: (data: object) => void) => {
-        excelMapService.getByProcessId(processId).subscribe({
+        excelMapService.getByNoticeId(noticeId).subscribe({
           next: (types) => {
             callback({ data: types }); // Load table first, then fetch notices
           },
@@ -48,7 +48,7 @@ export class ExcelMappingsDatatable extends DataTable {
         });
       },
       ajax1: {
-        url: `${environment.apiBaseUrl}/excel-mappings?processId=${processId}`,
+        url: `${environment.apiBaseUrl}/excel-mappings?noticeId=${noticeId}`,
         dataSrc: '',
         beforeSend: authBeforeSend(storageService)
       },
@@ -92,8 +92,8 @@ export class ExcelMappingsDatatable extends DataTable {
           data: null, title: '', orderable: false, searchable: false,
           className: 'text-nowrap',
           render: () =>
-            `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-edit">Edit</button>` +
-            `<button class="btn btn-outline-danger btn-sm dt-btn-delete">Delete</button>`
+            `<button class="btn btn-primary btn-sm me-1 dt-btn-edit">Edit</button>` +
+            `<button class="btn btn-danger btn-sm dt-btn-delete">Delete</button>`
         }
       ],
       createdRow: (row: HTMLElement, data: any) => {

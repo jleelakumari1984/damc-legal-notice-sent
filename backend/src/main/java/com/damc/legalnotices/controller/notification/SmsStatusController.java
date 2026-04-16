@@ -60,7 +60,7 @@ public class SmsStatusController {
             if (StringUtils.hasText(queryString) || StringUtils.hasText(requestBody)) {
                 result.put("status", "success");
                 entity = smsStatusService.saveData(queryString, requestBody);
-                callbackService.processSmsDeliveryReport(queryString);
+                callbackService.noticeSmsDeliveryReport(queryString);
                 entity.setCompleteDate(LocalDateTime.now());
                 entity.setProcessDate(LocalDateTime.now());
                 entity.setStatus("complete");

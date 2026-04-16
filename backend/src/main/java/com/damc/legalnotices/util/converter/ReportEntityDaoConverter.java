@@ -14,6 +14,7 @@ import com.damc.legalnotices.entity.notification.SendLoanSmsDetailEntity;
 import com.damc.legalnotices.entity.notification.SendLoanWhatsappDetailEntity;
 import com.damc.legalnotices.entity.schedule.ScheduledNoticeItemEntity;
 import com.damc.legalnotices.entity.view.ScheduleReportViewEntity;
+import com.damc.legalnotices.util.TemplateUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,21 +26,22 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ReportEntityDaoConverter {
     private final ObjectMapper objectMapper;
+    private final TemplateUtil templateUtil;
 
     public NoticeReportDao toReportDto(ScheduleReportViewEntity e) {
         return NoticeReportDao.builder()
                 .id(e.getId())
-                .processName(e.getTemplateStepName())
+                .noticeName(e.getTemplateStepName())
                 .originalFileName(e.getOriginalFileName())
                 .sendSms(e.getSendSms())
                 .sendWhatsapp(e.getSendWhatsapp())
                 .status(e.getStatus())
                 .createdAt(e.getCreatedAt())
-                .processedAt(e.getProcessedAt())
+                .noticeedAt(e.getProcessedAt())
                 .failureReason(e.getFailureReason())
                 .totalItems(e.getTotalLoans())
                 .pendingItems(e.getPendingLoans())
-                .processingItems(e.getProcessingLoans())
+                .noticeingItems(e.getProcessingLoans())
                 .completedItems(e.getCompletedLoans())
                 .failedItems(e.getFailedLoans())
                 .build();
@@ -67,9 +69,11 @@ public class ReportEntityDaoConverter {
     }
 
     public SendSmsDao toSmsLogDao(SendErrorSmsDetailEntity e) {
+        String text = templateUtil.getSmsLogMessage(e.getMessage());
+
         return SendSmsDao.builder()
                 .sendTo(e.getSendTo())
-                .message(e.getMessage())
+                .message(text)
                 .sendAt(e.getSendAt())
                 .sendStatus(-1)
                 .receivedStatus("ERROR")
@@ -78,9 +82,11 @@ public class ReportEntityDaoConverter {
     }
 
     public SendSmsDao toSmsLogDao(SendLoanSmsDetailEntity e) {
+        String text = templateUtil.getSmsLogMessage(e.getMessage());
+
         return SendSmsDao.builder()
                 .sendTo(e.getSendTo())
-                .message(e.getMessage())
+                .message(text)
                 .sendAt(e.getSendAt())
                 .sendStatus(e.getSendStatus())
                 .sendResponse(e.getSendResponse())
@@ -92,9 +98,11 @@ public class ReportEntityDaoConverter {
     }
 
     public SendWhatsappDao toWhatsAppLogDao(SendLoanWhatsappDetailEntity e) {
+        String text = templateUtil.getWhatsAppLogMessage(e.getMessage());
+
         return SendWhatsappDao.builder()
                 .sendTo(e.getSendTo())
-                .message(e.getMessage())
+                .message(text)
                 .sendAt(e.getSendAt())
                 .sendStatus(e.getSendStatus())
                 .sendResponse(e.getSendResponse())
@@ -105,9 +113,10 @@ public class ReportEntityDaoConverter {
     }
 
     public SendWhatsappDao toWhatsAppLogDao(SendErrorWhatsappDetailEntity e) {
+        String text = templateUtil.getWhatsAppLogMessage(e.getMessage());
         return SendWhatsappDao.builder()
                 .sendTo(e.getSendTo())
-                .message(e.getMessage())
+                .message(text)
                 .sendAt(e.getSendAt())
                 .sendStatus(-1)
                 .receivedStatus("ERROR")

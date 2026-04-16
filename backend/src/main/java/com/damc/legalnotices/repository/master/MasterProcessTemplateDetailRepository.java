@@ -14,4 +14,8 @@ public interface MasterProcessTemplateDetailRepository extends JpaRepository<Mas
 
     @Query("SELECT DISTINCT p FROM MasterProcessTemplateDetailEntity p LEFT JOIN FETCH p.excelMappings WHERE p.id = :id")
     Optional<MasterProcessTemplateDetailEntity> findByIdWithExcelMappings(Long id);
+
+    boolean existsByNameAndCreatedBy(String name, Long createdBy);
+
+    boolean existsByNameAndCreatedByAndIdNot(String name, Long createdBy, Long id);
 }

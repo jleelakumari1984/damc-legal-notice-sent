@@ -33,14 +33,14 @@ public class TemplateFormatGenerator {
             String[] addressList = address.split(",");
             int totalLength = addressList.length;
             StringBuilder newAddress = new StringBuilder();
-            int process = 0;
+            int notice = 0;
             for (int i = 0; i < totalLength; i++) {
                 newAddress.append(addressList[i]);
                 if (StringUtils.hasText(addressList[i])) {
                     newAddress.append(",");
-                    process++;
+                    notice++;
                 }
-                if ((process + 1) % 5 == 0) {
+                if ((notice + 1) % 5 == 0) {
                     newAddress.append("<br/>");
                 }
             }

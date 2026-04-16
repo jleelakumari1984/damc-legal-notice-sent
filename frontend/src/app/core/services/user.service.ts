@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User, UserPaginatedRequest, UserRequest } from '../models/user.model';
-import { PaginatedResponse } from '../models/datatable.model';
+import { User, UserFilter, UserRequest } from '../models/user.model';
+import { PaginatedRequest, PaginatedResponse } from '../models/datatable.model';
 
 
 
@@ -13,9 +13,10 @@ export class UserService {
 
   constructor(private readonly http: HttpClient) { }
 
-  getAll(request?: UserPaginatedRequest): Observable<PaginatedResponse<User[]>> {
+  getAll(request?: PaginatedRequest<UserFilter>): Observable<PaginatedResponse<User[]>> {
     if (!request) {
-      request = {} as UserPaginatedRequest;
+      request = {} as PaginatedRequest<UserFilter>;
+      request.filter = {} as UserFilter;
       request.allData = true;
     }
     return this.http.post<PaginatedResponse<User[]>>(`${this.api}/list`, request);

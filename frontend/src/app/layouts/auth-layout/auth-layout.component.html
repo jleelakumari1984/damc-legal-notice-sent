@@ -2,14 +2,16 @@
   <header class="topbar d-flex flex-wrap justify-content-between align-items-center gap-3">
     <div class="brand-wrap">
       <div>
-        <div class="brand-title">DAMC Legal Notices</div>
+        <div class="brand-title fs-2">Legal Notices</div>
         <div class="brand-sub"></div>
       </div>
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2">
       <div class="pill"><i class="fa fa-user-circle"></i> Welcome : {{ userName }}</div>
-      <button class="btn btn-light-soft" (click)="openSwitchSession()"><i class="fa fa-exchange-alt me-1"></i> Switch Session</button>
+      <button class="btn btn-light-soft" *ngIf="canChangeSession()" (click)="openSwitchSession()"><i
+          class="fa fa-exchange-alt me-1"></i> Switch
+        Session</button>
       <button class="btn btn-light-soft" (click)="logout()"><i class="fa fa-sign-out-alt me-1"></i> Logout</button>
     </div>
   </header>
@@ -18,21 +20,27 @@
     <div class="d-flex flex-wrap gap-2">
       <a routerLink="/notice" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-bullhorn me-1"></i>
         Notice(s)</a>
-      <a routerLink="/send-notices" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-paper-plane me-1"></i> Send
+      <a routerLink="/send-notices" routerLinkActive="fw-bold active" class="btn menu-btn"><i
+          class="fa fa-paper-plane me-1"></i> Send
         Notice</a>
-      <a routerLink="/reports" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-chart-line me-1"></i>
+      <a routerLink="/reports" routerLinkActive="fw-bold active" class="btn menu-btn"><i
+          class="fa fa-chart-line me-1"></i>
         Report(s)</a>
-     
-      <a *ngIf="isSuperOrAdmin()" routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-users me-1"></i> Users</a>
-      <a *ngIf="isSuperOrAdmin()" routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-wallet me-1"></i> Credit</a>
-      <a *ngIf="isSuperOrAdmin()" routerLink="/template-approvals" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-check-circle me-1"></i> Template Approvals</a>
-      <a *ngIf="isSuperOrAdmin()" routerLink="/sms-endpoints" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-sms me-1"></i> SMS Endpoints</a>
-      <a *ngIf="isSuperOrAdmin()" routerLink="/whatsapp-endpoints" routerLinkActive="fw-bold active" class="btn menu-btn"><i class="fa fa-comment-dots me-1"></i> WhatsApp Endpoints</a>
+
+      <a *ngIf="isSuperOrAdmin()" routerLink="/users" routerLinkActive="fw-bold active" class="btn menu-btn"><i
+          class="fa fa-users me-1"></i> Users</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/credit" routerLinkActive="fw-bold active" class="btn menu-btn"><i
+          class="fa fa-wallet me-1"></i> Credit</a>
+      <a *ngIf="isSuperOrAdmin()" routerLink="/template-approvals" routerLinkActive="fw-bold active"
+        class="btn menu-btn"><i class="fa fa-check-circle me-1"></i> Template Approvals</a>
     </div>
   </div>
 
   <main class="flex-grow-1 py-3">
-    <router-outlet></router-outlet>
+    <div class="container-fluid px-4">
+      <router-outlet></router-outlet>
+    </div>
+
   </main>
 </div>
 

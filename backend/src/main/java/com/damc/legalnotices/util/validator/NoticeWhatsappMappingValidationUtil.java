@@ -10,14 +10,13 @@ import java.util.Map;
 
 public final class NoticeWhatsappMappingValidationUtil {
 
-    private NoticeWhatsappMappingValidationUtil() {}
+    private NoticeWhatsappMappingValidationUtil() {
+    }
 
     public static void validateAdminTemplate(NoticeWhatsappConfigDto request) {
         Map<String, List<String>> errorMap = new HashMap<>();
         if (request.getTemplateContent() == null || request.getTemplateContent().isBlank())
             errorMap.computeIfAbsent("templateContent", k -> new ArrayList<>()).add("Template content is required");
-        if (request.getSentLevel() == null)
-            errorMap.computeIfAbsent("sentLevel", k -> new ArrayList<>()).add("Sent level is required");
         if (request.getTemplateName() == null || request.getTemplateName().isBlank())
             errorMap.computeIfAbsent("templateName", k -> new ArrayList<>()).add("Template name is required");
         if (request.getTemplateLang() == null || request.getTemplateLang().isBlank())

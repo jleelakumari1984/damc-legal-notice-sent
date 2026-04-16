@@ -1,6 +1,6 @@
 
 export interface SendSampleRequest {
-  processSno: number;
+  noticeSno: number;
   mobileNumber: string;
   sendSms: boolean;
   sendWhatsapp: boolean;

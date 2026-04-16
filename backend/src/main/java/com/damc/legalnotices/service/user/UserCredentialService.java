@@ -1,12 +1,10 @@
 package com.damc.legalnotices.service.user;
 
-import com.damc.legalnotices.config.SmsCredential;
-import com.damc.legalnotices.config.WhatsAppCredential;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dao.user.UserSmsCredentialDao;
+import com.damc.legalnotices.dao.user.UserWhatsAppCredentialDao;
 import com.damc.legalnotices.dto.user.UserSmsCredentialDto;
 import com.damc.legalnotices.dto.user.UserWhatsAppCredentialDto;
-
-import java.util.Optional;
 
 public interface UserCredentialService {
 
@@ -14,7 +12,7 @@ public interface UserCredentialService {
 
     void saveWhatsAppCredential(LoginUserDao sessionUser, Long userId, UserWhatsAppCredentialDto dto);
 
-    Optional<SmsCredential> getSmsCredential(Long userId);
+    UserSmsCredentialDao getSmsCredential(LoginUserDao sessionUser, Long userId);
 
-    Optional<WhatsAppCredential> getWhatsAppCredential(Long userId);
+    UserWhatsAppCredentialDao getWhatsAppCredential(LoginUserDao sessionUser, Long userId);
 }

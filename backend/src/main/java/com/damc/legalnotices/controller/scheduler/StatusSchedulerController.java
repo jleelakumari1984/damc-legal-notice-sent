@@ -29,8 +29,8 @@ public class StatusSchedulerController {
      * Returns count of records updated.
      */
     @GetMapping("/pending-sms")
-    public ResponseEntity<List<StatusReportSmsDao>> processPendingSmsParsing() {
-        return ResponseEntity.ok(callbackService.processPendingSmsParsing());
+    public ResponseEntity<List<StatusReportSmsDao>> noticePendingSmsParsing() {
+        return ResponseEntity.ok(callbackService.noticePendingSmsParsing());
     }
 
     /**
@@ -39,7 +39,7 @@ public class StatusSchedulerController {
      * Returns count of records updated.
      */
     @GetMapping("/pending-whatsapp")
-    public ResponseEntity<List<StatusReportWhatsappDao>> processPendingWhatsAppParsing() {
-        return ResponseEntity.ok(callbackService.processPendingWhatsAppParsing());
+    public ResponseEntity<List<StatusReportWhatsappDao>> noticePendingWhatsAppParsing() {
+        return ResponseEntity.ok(callbackService.noticePendingWhatsAppParsing());
     }
 }

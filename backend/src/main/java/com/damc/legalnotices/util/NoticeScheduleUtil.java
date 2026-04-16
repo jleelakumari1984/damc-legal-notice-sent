@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
-import com.damc.legalnotices.entity.excel.ProcessExcelMappingEntity;
+import com.damc.legalnotices.entity.master.MasterProcessExcelMappingEntity;
 import com.damc.legalnotices.entity.schedule.ScheduledNoticeItemEntity;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +48,7 @@ public class NoticeScheduleUtil {
     }
 
     public Map<String, Object> getMapProperties(ScheduledNoticeItemEntity item,
-            List<ProcessExcelMappingEntity> excelMappings) {
+            List<MasterProcessExcelMappingEntity> excelMappings) {
         Map<String, Object> row = getExcelData(item);
         if (row == null) {
             return Collections.emptyMap();
@@ -59,7 +59,7 @@ public class NoticeScheduleUtil {
                 .collect(Collectors.toMap(
                         entry -> excelMappings.stream()
                                 .filter(mapping -> mapping.getExcelFieldName().equals(entry.getKey()))
-                                .map(ProcessExcelMappingEntity::getDbFieldName)
+                                .map(MasterProcessExcelMappingEntity::getDbFieldName)
                                 .findFirst()
                                 .orElse(entry.getKey()),
                         Map.Entry::getValue));

@@ -43,7 +43,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                         boolean schedule,
                         Exception ex) {
                 if (ex != null) {
-                        log.error("Error while sending {} sms for processSno: {}, message: {}, mobile: {}, error: {}",
+                        log.error("Error while sending {} sms for noticeSno: {}, message: {}, mobile: {}, error: {}",
                                         sendType, smsData.getConfig().getId(), smsData.getMessage(),
                                         smsData.getMobileNumber(), ex.getMessage());
                         SendErrorSmsDetailEntity errorEntity = new SendErrorSmsDetailEntity();
@@ -58,7 +58,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                         errorEntity.setErrorMessage(ex.getMessage());
                         sendErrorSmsDetailRepository.save(errorEntity);
                 } else {
-                        log.info("{} sms sent for processSno: {}, message: {}, mobile: {}, response: {}",
+                        log.info("{} sms sent for noticeSno: {}, message: {}, mobile: {}, response: {}",
                                         sendType, smsData.getConfig().getId(), smsData.getMessage(),
                                         smsData.getMobileNumber(), response);
 
@@ -96,7 +96,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                         String response,
                         boolean schedule, Exception ex) {
                 if (ex != null) {
-                        log.error("Error while sending {} whatsapp for processSno: {}, message: {}, mobile: {}, error: {}",
+                        log.error("Error while sending {} whatsapp for noticeSno: {}, message: {}, mobile: {}, error: {}",
                                         sendType, whatsappData.getConfig().getId(), whatsappData.getMessage(),
                                         whatsappData.getMobileNumber(), ex.getMessage());
                         SendErrorWhatsappDetailEntity errorEntity = new SendErrorWhatsappDetailEntity();
@@ -111,7 +111,7 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
                         errorEntity.setErrorMessage(ex.getMessage());
                         sendErrorWhatsappDetailRepository.save(errorEntity);
                 } else {
-                        log.info("{} whatsapp sent for processSno: {}, message: {}, mobile: {}, response: {}",
+                        log.info("{} whatsapp sent for noticeSno: {}, message: {}, mobile: {}, response: {}",
                                         sendType, whatsappData.getConfig().getId(), whatsappData.getMessage(),
                                         whatsappData.getMobileNumber(), response);
 
@@ -148,7 +148,8 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
          * Parses SMS send response: {"data":{"ack_id":"...","msgid":"..."}}
          */
         private String parseSmsAckId(String response) {
-                if (!StringUtils.hasText(response)) return null;
+                if (!StringUtils.hasText(response))
+                        return null;
                 try {
                         JsonNode root = objectMapper.readTree(response);
                         String ackId = root.path("data").path("ack_id").asText(null);
@@ -160,14 +161,17 @@ public class NotificationsSaveServiceImpl implements NotificationsSaveService {
         }
 
         /**
-         * Parses WhatsApp send response: {"status":"success","message_id":47880,"message_wamid":"..."}
+         * Parses WhatsApp send response:
+         * {"status":"success","message_id":47880,"message_wamid":"..."}
          */
         private String parseWhatsAppAckId(String response) {
-                if (!StringUtils.hasText(response)) return null;
+                if (!StringUtils.hasText(response))
+                        return null;
                 try {
                         JsonNode root = objectMapper.readTree(response);
                         String wamid = root.path("message_wamid").asText(null);
-                        if (StringUtils.hasText(wamid) && !"null".equals(wamid)) return wamid;
+                        if (StringUtils.hasText(wamid) && !"null".equals(wamid))
+                                return wamid;
                         long messageId = root.path("message_id").asLong(0);
                         return messageId > 0 ? String.valueOf(messageId) : null;
                 } catch (Exception ex) {

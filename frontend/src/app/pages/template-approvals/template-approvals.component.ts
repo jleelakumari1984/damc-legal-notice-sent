@@ -17,7 +17,7 @@ export class TemplateApprovalsComponent implements AfterViewInit, OnInit, OnDest
 
   activeTab: 'sms' | 'whatsapp' = 'sms';
   errorMessage = '';
-
+  showApproval = false;
   private readonly SMS_TABLE_ID = '#smsPendingTable';
   private readonly WA_TABLE_ID = '#waPendingTable';
   private readonly dtHelper = new DatatableHelper();
@@ -41,8 +41,8 @@ export class TemplateApprovalsComponent implements AfterViewInit, OnInit, OnDest
     const dt = new SmsPendingDatatable({
       service: this.templateService,
       callbacks: {
-        onApprove: (t) => this.smsApprovalForm.open(t, false),
-        onReject: (t) => this.smsApprovalForm.open(t, true),
+        onApprove: (t) => { this.showApproval = true; this.smsApprovalForm.open(t, false, true); },
+        onReject: (t) => { this.showApproval = true; this.smsApprovalForm.open(t, true, true); },
         onError: (msg) => { this.errorMessage = msg; }
       }
     });
@@ -53,9 +53,9 @@ export class TemplateApprovalsComponent implements AfterViewInit, OnInit, OnDest
     const dt = new WhatsappPendingDatatable({
       service: this.templateService,
       callbacks: {
-        onApprove: (t) => this.whatsappApprovalForm.open(t, false),
-        onReject: (t) => this.whatsappApprovalForm.open(t, true),
-        onError: (msg) => { this.errorMessage = msg; }
+        onApprove: (t) => { this.showApproval = true; this.whatsappApprovalForm.open(t, false, true); },
+        onReject: (t) => { this.showApproval = true; this.whatsappApprovalForm.open(t, true, true); },
+        onError: (msg) => { this.showApproval = true; this.errorMessage = msg; }
       }
     });
     this.dtHelper.initTable(this.WA_TABLE_ID, dt);
@@ -64,6 +64,10 @@ export class TemplateApprovalsComponent implements AfterViewInit, OnInit, OnDest
   reloadBoth(): void {
     this.dtHelper.reload(this.SMS_TABLE_ID);
     this.dtHelper.reload(this.WA_TABLE_ID);
+  }
+
+  onApprovalCancelled(): void {
+    this.showApproval = false;
   }
 }
 

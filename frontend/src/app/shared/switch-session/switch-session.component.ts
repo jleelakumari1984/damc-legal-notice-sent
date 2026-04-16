@@ -5,7 +5,8 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { StorageService } from '../../core/services/storage.service';
 import { UserResponse } from '../../core/services/auth/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { User } from '../../core/models/user.model';
+import { User, UserFilter } from '../../core/models/user.model';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
@@ -46,7 +47,8 @@ export class SwitchSessionComponent implements OnInit {
 
     if (!this.isInSwitchedSession) {
       this.loading = true;
-      this.userService.getAll().subscribe({
+      let request = { filter: { enabled: true }, allData: true } as PaginatedRequest<UserFilter>;
+      this.userService.getAll(request).subscribe({
         next: (users) => { this.users = users.data; this.loading = false; },
         error: () => { this.errorMessage = 'Failed to load users.'; this.loading = false; }
       });
@@ -59,7 +61,6 @@ export class SwitchSessionComponent implements OnInit {
     this.errorMessage = '';
     this.authService.loginAs(this.selectedUserId).subscribe({
       next: (response) => {
-        this.storageService.switchToSession(response);
         this.switching = false;
         $('#switchSessionModal').modal('hide');
         this.router.navigate(['/notice']);

@@ -13,7 +13,5 @@ public class NoticeWhatsappApproveDto {
 
     @NotNull
     private String templateLang;
-
-    @NotNull
-    private Integer sentLevel;
+ 
 }

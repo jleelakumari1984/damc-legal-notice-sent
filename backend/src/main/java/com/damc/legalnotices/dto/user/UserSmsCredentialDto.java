@@ -15,7 +15,6 @@ public class UserSmsCredentialDto {
     @NotBlank
     private String userName;
 
-    @NotBlank
     private String password;
 
     @NotNull

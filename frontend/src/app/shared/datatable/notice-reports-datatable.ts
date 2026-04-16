@@ -3,12 +3,14 @@ import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datata
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
 import { ProcessingStatus } from '../../core/models/schedule.model';
-import { NoticeReportRequest, NoticeReportSummary } from '../../core/models/report.notice';
+import { NoticeReportFilter, NoticeReportSummary } from '../../core/models/report.notice';
+import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
 
 export interface NoticeReportsTableOptions {
   service: NoticeReportsService;
+  getFilters?: () => NoticeReportFilter;
   callbacks: {
     onViewDetail: (id: NoticeReportSummary, status: string, itemCount: number) => void;
     onSmsDetail: (id: NoticeReportSummary) => void;
@@ -39,21 +41,23 @@ export class NoticeReportsDatatable extends DataTable {
             sortField = dtParams.columns[colIndex].data || sortField;
           }
         }
-        var request: NoticeReportRequest = {
+        const filters = this.options.getFilters ? this.options.getFilters() : {};
+        var request: PaginatedRequest<NoticeReportFilter> = {
           sortColumn: sortField,
           sortDirection: sortDir,
           dtStart: start,
           dtLength: length,
           dtDraw: dtParams.draw,
+          filter: filters
         }
         service.getAll(request).subscribe({
           next: (reports) => {
-            callback({ data: reports }); // Load table first, then fetch notices
+            callback({ draw: request.dtDraw, recordsTotal: reports.recordsTotal, recordsFiltered: reports.recordsFiltered, data: reports.data }); // Load table first, then fetch notices
           },
           error: () => {
             var msg = 'Failed to load notice reports';
             callbacks.onError(msg);
-            callback({ data: [] });
+            callback({ draw: request.dtDraw, recordsTotal: 0, recordsFiltered: 0, data: [] });
           }
         });
       },
@@ -61,7 +65,7 @@ export class NoticeReportsDatatable extends DataTable {
       columns: [
         { data: 'id', title: '#' },
         { data: 'originalFileName', title: 'File Name', className: 'text-nowrap', render: (d: string) => esc(d) },
-        { data: 'processName', title: 'Process Name', className: 'text-nowrap' },
+        { data: 'noticeName', title: 'Process Name', className: 'text-nowrap' },
         {
           data: 'sendSms', title: 'SMS', className: 'text-nowrap',
           render: (d: boolean, t: string) => {
@@ -124,8 +128,8 @@ export class NoticeReportsDatatable extends DataTable {
           data: null, title: 'Logs', orderable: false, searchable: false,
           className: 'text-end text-nowrap',
           render: (d: null, t: string, row: any) => {
-            let html = `<button class="btn btn-outline-primary btn-sm me-1 dt-btn-sms" title="SMS Logs"><i class="fas fa-sms"></i></button>`;
-            html += `<button class="btn btn-outline-success btn-sm me-1 dt-btn-whatsapp" title="WhatsApp Logs"><i class="fab fa-whatsapp"></i></button>`;
+            let html = `<button class="btn btn-primary btn-sm me-1 dt-btn-sms" title="SMS Logs"><i class="fas fa-sms"></i></button>`;
+            html += `<button class="btn btn-success btn-sm me-1 dt-btn-whatsapp" title="WhatsApp Logs"><i class="fab fa-whatsapp"></i></button>`;
             return html;
           }
         }

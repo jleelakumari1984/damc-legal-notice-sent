@@ -12,7 +12,6 @@ public class UserWhatsAppCredentialDto {
     @NotBlank
     private String url;
 
-    @NotBlank
     private String accessToken;
 
     private String attachmentDownloadUrl;

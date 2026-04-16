@@ -42,8 +42,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (userDetails != null && userDetails instanceof SessionUserDao
                     && jwtUtil.isTokenValid(jwt, ((SessionUserDao) userDetails).getUserDao())) {
+                var sessionUser = (SessionUserDao) userDetails;
+                sessionUser.getUserDao().setCanSwitchSession(jwtUtil.canSwitchSession(jwt));
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        ((SessionUserDao) userDetails).getUserDao(),
+                        sessionUser.getUserDao(),
                         null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

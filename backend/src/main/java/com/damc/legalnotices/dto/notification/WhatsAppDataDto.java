@@ -2,13 +2,12 @@ package com.damc.legalnotices.dto.notification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.damc.legalnotices.config.WhatsAppCredential;
+import com.damc.legalnotices.dao.user.UserWhatsAppCredentialDao;
+import com.damc.legalnotices.dto.notification.WhatsAppApiRequestDto.WhatsAppComponentDto;
 import com.damc.legalnotices.entity.master.MasterProcessWhatsappConfigDetailEntity;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -37,7 +36,7 @@ public class WhatsAppDataDto {
     private Map<String, Object> props = new HashMap<String, Object>();
 
     @Builder.Default
-    private List<Object> components = new ArrayList<Object>();;
+    private List<WhatsAppComponentDto> components = new ArrayList<>();
     private boolean sendEnabled;
 
     public void addMessage(String s) {
@@ -48,16 +47,17 @@ public class WhatsAppDataDto {
         }
     }
 
-    public String getPostData(WhatsAppCredential credential) throws JsonProcessingException {
-        Hashtable<String, Object> sendObject = new Hashtable<>();
-        sendObject.put("token", "********************");
-        sendObject.put("phone", getMobileNumber());
-        sendObject.put("template_language", config.getTemplateLang());
-        sendObject.put("template_name", config.getTemplateName());
-        sendObject.put("components", getComponents());
+    public String getPostData(UserWhatsAppCredentialDao credential) throws Exception {
+        WhatsAppApiRequestDto whatsappApiRequestDao = WhatsAppApiRequestDto.builder()
+                .phone(getMobileNumber())
+                .token("********************")
+                .templateLanguage(config.getTemplateLang())
+                .templateName(config.getTemplateName())
+                .components(getComponents())
+                .build();
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        setPostMessage(ow.writeValueAsString(sendObject));
-        sendObject.replace("token", credential.getAccessToken());
-        return ow.writeValueAsString(sendObject);
+        setPostMessage(ow.writeValueAsString(whatsappApiRequestDao));
+        whatsappApiRequestDao.setToken(credential.getAccessToken());
+        return ow.writeValueAsString(whatsappApiRequestDao);
     }
 }

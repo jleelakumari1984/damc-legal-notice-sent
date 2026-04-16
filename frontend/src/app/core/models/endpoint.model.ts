@@ -41,3 +41,43 @@ export interface WhatsappEndpointRequest {
     apiPath: string;
     status: number;
 }
+
+// User SMS Credential
+export interface UserSmsCredential {
+    id: number;
+    userId: number;
+    url: string;
+    userName: string;
+    live: boolean;
+    testMobileNumber: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface UserSmsCredentialRequest {
+    url: string;
+    userName: string;
+    password?: string;
+    live: boolean;
+    testMobileNumber?: string | null;
+}
+
+// User WhatsApp Credential
+export interface UserWhatsAppCredential {
+    id: number;
+    userId: number;
+    url: string;
+    attachmentDownloadUrl: string | null;
+    live: boolean;
+    testMobileNumber: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface UserWhatsAppCredentialRequest {
+    url: string;
+    accessToken: string;
+    attachmentDownloadUrl?: string | null;
+    live: boolean;
+    testMobileNumber?: string | null;
+}

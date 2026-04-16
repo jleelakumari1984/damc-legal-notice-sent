@@ -13,7 +13,7 @@ public class StatusReportSmsDao {
     private String requestBody;
     private String status;
     private LocalDateTime createdDate;
-    private LocalDateTime processDate;
+    private LocalDateTime noticeDate;
     private LocalDateTime completeDate;
     private String description;
 }

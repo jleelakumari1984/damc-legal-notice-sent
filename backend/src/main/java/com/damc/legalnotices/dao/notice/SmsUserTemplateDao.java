@@ -9,9 +9,10 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class SmsUserTemplateDao {
     private Long id;
-    private Long processId;
+    private Long noticeId;
     private String userTemplateContent;
     private Integer status;
     private Integer approveStatus;
     private LocalDateTime createdAt;
+
 }

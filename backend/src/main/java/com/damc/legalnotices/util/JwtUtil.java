@@ -29,6 +29,8 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(userDao.getLoginName())
                 .issuedAt(now)
+                .claim("canSwitchSession",
+                        userDao.getCanSwitchSession() == null ? false : userDao.getCanSwitchSession())
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
@@ -40,8 +42,13 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token, LoginUserDao userDao) {
         String username = extractUsername(token);
-        
+
         return username.equals(userDao.getLoginName()) && !isTokenExpired(token);
+    }
+
+    public boolean canSwitchSession(String token) {
+        Boolean canSwitch = extractClaim(token, claims -> claims.get("canSwitchSession", Boolean.class));
+        return canSwitch != null && canSwitch;
     }
 
     private boolean isTokenExpired(String token) {

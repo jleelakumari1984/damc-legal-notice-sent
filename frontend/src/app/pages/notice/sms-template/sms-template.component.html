@@ -1,6 +1,6 @@
-<div class="container py-4">
+<div class="py-4" [class.d-none]="showApproval">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="brand-title mb-0">SMS Templates</h3>
+    <h3 class="brand-title mb-0">SMS Templates of <span class="fw-bold text-danger">{{ selectedNotice?.name }}</span></h3>
     <div class="d-flex gap-2">
       <button class="btn btn-brand btn-sm" (click)="openAddForm()" *ngIf="selectedNotice">
         + Add Template
@@ -29,11 +29,9 @@
     </div>
   </div>
 </div>
+<app-sms-approval-form *ngIf="isSuperAdmin" [inline]="showApproval" (done)="onApproved()" (cancelled)="onApprovalCancelled()"></app-sms-approval-form>
 
-<app-sms-template-form *ngIf="isSuperAdmin" [editTemplate]="editTemplate" [noticeType]="selectedNotice"
-  (saved)="onSaved()"></app-sms-template-form>
-
-<app-sms-template-form-user *ngIf="!isSuperAdmin" [editTemplate]="editTemplate" [noticeType]="selectedNotice"
-  (saved)="onSaved()"></app-sms-template-form-user>
+<app-sms-template-form-user [editTemplate]="editTemplate" [noticeType]="selectedNotice"
+  (saved)="onSaved($event)"></app-sms-template-form-user>
 
 <app-sms-template-view></app-sms-template-view>

@@ -23,6 +23,9 @@ public class ProcessConfigReportViewEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "created_user_name")
+    private String createdUserName;
+
     @Column(name = "created_by")
     private Long createdBy;
 

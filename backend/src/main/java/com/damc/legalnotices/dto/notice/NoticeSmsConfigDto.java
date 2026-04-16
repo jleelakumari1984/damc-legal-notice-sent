@@ -8,10 +8,9 @@ import lombok.Setter;
 @Setter
 public class NoticeSmsConfigDto {
 
-    @NotNull(message = "processId is required")
-    private Long processId;
+    @NotNull(message = "noticeId is required")
+    private Long noticeId;
 
-    private Integer sentLevel;
     private String peid;
     private String senderId;
     private String routeId;

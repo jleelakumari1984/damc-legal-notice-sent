@@ -12,12 +12,18 @@ import java.util.List;
 public interface MasterProcessWhatsappConfigDetailRepository
         extends JpaRepository<MasterProcessWhatsappConfigDetailEntity, Long> {
 
-    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE   p.id = :processId")
+    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE   p.id = :processId ")
     List<MasterProcessWhatsappConfigDetailEntity> findByProcessId(Long processId);
 
-    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.status = :status and p.id = :processId")
-    List<MasterProcessWhatsappConfigDetailEntity> findByProcessIdAndStatus(Long processId, Integer status);
+    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE   p.id = :processId and e.createdBy = :createdBy")
+    List<MasterProcessWhatsappConfigDetailEntity> findByProcessIdAndCreatedBy(Long processId, Long createdBy);
+
+    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.status = :status and p.id = :processId and e.approveStatus = :approveStatus")
+    List<MasterProcessWhatsappConfigDetailEntity> findByProcessIdAndStatusAndApprovedStatus(Long processId, Integer status, Integer approveStatus);
 
     @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.approveStatus = 0")
     Page<MasterProcessWhatsappConfigDetailEntity> findPendingTemplates(Pageable pageable);
+
+    @Query("SELECT e FROM MasterProcessWhatsappConfigDetailEntity e left join e.process p left join e.createdUser u WHERE e.approveStatus = 0 and e.createdBy = :userId")
+    Page<MasterProcessWhatsappConfigDetailEntity> findPendingTemplatesByCreatedBy(Long userId, Pageable pagination);
 }

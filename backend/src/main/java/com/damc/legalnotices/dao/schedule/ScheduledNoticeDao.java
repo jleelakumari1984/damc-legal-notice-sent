@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ScheduledNoticeDao {
     private Long id;
-    private Long processSno;
-    private String processName;
+    private Long noticeSno;
+    private String noticeName;
     private String originalFileName;
     private String zipFilePath;
     private String extractedFolderPath;

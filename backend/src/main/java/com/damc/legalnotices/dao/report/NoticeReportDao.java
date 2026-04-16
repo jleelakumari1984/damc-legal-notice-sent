@@ -9,17 +9,17 @@ import java.time.LocalDateTime;
 @Builder
 public class NoticeReportDao {
     private Long id;
-    private String processName;
+    private String noticeName;
     private String originalFileName;
     private Boolean sendSms;
     private Boolean sendWhatsapp;
     private String status;
     private LocalDateTime createdAt;
-    private LocalDateTime processedAt;
+    private LocalDateTime noticeedAt;
     private String failureReason;
     private long totalItems;
     private long pendingItems;
-    private long processingItems;
+    private long noticeingItems;
     private long completedItems;
     private long failedItems;
 }

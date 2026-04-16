@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NoticeExcelMappingFormComponent } from './notice-excel-mapping-form/notice-excel-mapping-form.component';
 import { NoticeExcelMappingResponse, NoticeType } from '../../../core/models/notices.model';
 import { NoticeService } from '../../../core/services/notice.service';
-import { NoticeReportRequest } from '../../../core/models/report.notice';
+import { NoticeReportFilter } from '../../../core/models/report.notice';
 
 @Component({
   selector: 'app-notice-excel-mappings',
@@ -36,7 +36,7 @@ export class NoticeExcelMappingsComponent implements OnInit, AfterViewInit {
       this.loadNoticeTypes();
     }
     this.route.queryParams.subscribe(params => {
-      const processId = Number(params['processId']);
+      const noticeId = Number(params['noticeId']);
     });
   }
 

@@ -61,20 +61,7 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/template-approvals/template-approvals.module').then((module) => module.TemplateApprovalsModule)
       },
-      {
-        path: 'sms-endpoints',
-        canActivate: [RoleGuard],
-        data: { allowedLevels: [1, 2] },
-        loadChildren: () =>
-          import('./pages/users/sms-endpoints/sms-endpoints.module').then((module) => module.SmsEndpointsModule)
-      },
-      {
-        path: 'whatsapp-endpoints',
-        canActivate: [RoleGuard],
-        data: { allowedLevels: [1, 2] },
-        loadChildren: () =>
-          import('./pages/users/whatsapp-endpoints/whatsapp-endpoints.module').then((module) => module.WhatsappEndpointsModule)
-      }
+      
     ]
   },
   { path: '**', redirectTo: 'login' }

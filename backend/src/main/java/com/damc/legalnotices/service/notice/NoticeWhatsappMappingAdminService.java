@@ -4,6 +4,7 @@ import com.damc.legalnotices.dao.DataTableDao;
 import com.damc.legalnotices.dao.notice.WhatsAppPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.WhatsAppTemplateDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.notice.NoticeWhatsappConfigDto;
 import com.damc.legalnotices.dto.notice.NoticeWhatsappPendingDto;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface NoticeWhatsappMappingAdminService {
 
-    List<WhatsAppTemplateDao> getByProcessId(LoginUserDao sessionUser, Long processId);
+    List<WhatsAppTemplateDao> getByNoticeId(LoginUserDao sessionUser, Long noticeId);
 
     WhatsAppTemplateDao getById(LoginUserDao sessionUser, Long id);
 
@@ -21,5 +22,6 @@ public interface NoticeWhatsappMappingAdminService {
 
     void delete(LoginUserDao sessionUser, Long id);
 
-    DataTableDao<List<WhatsAppPendingTemplateDao>>  getPendingTemplates(LoginUserDao sessionUser,NoticeWhatsappPendingDto request);
+    DataTableDao<List<WhatsAppPendingTemplateDao>> getPendingTemplates(LoginUserDao sessionUser,
+            DatatableDto<NoticeWhatsappPendingDto> request);
 }
