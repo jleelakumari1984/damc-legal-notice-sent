@@ -9,6 +9,7 @@ import { PaginatedRequest, PaginatedResponse } from '../models/datatable.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+
   private readonly api = `${environment.apiBaseUrl}/users`;
 
   constructor(private readonly http: HttpClient) { }
@@ -21,7 +22,9 @@ export class UserService {
     }
     return this.http.post<PaginatedResponse<User[]>>(`${this.api}/list`, request);
   }
-
+  getAllExisting(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.api}/existing`);
+  }
   getById(id: number): Observable<User> {
     return this.http.get<User>(`${this.api}/${id}`);
   }

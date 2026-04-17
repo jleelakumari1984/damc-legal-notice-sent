@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class NoticeReportDao {
     private Long id;
     private String noticeName;
+    private String createdUserName;
     private String originalFileName;
     private Boolean sendSms;
     private Boolean sendWhatsapp;
@@ -19,7 +20,7 @@ public class NoticeReportDao {
     private String failureReason;
     private long totalItems;
     private long pendingItems;
-    private long noticeingItems;
+    private long processingItems;
     private long completedItems;
     private long failedItems;
 }

@@ -5,12 +5,13 @@ import { ExcelMappingsDatatable } from '../../../../shared/datatable/excel-mappi
 import { NoticeExcelMappingsService } from '../../../../core/services/notice-excel-mappings.service';
 import { NoticeExcelMappingResponse, NoticeType } from '../../../../core/models/notices.model';
 import { StorageService } from '../../../../core/services/storage.service';
+import { BaseComponent } from '../../../../shared/base/base.component';
 
 @Component({
   selector: 'app-excel-mappings-list',
   templateUrl: './excel-mappings-list.component.html'
 })
-export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
+export class ExcelMappingsListComponent extends BaseComponent implements AfterViewInit, OnChanges {
   editMapping: NoticeExcelMappingResponse | null = null;
 
   @Input() selectedNotice: NoticeType | null = null;
@@ -28,8 +29,9 @@ export class ExcelMappingsListComponent implements AfterViewInit, OnChanges {
     private readonly mappingsService: NoticeExcelMappingsService,
     private readonly datatableHelper: DatatableHelper,
     private readonly excelMapService: NoticeExcelMappingsService,
-    private readonly storageService: StorageService
-  ) { }
+  ) {
+    super();
+  }
 
   ngAfterViewInit(): void {
     if (this.selectedNotice) {

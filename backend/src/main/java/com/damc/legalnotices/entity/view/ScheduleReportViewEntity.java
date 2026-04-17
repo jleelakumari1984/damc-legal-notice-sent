@@ -26,6 +26,9 @@ public class ScheduleReportViewEntity {
     @Column(name = "created_by")
     private Long createdBy;
 
+    @Column(name = "created_user_name")
+    private String createdUserName;
+
     @Column(name = "extracted_folder_path")
     private String extractedFolderPath;
 

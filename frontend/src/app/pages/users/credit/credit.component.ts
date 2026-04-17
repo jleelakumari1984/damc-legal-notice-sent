@@ -6,13 +6,14 @@ import { CreditService } from '../../../core/services/credit.service';
 import { CreditFormComponent } from './credit-form/credit-form.component';
 import { Credit } from '../../../core/models/credit.model';
 import { StorageService } from '../../../core/services/storage.service';
+import { BaseComponent } from '../../../shared/base/base.component';
 
 @Component({
   selector: 'app-credit',
   templateUrl: './credit.component.html',
   styleUrls: ['./credit.component.css']
 })
-export class CreditComponent implements AfterViewInit, OnChanges {
+export class CreditComponent extends BaseComponent implements AfterViewInit, OnChanges {
   @Input() userId: number | null = null;
   @Input() userName: string = '';
   @Output() close = new EventEmitter<void>();
@@ -31,8 +32,7 @@ export class CreditComponent implements AfterViewInit, OnChanges {
   constructor(
     private readonly service: CreditService,
     private readonly datatableHelper: DatatableHelper,
-    private readonly storageService: StorageService
-  ) { }
+  ) { super(); }
 
   ngAfterViewInit(): void {
     this.initTable();

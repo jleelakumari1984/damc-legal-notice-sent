@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Getter
 @Builder
 public class ScheduledNoticeDao {
@@ -12,7 +14,9 @@ public class ScheduledNoticeDao {
     private Long noticeSno;
     private String noticeName;
     private String originalFileName;
+    @JsonIgnore
     private String zipFilePath;
+    @JsonIgnore
     private String extractedFolderPath;
     private Boolean sendSms;
     private Boolean sendWhatsapp;

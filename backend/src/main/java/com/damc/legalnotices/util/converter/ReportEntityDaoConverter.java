@@ -28,10 +28,13 @@ public class ReportEntityDaoConverter {
     private final ObjectMapper objectMapper;
     private final TemplateUtil templateUtil;
 
+
+
     public NoticeReportDao toReportDto(ScheduleReportViewEntity e) {
         return NoticeReportDao.builder()
                 .id(e.getId())
                 .noticeName(e.getTemplateStepName())
+                .createdUserName(e.getCreatedUserName())
                 .originalFileName(e.getOriginalFileName())
                 .sendSms(e.getSendSms())
                 .sendWhatsapp(e.getSendWhatsapp())
@@ -41,7 +44,7 @@ public class ReportEntityDaoConverter {
                 .failureReason(e.getFailureReason())
                 .totalItems(e.getTotalLoans())
                 .pendingItems(e.getPendingLoans())
-                .noticeingItems(e.getProcessingLoans())
+                .pendingItems(e.getProcessingLoans())
                 .completedItems(e.getCompletedLoans())
                 .failedItems(e.getFailedLoans())
                 .build();

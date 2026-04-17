@@ -3,14 +3,15 @@ import { WhatsappLog } from "./whatsapp.model";
 
 export interface NoticeReportFilter {
     noticeName?: string;
-    userId?: number;
+    userId?: number | null;
     status?: string;
-    fromDate?: Date;
-    toDate?: Date;
+    fromDate?: Date | null;
+    toDate?: Date | null;
 }
 export interface NoticeReportSummary {
     id: number;
     noticeName: string;
+    createdUserName: string;
     originalFileName: string;
     zipFilePath: string;
     extractedFolderPath: string;

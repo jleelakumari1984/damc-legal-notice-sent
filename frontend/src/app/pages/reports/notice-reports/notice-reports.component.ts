@@ -7,6 +7,8 @@ import { statusBadgeClass } from '../../../shared/datatable/datatable.utils';
 import { NoticeReportDetail, NoticeReportFilter, NoticeReportItemDetail, NoticeReportSummary } from '../../../core/models/report.notice';
 import { NoticeReportsService } from '../../../core/services/notice-reports.service';
 import { ReportFilterComponent } from './report-filter/report-filter.component';
+import { StorageService } from '../../../core/services/storage.service';
+import { BaseComponent } from '../../../shared/base/base.component';
 
 declare const $: any;
 
@@ -15,7 +17,7 @@ declare const $: any;
   templateUrl: './notice-reports.component.html',
   styleUrls: ['./notice-reports.component.css']
 })
-export class NoticeReportsComponent implements OnInit, AfterViewInit {
+export class NoticeReportsComponent extends BaseComponent implements OnInit, AfterViewInit {
   @ViewChild(ReportFilterComponent) reportFilter!: ReportFilterComponent;
 
   selectedReport: NoticeReportSummary | null = null;
@@ -28,12 +30,15 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
   itemDetailError = '';
   activeLogTab: 'sms' | 'whatsapp' | 'error' = 'sms';
 
-  private activeFilter: NoticeReportFilter = {};
+  activeFilter: NoticeReportFilter = {};
 
   constructor(
     private readonly service: NoticeReportsService,
-    private readonly datatableHelper: DatatableHelper
-  ) { }
+    private readonly datatableHelper: DatatableHelper,
+  ) {
+    super();
+    this.activeFilter.userId = super.getUserId();
+  }
 
   ngOnInit(): void { }
 
@@ -44,6 +49,7 @@ export class NoticeReportsComponent implements OnInit, AfterViewInit {
   private initTable(): void {
     this.datatableHelper.initTable('#noticesTable', new NoticeReportsDatatable({
       service: this.service,
+      storageService: this.storageService,
       getFilters: () => this.activeFilter,
       callbacks: {
         onViewDetail: (id, status, itemCount) => this.viewDetail(id, status, itemCount),

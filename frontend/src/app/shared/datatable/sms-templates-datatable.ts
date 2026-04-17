@@ -9,9 +9,8 @@ declare const $: any;
 export interface SmsTemplatesDatatableOptions {
   getStatus?: () => boolean | null;
   noticeId: number;
-  isSuperAdmin: boolean;
-  service: NoticeTemplateService;
   storageService: StorageService;
+  service: NoticeTemplateService;
   callbacks: {
     onEdit: (template: SmsTemplate) => void;
     onView: (template: SmsTemplate) => void;
@@ -28,8 +27,8 @@ export class SmsTemplatesDatatable extends DataTable {
   }
 
   build(): object {
-    const { noticeId, isSuperAdmin, service, storageService, callbacks, getStatus } = this.options;
-
+    const { noticeId, service, storageService, callbacks, getStatus } = this.options;
+    const isSuperAdmin = storageService.isSuperAdmin();
     const adminColumns = [
       {
         data: null, title: '#', orderable: false, searchable: false,

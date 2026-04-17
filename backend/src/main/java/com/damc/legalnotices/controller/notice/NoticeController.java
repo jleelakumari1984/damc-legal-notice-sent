@@ -87,4 +87,5 @@ public class NoticeController {
         return ResponseEntity.ok(noticeScheduleService.scheduleNotice(baseService.getSessionUser(),
                 request));
     }
+
 }

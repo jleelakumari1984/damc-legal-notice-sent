@@ -31,4 +31,6 @@ public interface NoticeReportService {
 
         DataTableDao<NoticeReportWhatsappDetailsDao> getWhatsAppErrorLogs(LoginUserDao sessionUser, Long id,
                         DatatableDto<NoticeWhatsappLogListReportDto> request);
+ 
+    
 }

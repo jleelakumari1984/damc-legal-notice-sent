@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { StorageService } from '../../core/services/storage.service';
+import { BaseComponent } from '../../shared/base/base.component';
 
 declare const $: any;
 
@@ -10,22 +11,16 @@ declare const $: any;
   templateUrl: './auth-layout.component.html',
   styleUrls: ['./auth-layout.component.css']
 })
-export class AuthLayoutComponent {
+export class AuthLayoutComponent extends BaseComponent {
   userName: string | undefined = undefined;
 
-  constructor(private readonly storageService: StorageService, private readonly router: Router) {
-    this.userName = this.storageService.getUser()?.displayName;
+  constructor(private readonly router: Router) {
+    super();
+    this.userName = this.currentUser?.displayName;
   }
 
-  isSuperAdmin(): boolean {
-    return this.storageService.isSuperAdmin();
-  }
-
-  isSuperOrAdmin(): boolean {
-    return this.storageService.isSuperOrAdmin();
-  }
   canChangeSession(): boolean {
-    return this.storageService.isSuperOrAdmin() || this.storageService.getUser()?.canSwitchSession || false;
+    return this.isSuperOrAdmin() || this.currentUser?.canSwitchSession || false;
   }
 
   openSwitchSession(): void {

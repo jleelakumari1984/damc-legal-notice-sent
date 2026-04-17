@@ -52,6 +52,7 @@ public class ProcessConfigReportViewEntity {
 
     @Column(name = "whatsapp_message_count")
     private Long whatsappMessageCount;
+    
     @Column(name = "whatsapp_active_count")
     private Long whatsappActiveCount;
 

@@ -6,6 +6,7 @@ import com.damc.legalnotices.dao.notification.SendWhatsappDao;
 import com.damc.legalnotices.dao.report.NoticeReportDetailDao;
 import com.damc.legalnotices.dao.report.NoticeReportSmsDetailsDao;
 import com.damc.legalnotices.dao.report.NoticeReportWhatsappDetailsDao;
+import com.damc.legalnotices.dao.schedule.ScheduledNoticeDao;
 import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.report.NoticeReportDto;
 import com.damc.legalnotices.dto.report.NoticeSmsLogListReportDto;
@@ -13,6 +14,7 @@ import com.damc.legalnotices.dto.report.NoticeWhatsappLogListReportDto;
 import com.damc.legalnotices.dao.report.NoticeReportDao;
 import com.damc.legalnotices.service.BaseService;
 import com.damc.legalnotices.service.notice.NoticeReportService;
+import com.damc.legalnotices.service.schedule.NoticeScheduleService;
 import com.damc.legalnotices.util.CsvExportUtil;
 
 import jakarta.validation.Valid;
@@ -39,6 +41,7 @@ import java.util.List;
 public class NoticeReportController {
 
     private final NoticeReportService noticeReportService;
+    private final NoticeScheduleService noticeScheduleService;
     private final CsvExportUtil csvExportUtil;
     private final BaseService baseService;
 
@@ -53,6 +56,16 @@ public class NoticeReportController {
             @PathVariable Long id,
             @RequestParam(required = false) String status) {
         return ResponseEntity.ok(noticeReportService.getNoticeReportDetail(baseService.getSessionUser(), id, status));
+    }
+
+    @GetMapping("/schedule/{id}/stop")
+    public ResponseEntity<ScheduledNoticeDao> stopSchedule(@PathVariable Long id) {
+        return ResponseEntity.ok(noticeScheduleService.stopSchedule(baseService.getSessionUser(), id));
+    }
+
+    @GetMapping("/schedule/{id}/start")
+    public ResponseEntity<ScheduledNoticeDao> startSchedule(@PathVariable Long id) {
+        return ResponseEntity.ok(noticeScheduleService.startSchedule(baseService.getSessionUser(), id));
     }
 
     @PostMapping("/sms-logs/{id}")

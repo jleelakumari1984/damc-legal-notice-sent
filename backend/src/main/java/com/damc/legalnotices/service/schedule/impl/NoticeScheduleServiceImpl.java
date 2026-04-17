@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.damc.legalnotices.dao.excel.NoticeExcelDao;
 import com.damc.legalnotices.dao.excel.ScheduledNoticeItemDao;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
 import com.damc.legalnotices.dao.notice.NoticeValidationDao;
+import com.damc.legalnotices.dao.schedule.ScheduledNoticeDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dao.user.UserSmsCredentialDao;
 import com.damc.legalnotices.dao.user.UserWhatsAppCredentialDao;
@@ -129,7 +131,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
         scheduledNotice.setSendWhatsapp(Boolean.TRUE.equals(sendWhatsapp));
         scheduledNotice.setCreatedBy(sessionUser.getId());
         scheduledNotice.setCreatedAt(LocalDateTime.now());
-        scheduledNotice.setStatus(NoticeScheduleStatus.EXCELNOTICEING);
+        scheduledNotice.setStatus(NoticeScheduleStatus.EXCELPROCESSING);
         scheduledNotice = scheduledNoticeRepository.save(scheduledNotice);
         log.info("ScheduledNotice created with id: {}", scheduledNotice.getId());
         NoticeScheduleStatus excelNotice = NoticeScheduleStatus.EXCELUPLOADED;
@@ -213,11 +215,10 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
     @Override
     @Transactional
     public List<NoticeExcelDao> noticePendingExcelParsing() {
-        long identifier = System.currentTimeMillis();
-
+        long identifier = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         // Atomically claim up to 50 EXCELUPLOADED rows with this identifier
         int claimed = scheduledNoticeRepository.claimPendingForExcelParsing(identifier,
-                NoticeScheduleStatus.EXCELNOTICEING.name(),
+                NoticeScheduleStatus.EXCELPROCESSING.name(),
                 NoticeScheduleStatus.EXCELUPLOADED.name());
         if (claimed == 0) {
             log.info("No notices pending Excel parsing");
@@ -268,9 +269,9 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
     @Override
     @Transactional
     public List<ScheduledNoticeItemDao> noticePendingNoticeItems() {
-        long identifier = System.currentTimeMillis();
+        long identifier = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         int claimed = scheduledNoticeItemRepository.claimPendingItems(identifier,
-                NoticeScheduleStatus.NOTICEING.name(),
+                NoticeScheduleStatus.PROCESSING.name(),
                 NoticeScheduleStatus.PENDING.name());
         if (claimed == 0) {
             log.info("No notices pending Excel parsing");
@@ -370,7 +371,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                         item.setProcessedAt(LocalDateTime.now());
                         item.setFailureReason(null);
                     } catch (Exception ex) {
-                        log.error("Failed noticeing agreement {}", item.getAgreementNumber(), ex);
+                        log.error("Failed processing agreement {}", item.getAgreementNumber(), ex);
                         item.setStatus(NoticeScheduleStatus.FAILED);
                         item.setFailureReason(ex.getMessage());
                         item.setProcessedAt(LocalDateTime.now());
@@ -390,7 +391,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
             } finally {
                 items.stream()
-                        .filter(item -> NoticeScheduleStatus.NOTICEING.equals(item.getStatus()))
+                        .filter(item -> NoticeScheduleStatus.PROCESSING.equals(item.getStatus()))
                         .forEach(item -> {
                             item.setStatus(NoticeScheduleStatus.PENDING);
                             item.setIdentifier(0L);
@@ -412,7 +413,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                         notice.setStatus(NoticeScheduleStatus.COMPLETED);
                         notice.setProcessedAt(LocalDateTime.now());
                         scheduledNoticeRepository.save(notice);
-                        log.info("ScheduledNotice id={} marked as COMPLETED (no pending/noticeing items remaining)",
+                        log.info("ScheduledNotice id={} marked as COMPLETED (no pending/processing items remaining)",
                                 notice.getId());
                     }
                 }
@@ -500,6 +501,38 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                                 .findFirst()
                                 .orElse(entry.getKey()),
                         Map.Entry::getValue));
+    }
+
+    @Transactional
+    @Override
+    public ScheduledNoticeDao stopSchedule(LoginUserDao sessionUser, Long noticeId) {
+        ScheduledNoticeEntity notice = scheduledNoticeRepository.findById(noticeId)
+                .orElseThrow(() -> new IllegalArgumentException("Report not found: " + noticeId));
+        if (notice.getStatus() == null || NoticeScheduleStatus.EXCELUPLOADED == notice.getStatus()
+                || NoticeScheduleStatus.STOP == notice.getStatus()) {
+            throw new IllegalStateException("Schedule is already stopped: " + noticeId);
+        }
+        scheduledNoticeItemRepository.updateStatusByScheduledNoticeId(noticeId, NoticeScheduleStatus.STOP.name());
+        notice.setStatus(NoticeScheduleStatus.STOP);
+        notice = scheduledNoticeRepository.save(notice);
+
+        return entityDaoConverter.toScheduledNoticeDao(notice);
+    }
+
+    @Transactional
+    @Override
+    public ScheduledNoticeDao startSchedule(LoginUserDao sessionUser, Long noticeId) {
+        ScheduledNoticeEntity notice = scheduledNoticeRepository.findById(noticeId)
+                .orElseThrow(() -> new IllegalArgumentException("Report not found: " + noticeId));
+
+        if (notice.getStatus() == null
+                || NoticeScheduleStatus.START == notice.getStatus()) {
+            throw new IllegalStateException("Schedule is already started: " + noticeId);
+        }
+        scheduledNoticeItemRepository.updateStatusByScheduledNoticeId(noticeId, NoticeScheduleStatus.PENDING.name());
+        notice.setStatus(NoticeScheduleStatus.START);
+        notice = scheduledNoticeRepository.save(notice);
+        return entityDaoConverter.toScheduledNoticeDao(notice);
     }
 
 }

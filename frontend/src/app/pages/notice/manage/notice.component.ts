@@ -9,13 +9,14 @@ import { NoticeType } from '../../../core/models/notices.model';
 import { NoticeExcelMappingsComponent } from '../excel-mappings/notice-excel-mappings.component';
 import { StorageService } from '../../../core/services/storage.service';
 import { NoticeReportFilter } from '../../../core/models/report.notice';
+import { BaseComponent } from '../../../shared/base/base.component';
 
 @Component({
   selector: 'app-notice',
   templateUrl: './notice.component.html',
   styleUrls: ['./notice.component.css']
 })
-export class NoticeComponent implements AfterViewInit {
+export class NoticeComponent extends BaseComponent implements AfterViewInit {
   @ViewChild(NoticeFormComponent) noticeForm!: NoticeFormComponent;
   @ViewChild(NoticeExcelMappingsComponent) noticeExcelMappings!: NoticeExcelMappingsComponent;
   @ViewChild(NoticeFilterComponent) noticeFilter!: NoticeFilterComponent;
@@ -26,16 +27,16 @@ export class NoticeComponent implements AfterViewInit {
   actionId: number | null = null;
   isActiveStatus: boolean | null = null;
   private readonly tableId = "#noticesTable";
-  private activeFilter: NoticeReportFilter = {};
+  activeFilter: NoticeReportFilter = {};
   successMessage = '';
   errorMessage = '';
 
   constructor(
     private readonly service: NoticeService,
-    private readonly datatableHelper: DatatableHelper,
-    private readonly storageService: StorageService
+    private readonly datatableHelper: DatatableHelper
   ) {
-    this.activeFilter.userId = this.storageService.getUser()?.id;
+    super();
+    this.activeFilter.userId = super.getUserId();
   }
 
   ngAfterViewInit(): void {

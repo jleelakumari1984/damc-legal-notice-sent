@@ -10,7 +10,6 @@ export interface WhatsappTemplatesDatatableOptions {
   getStatus: () => boolean | null;
 
   noticeId: number;
-  isSuperAdmin: boolean;
   service: NoticeTemplateService;
   storageService: StorageService;
   callbacks: {
@@ -29,7 +28,8 @@ export class WhatsappTemplatesDatatable extends DataTable {
   }
 
   build(): object {
-    const { noticeId, isSuperAdmin, service, storageService, callbacks, getStatus } = this.options;
+    const { noticeId, service, storageService, callbacks, getStatus } = this.options;
+    const isSuperAdmin = storageService.isSuperAdmin();
 
     const adminColumns = [
       {

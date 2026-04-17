@@ -9,26 +9,46 @@
       </div>
       <div class="modal-body">
         <div class="row g-3">
+
+          <!-- Notice Name -->
           <div class="col-12">
-            <label class="form-label">Notice Name</label>
-            <input class="form-control" [(ngModel)]="noticeName"
+            <label class="form-label" for="rf-noticeName">Notice Name</label>
+            <input id="rf-noticeName" class="form-control" [(ngModel)]="noticeName"
               placeholder="Search by notice name..." (keyup.enter)="apply()">
           </div>
+
+          <!-- Status – select2 -->
           <div class="col-12">
-            <label class="form-label">Status</label>
-            <select class="form-select" [(ngModel)]="status">
-              <option value="">All</option>
+            <label class="form-label" for="rf-status">Status</label>
+            <select id="rf-status" class="form-select">
+              <option value="">All statuses</option>
               <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
             </select>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">From Date</label>
-            <input type="date" class="form-control" [(ngModel)]="fromDate">
+
+          <!-- User – select2 -->
+          <div class="col-12">
+            <label class="form-label" for="rf-userId">User</label>
+            <select id="rf-userId" class="form-select">
+              <option value="">All users</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+            </select>
           </div>
+
+          <!-- From Date – flatpickr datetime -->
           <div class="col-md-6">
-            <label class="form-label">To Date</label>
-            <input type="date" class="form-control" [(ngModel)]="toDate">
+            <label class="form-label" for="rf-fromDate">From Date &amp; Time</label>
+            <input id="rf-fromDate" type="text" class="form-control"
+              placeholder="YYYY-MM-DD HH:MM" autocomplete="off">
           </div>
+
+          <!-- To Date – flatpickr datetime -->
+          <div class="col-md-6">
+            <label class="form-label" for="rf-toDate">To Date &amp; Time</label>
+            <input id="rf-toDate" type="text" class="form-control"
+              placeholder="YYYY-MM-DD HH:MM" autocomplete="off">
+          </div>
+
         </div>
       </div>
       <div class="modal-footer">

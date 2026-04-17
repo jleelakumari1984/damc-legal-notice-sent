@@ -9,12 +9,13 @@ import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { WhatsappTemplatesDatatable } from '../../../shared/datatable/whatsapp-templates-datatable';
 import { ConfirmModalService } from '../../../shared/confirm-modal/confirm-modal.service';
 import { WhatsappApprovalFormComponent } from '../../template-approvals/whatsapp-approval-form/whatsapp-approval-form.component';
+import { BaseComponent } from '../../../shared/base/base.component';
 
 @Component({
   selector: 'app-whatsapp-template',
   templateUrl: './whatsapp-template.component.html'
 })
-export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
+export class WhatsappTemplateComponent   extends BaseComponent  implements OnInit, OnChanges, OnDestroy {
   @ViewChild(WhatsappTemplateFormUserComponent) userForm?: WhatsappTemplateFormUserComponent;
   @ViewChild(WhatsappTemplateViewComponent) viewComp?: WhatsappTemplateViewComponent;
   @ViewChild(WhatsappApprovalFormComponent) whatsappApprovalForm!: WhatsappApprovalFormComponent;
@@ -32,14 +33,11 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private readonly service: NoticeTemplateService,
-    private readonly storageService: StorageService,
-    private readonly dtHelper: DatatableHelper,
+     private readonly dtHelper: DatatableHelper,
     private readonly confirmService: ConfirmModalService
-  ) { }
+  ) { super(); }
 
-  get isSuperAdmin(): boolean {
-    return this.storageService.isSuperAdmin();
-  }
+ 
 
   ngOnInit(): void {
     if (this.selectedNotice) {
@@ -62,7 +60,6 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
     const dt = new WhatsappTemplatesDatatable({
       getStatus: () => this.isActiveStatus,
       noticeId: this.selectedNotice.id,
-      isSuperAdmin: this.isSuperAdmin,
       service: this.service,
       storageService: this.storageService,
       callbacks: {

@@ -2,12 +2,12 @@ package com.damc.legalnotices.enums;
 
 public enum NoticeScheduleStatus {
     EXCELUPLOADED,
-    EXCELNOTICEING,
+    EXCELPROCESSING,
     EXCELCOMPLETED,
     EXCELFAILED,
     UPLOADED,
     PENDING,
-    NOTICEING,
+    PROCESSING,
     COMPLETED,
     FAILED,
     START,

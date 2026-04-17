@@ -9,12 +9,13 @@ import { DatatableHelper } from '../../../shared/datatable/datatable.helper';
 import { SmsTemplatesDatatable } from '../../../shared/datatable/sms-templates-datatable';
 import { ConfirmModalService } from '../../../shared/confirm-modal/confirm-modal.service';
 import { SmsApprovalFormComponent } from '../../template-approvals/sms-approval-form/sms-approval-form.component';
+import { BaseComponent } from '../../../shared/base/base.component';
 
 @Component({
   selector: 'app-sms-template',
   templateUrl: './sms-template.component.html'
 })
-export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
+export class SmsTemplateComponent extends BaseComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(SmsTemplateFormUserComponent) userForm?: SmsTemplateFormUserComponent;
   @ViewChild(SmsTemplateViewComponent) viewComp?: SmsTemplateViewComponent;
   @ViewChild(SmsApprovalFormComponent) smsApprovalForm!: SmsApprovalFormComponent;
@@ -33,14 +34,13 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private readonly service: NoticeTemplateService,
-    private readonly storageService: StorageService,
     private readonly dtHelper: DatatableHelper,
     private readonly confirmService: ConfirmModalService
-  ) { }
-
-  get isSuperAdmin(): boolean {
-    return this.storageService.isSuperAdmin();
+  ) {
+    super();
   }
+
+
 
   ngOnInit(): void {
     if (this.selectedNotice) {
@@ -63,7 +63,6 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
     const dt = new SmsTemplatesDatatable({
       getStatus: () => this.isActiveStatus,
       noticeId: this.selectedNotice.id,
-      isSuperAdmin: this.isSuperAdmin,
       service: this.service,
       storageService: this.storageService,
       callbacks: {

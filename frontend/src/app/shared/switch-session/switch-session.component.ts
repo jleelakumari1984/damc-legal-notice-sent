@@ -7,6 +7,7 @@ import { UserResponse } from '../../core/services/auth/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { User, UserFilter } from '../../core/models/user.model';
 import { PaginatedRequest } from '../../core/models/datatable.model';
+import { BaseComponent } from '../base/base.component';
 
 declare const $: any;
 
@@ -14,10 +15,9 @@ declare const $: any;
   selector: 'app-switch-session',
   templateUrl: './switch-session.component.html'
 })
-export class SwitchSessionComponent implements OnInit {
+export class SwitchSessionComponent extends BaseComponent implements OnInit {
   isInSwitchedSession = false;
   originalUser: UserResponse | null = null;
-  currentUser: UserResponse | null = null;
 
   users: User[] = [];
   selectedUserId: number | null = null;
@@ -27,21 +27,18 @@ export class SwitchSessionComponent implements OnInit {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly storageService: StorageService,
     private readonly userService: UserService,
     private readonly router: Router
-  ) { }
+  ) { super(); }
 
   ngOnInit(): void {
     this.isInSwitchedSession = this.storageService.isInSwitchedSession();
     this.originalUser = this.storageService.getOriginalUser();
-    this.currentUser = this.storageService.getUser();
   }
 
   refresh(): void {
     this.isInSwitchedSession = this.storageService.isInSwitchedSession();
     this.originalUser = this.storageService.getOriginalUser();
-    this.currentUser = this.storageService.getUser();
     this.errorMessage = '';
     this.selectedUserId = null;
 

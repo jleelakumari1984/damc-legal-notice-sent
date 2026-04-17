@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { WhatsappTemplate } from '../../../../core/models/notices.model';
 import { StorageService } from '../../../../core/services/storage.service';
+import { BaseComponent } from '../../../../shared/base/base.component';
 
 declare const $: any;
 
@@ -9,16 +10,13 @@ declare const $: any;
     selector: 'app-whatsapp-template-view',
     templateUrl: './whatsapp-template-view.component.html'
 })
-export class WhatsappTemplateViewComponent {
+export class WhatsappTemplateViewComponent extends BaseComponent {
     viewTemplate: WhatsappTemplate | null = null;
 
     constructor(
-        private readonly storageService: StorageService,
-    ) { }
+    ) { super(); }
 
-    get isSuperAdmin(): boolean {
-        return this.storageService.isSuperAdmin();
-    }
+
     open(template: WhatsappTemplate): void {
         this.viewTemplate = template;
         $('#whatsappViewModal').modal('show');

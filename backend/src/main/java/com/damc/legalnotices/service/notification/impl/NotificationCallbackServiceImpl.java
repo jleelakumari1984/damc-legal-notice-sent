@@ -78,7 +78,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
             }
 
         } catch (Exception ex) {
-            log.error("SMS DLR: error noticeing delivery report: {}", ex.getMessage(), ex);
+            log.error("SMS DLR: error processing delivery report: {}", ex.getMessage(), ex);
         }
         return updated;
     }
@@ -137,7 +137,7 @@ public class NotificationCallbackServiceImpl implements NotificationCallbackServ
                 }
             }
         } catch (Exception ex) {
-            log.error("WhatsApp callback: error noticeing status update: {}", ex.getMessage(), ex);
+            log.error("WhatsApp callback: error processing status update: {}", ex.getMessage(), ex);
         }
         return updated;
     }

@@ -8,6 +8,7 @@ import { UserFilterComponent } from './user-filter/user-filter.component';
 import { StorageService } from '../../core/services/storage.service';
 import { User, UserFilter } from '../../core/models/user.model';
 import { ConfirmModalService } from '../../shared/confirm-modal/confirm-modal.service';
+import { BaseComponent } from '../../shared/base/base.component';
 
 declare const $: any;
 
@@ -16,7 +17,7 @@ declare const $: any;
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
-export class UsersComponent implements AfterViewInit {
+export class UsersComponent extends BaseComponent implements AfterViewInit {
   @ViewChild(UserFormComponent) userForm!: UserFormComponent;
   @ViewChild(UserFilterComponent) userFilter!: UserFilterComponent;
 
@@ -33,9 +34,8 @@ export class UsersComponent implements AfterViewInit {
   constructor(
     private readonly service: UserService,
     private readonly datatableHelper: DatatableHelper,
-    private readonly storageService: StorageService,
     private readonly confirmService: ConfirmModalService
-  ) { }
+  ) { super(); }
 
   ngAfterViewInit(): void {
     this.initTable();

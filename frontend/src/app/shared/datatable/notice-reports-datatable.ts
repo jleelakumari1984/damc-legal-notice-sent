@@ -5,12 +5,14 @@ import { NoticeReportsService } from '../../core/services/notice-reports.service
 import { ProcessingStatus } from '../../core/models/schedule.model';
 import { NoticeReportFilter, NoticeReportSummary } from '../../core/models/report.notice';
 import { PaginatedRequest } from '../../core/models/datatable.model';
+import { StorageService } from '../../core/services/storage.service';
 
 declare const $: any;
 
 export interface NoticeReportsTableOptions {
   service: NoticeReportsService;
   getFilters?: () => NoticeReportFilter;
+  storageService: StorageService;
   callbacks: {
     onViewDetail: (id: NoticeReportSummary, status: string, itemCount: number) => void;
     onSmsDetail: (id: NoticeReportSummary) => void;
@@ -25,7 +27,7 @@ export class NoticeReportsDatatable extends DataTable {
   }
 
   build(): object {
-    const { callbacks, service } = this.options;
+    const { callbacks, service, storageService } = this.options;
     return {
       ...BASE_DT_OPTIONS,
       ajax: (dtParams: any, callback: (data: object) => void) => {
@@ -66,6 +68,7 @@ export class NoticeReportsDatatable extends DataTable {
         { data: 'id', title: '#' },
         { data: 'originalFileName', title: 'File Name', className: 'text-nowrap', render: (d: string) => esc(d) },
         { data: 'noticeName', title: 'Process Name', className: 'text-nowrap' },
+        { data: 'createdUserName', title: 'Created By', className: 'text-nowrap', visible: storageService?.isSuperOrAdmin() ?? false },
         {
           data: 'sendSms', title: 'SMS', className: 'text-nowrap',
           render: (d: boolean, t: string) => {

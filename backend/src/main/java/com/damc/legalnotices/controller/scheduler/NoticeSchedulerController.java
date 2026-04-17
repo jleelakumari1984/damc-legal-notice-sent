@@ -29,7 +29,7 @@ public class NoticeSchedulerController {
     }
 
     @GetMapping("/pending-notice-items")
-    public ResponseEntity<List<ScheduledNoticeItemDao>> executePendingNoticeItemsNoticeing() {
+    public ResponseEntity<List<ScheduledNoticeItemDao>> executePendingNoticeItemsProcessing() {
         log.info("Running scheduled notice noticeor for pending notice items");
         return ResponseEntity.ok(scheduleService.noticePendingNoticeItems());
     }
