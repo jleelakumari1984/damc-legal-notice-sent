@@ -2,6 +2,7 @@ package com.damc.legalnotices.util;
 
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -14,10 +15,13 @@ import java.util.zip.ZipInputStream;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ZipExtractorUtil {
 
+    private final FileUtil fileUtil;
+
     public void extract(Path zipFilePath, Path targetDir) throws IOException {
-        Files.createDirectories(targetDir);
+        fileUtil.createDirectoriesIfNotExists(targetDir);
         log.info("Extracting Zip File {}", zipFilePath.getFileName().toString());
         try (InputStream inputStream = Files.newInputStream(zipFilePath);
                 ZipInputStream zis = new ZipInputStream(inputStream)) {
@@ -29,9 +33,9 @@ public class ZipExtractorUtil {
                 }
 
                 if (entry.isDirectory()) {
-                    Files.createDirectories(resolvedPath);
+                    fileUtil.createDirectoriesIfNotExists(resolvedPath);
                 } else {
-                    Files.createDirectories(resolvedPath.getParent());
+                    fileUtil.createDirectoriesIfNotExists(resolvedPath.getParent());
                     Files.copy(zis, resolvedPath, StandardCopyOption.REPLACE_EXISTING);
                 }
                 zis.closeEntry();

@@ -28,11 +28,11 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.form = this.fb.group({
       excelFieldName: ['', [Validators.required, Validators.maxLength(255)]],
-      dbFieldName: ['', [Validators.required, Validators.maxLength(255)]],
-      isKey: [0],
+      isAgreement: [0],
+      isCustomerName: [0],
       isMobile: [0],
       isMandatory: [0],
-      isAttachment: [0]
+      isAttachment: [0],
     });
   }
 
@@ -43,14 +43,14 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
       if (m) {
         this.form.setValue({
           excelFieldName: m.excelFieldName,
-          dbFieldName: m.dbFieldName,
-          isKey: m.isKey ?? 0,
+          isAgreement: m.isAgreement ?? 0,
+          isCustomerName: m.isCustomerName ?? 0,
           isMobile: m.isMobile ?? 0,
           isMandatory: m.isMandatory ?? 0,
-          isAttachment: m.isAttachment ?? 0
+          isAttachment: m.isAttachment ?? 0,
         });
       } else {
-        this.form.reset({ excelFieldName: '', dbFieldName: '', isKey: 0, isMobile: 0, isMandatory: 0, isAttachment: 0 });
+        this.form.reset({ excelFieldName: '', isAgreement: 0, isCustomerName: 0, isMobile: 0, isMandatory: 0, isAttachment: 0 });
       }
       this.errorMessage = '';
     }
@@ -61,7 +61,7 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
   }
 
   cancel(): void {
-    this.form.reset({ excelFieldName: '', dbFieldName: '', isKey: 0, isMobile: 0, isMandatory: 0, isAttachment: 0 });
+    this.form.reset({ excelFieldName: '', isAgreement: 0, isCustomerName: 0, isMobile: 0, isMandatory: 0, isAttachment: 0 });
     this.errorMessage = '';
     $('#mappingModal').modal('hide');
   }
@@ -71,12 +71,15 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
     const request: NoticeExcelMappingRequest = {
       noticeId: this.noticeType.id,
       excelFieldName: this.form.value.excelFieldName.trim(),
-      dbFieldName: this.form.value.dbFieldName.trim(),
-      isKey: this.form.value.isKey ? 1 : 0,
+      isAgreement: this.form.value.isAgreement ? 1 : 0,
+      isCustomerName: this.form.value.isCustomerName ? 1 : 0,
       isMobile: this.form.value.isMobile ? 1 : 0,
       isMandatory: this.form.value.isMandatory ? 1 : 0,
-      isAttachment: this.form.value.isAttachment ? 1 : 0
+      isAttachment: this.form.value.isAttachment ? 1 : 0,
+      isCustomer: this.form.value.isCustomer ? 1 : 0
     };
+
+
     this.saving = true;
     this.errorMessage = '';
 
@@ -87,7 +90,7 @@ export class NoticeExcelMappingFormComponent implements OnInit, OnChanges {
     call.subscribe({
       next: () => {
         this.saving = false;
-        this.form.reset({ excelFieldName: '', dbFieldName: '', isKey: 0, isMobile: 0, isMandatory: 0, isAttachment: 0 });
+        this.form.reset({ excelFieldName: '', isAgreement: 0, isMobile: 0, isMandatory: 0, isAttachment: 0, isCustomer: 0 });
         $('#mappingModal').modal('hide');
         this.saved.emit();
       },

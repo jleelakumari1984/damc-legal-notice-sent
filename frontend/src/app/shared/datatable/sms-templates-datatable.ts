@@ -7,6 +7,7 @@ import { SmsTemplate, TemplateApprovedStatus } from '../../core/models/notices.m
 declare const $: any;
 
 export interface SmsTemplatesDatatableOptions {
+  getStatus?: () => boolean | null;
   noticeId: number;
   isSuperAdmin: boolean;
   service: NoticeTemplateService;
@@ -27,7 +28,7 @@ export class SmsTemplatesDatatable extends DataTable {
   }
 
   build(): object {
-    const { noticeId, isSuperAdmin, service, storageService, callbacks } = this.options;
+    const { noticeId, isSuperAdmin, service, storageService, callbacks, getStatus } = this.options;
 
     const adminColumns = [
       {
@@ -59,6 +60,9 @@ export class SmsTemplatesDatatable extends DataTable {
         }
       },
       {
+        data: 'numberOfMessage', title: 'Number of Messages',
+        render: (d: number, t: string) => (t === 'sort' || t === 'type') ? d : d
+      }, {
         data: 'createdAt', title: 'Created At',
         render: (d: string, t: string) => (t === 'sort' || t === 'type') ? d : formatDateTime(d)
       },
@@ -111,6 +115,10 @@ export class SmsTemplatesDatatable extends DataTable {
         }
       },
       {
+        data: 'numberOfMessages', title: 'Number of Messages',
+        render: (d: number, t: string) => (t === 'sort' || t === 'type') ? d : d
+      },
+      {
         data: 'status', title: 'Status',
         render: (d: number, t: string) => {
           if (t !== 'display') return d;
@@ -144,7 +152,7 @@ export class SmsTemplatesDatatable extends DataTable {
     return {
       ...BASE_DT_OPTIONS,
       ajax: (_dtParams: any, callback: (data: object) => void) => {
-        service.getSmsTemplates(noticeId).subscribe({
+        service.getSmsTemplates(noticeId, getStatus ? getStatus() : null).subscribe({
           next: (data) => callback({ data }),
           error: () => {
             callbacks.onError('Failed to load SMS templates.');

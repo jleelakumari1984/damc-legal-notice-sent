@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NoticeWhatsappRejectDto {
+public class NoticeWhatsAppRejectDto {
 
     @NotNull
     private String rejectReason;

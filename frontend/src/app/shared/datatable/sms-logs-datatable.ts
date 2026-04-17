@@ -1,7 +1,7 @@
 import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
-import { SmsLogRequest } from '../../core/models/sms.model';
+import { SmsLogFilter } from '../../core/models/sms.model';
 import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
@@ -51,7 +51,7 @@ export class SmsLogsDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: PaginatedRequest<SmsLogRequest> = {
+                var request: PaginatedRequest<SmsLogFilter> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,

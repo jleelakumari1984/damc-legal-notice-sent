@@ -31,14 +31,17 @@ public class MasterProcessMailConfigDetailEntity {
     @JoinColumn(name = "process_sno")
     private MasterProcessTemplateDetailEntity process;
 
-    @Column(name = "sent_level")
-    private Integer sentLevel;
-
     @Column(name = "mail_subject")
     private String mailSubject;
 
     @Column(name = "template_path")
     private String templatePath;
+
+    @Column(name = "message_length")
+    private Integer messageLength;
+
+    @Column(name = "number_of_message")
+    private Integer numberOfMessage;
 
     @Column(name = "created_by", updatable = false)
     private Long createdBy;

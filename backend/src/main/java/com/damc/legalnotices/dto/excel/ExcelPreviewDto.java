@@ -1,14 +1,18 @@
 package com.damc.legalnotices.dto.excel;
 
-import lombok.Builder;
-import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-@Builder
+@Setter
 public class ExcelPreviewDto {
-    private List<String> columnNames;
-    private List<ExcelPreviewRowDto> rows;
-    private int totalRows;
+
+    @NotNull(message = "noticeSno is required")
+    private Long noticeSno;
+
+    @NotNull(message = "zipFile is required")
+    private MultipartFile zipFile;
 }

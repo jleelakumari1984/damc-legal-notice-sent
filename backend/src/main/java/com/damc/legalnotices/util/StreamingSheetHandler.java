@@ -1,7 +1,7 @@
 package com.damc.legalnotices.util;
 
-import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
-import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
+import com.damc.legalnotices.dao.excel.ExcelPreviewDao;
+import com.damc.legalnotices.dao.excel.ExcelPreviewRowDao;
 import com.damc.legalnotices.errors.StopParsingException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class StreamingSheetHandler implements XSSFSheetXMLHandler.SheetContentsH
 
     private final int maxRows;
     private final List<String> headers = new ArrayList<>();
-    private final List<ExcelPreviewRowDto> rows = new ArrayList<>();
+    private final List<ExcelPreviewRowDao> rows = new ArrayList<>();
     private Map<String, Object> currentRow;
     private int currentRowNum = -1;
     private int totalRows = 0;
@@ -47,7 +47,7 @@ public class StreamingSheetHandler implements XSSFSheetXMLHandler.SheetContentsH
             for (String header : headers) {
                 currentRow.putIfAbsent(header, "");
             }
-            rows.add(ExcelPreviewRowDto.builder().data(currentRow).rowNum(rowNum).build());
+            rows.add(ExcelPreviewRowDao.builder().data(currentRow).rowNum(rowNum).build());
 
         }
         if (maxRows > 0 && rowNum >= maxRows) {
@@ -83,8 +83,8 @@ public class StreamingSheetHandler implements XSSFSheetXMLHandler.SheetContentsH
         return col - 1;
     }
 
-    public ExcelPreviewDto toDto() {
-        return ExcelPreviewDto.builder()
+    public ExcelPreviewDao toDto() {
+        return ExcelPreviewDao.builder()
                 .columnNames(headers)
                 .rows(rows)
                 .totalRows(totalRows)

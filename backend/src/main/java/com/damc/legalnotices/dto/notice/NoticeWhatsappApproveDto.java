@@ -1,17 +1,19 @@
 package com.damc.legalnotices.dto.notice;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class NoticeWhatsappApproveDto {
+public class NoticeWhatsAppApproveDto {
 
-    @NotNull
+    @NotBlank
     private String templateName;
 
-    @NotNull
+    @NotBlank
     private String templateLang;
- 
+
+    @NotBlank
+    private String templateContent;
 }

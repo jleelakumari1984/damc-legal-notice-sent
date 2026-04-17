@@ -1,7 +1,7 @@
 package com.damc.legalnotices.controller.scheduler;
 
-import com.damc.legalnotices.dao.excel.NoticeedExcelDao;
-import com.damc.legalnotices.dao.excel.NoticeedNoticeItemDao;
+import com.damc.legalnotices.dao.excel.NoticeExcelDao;
+import com.damc.legalnotices.dao.excel.ScheduledNoticeItemDao;
 import com.damc.legalnotices.service.schedule.NoticeScheduleService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,13 @@ public class NoticeSchedulerController {
     private final NoticeScheduleService scheduleService;
 
     @GetMapping("/pending-excel")
-    public ResponseEntity<List<NoticeedExcelDao>> executePendingExcelParsing() {
+    public ResponseEntity<List<NoticeExcelDao>> executePendingExcelParsing() {
         log.info("Running scheduled notice noticeor for pending Excel parsing");
         return ResponseEntity.ok(scheduleService.noticePendingExcelParsing());
     }
 
     @GetMapping("/pending-notice-items")
-    public ResponseEntity<List<NoticeedNoticeItemDao>> executePendingNoticeItemsNoticeing() {
+    public ResponseEntity<List<ScheduledNoticeItemDao>> executePendingNoticeItemsNoticeing() {
         log.info("Running scheduled notice noticeor for pending notice items");
         return ResponseEntity.ok(scheduleService.noticePendingNoticeItems());
     }

@@ -11,7 +11,7 @@ import com.damc.legalnotices.dto.notice.NoticeValidationRowDto;
 @Getter
 @Setter
 @Builder
-public class NoticeedExcelDao {
+public class NoticeExcelDao {
     private Long scheduledNoticeId;
     private String ExcelName;
     private List<NoticeValidationRowDto> validationRows;

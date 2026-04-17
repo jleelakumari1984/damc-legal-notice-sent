@@ -42,7 +42,7 @@
 <app-notice-excel-mappings *ngIf="actionType === 'excel'" [selectedNotice]="editNotice" [selectFrom]="'notice'"
   (onClose)="closeNoticeMapping()"></app-notice-excel-mappings>
 
-<app-sms-template *ngIf="actionType === 'sms'" [selectedNotice]="editNotice"
+<app-sms-template *ngIf="actionType === 'sms'" [selectedNotice]="editNotice" [isActiveStatus]="isActiveStatus"
   (onClose)="closeSmsTemplate($event)"></app-sms-template>
 
 <app-whatsapp-template *ngIf="actionType === 'whatsapp'" [selectedNotice]="editNotice"

@@ -7,11 +7,13 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <div class="row g-3">
         <div class="col-md-4">
-          <label class="form-label">Notice Type</label>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label mb-0">Notice Type</label>
+          </div>
           <select class="form-select" formControlName="noticeSno" (change)="onNoticeTypeChange($event)">
             <option value="">Select Notice Type</option>
-            <option *ngFor="let type of noticeTypes" [value]="type.id"
-              [disabled]="type.smsMapCount == 0 && type.whatsappMapCount == 0 && type.mailMapCount == 0 && type.excelMapCount == 0">
+            <option *ngFor="let type of filteredNoticeTypes" [value]="type.id"
+              [disabled]="type.excelMapCount == 0 || (type.smsActiveCount == 0 && type.whatsappActiveCount == 0 ) ">
               {{ type.name }}</option>
           </select>
         </div>
@@ -19,19 +21,21 @@
         <div class="col-md-4">
           <label class="form-label">Upload ZIP (Excel + PDFs)</label>
           <input type="file" class="form-control" accept=".zip,.xlsx,.xls" (change)="onFileChange($event)"
-            [disabled]="!selectedNoticeType" />
+            [disabled]="!selectedNoticeType  || selectedNoticeType.excelMapCount == 0 || (selectedNoticeType.smsActiveCount == 0 && selectedNoticeType.whatsappActiveCount == 0 )" />
         </div>
 
 
 
-        <div class="col-md-6 d-flex align-items-center gap-4 pt-2">
-          <div class="form-check" *ngIf="!selectedNoticeType || selectedNoticeType.smsMapCount > 0">
+        <div class="col-md-6 d-flex align-items-center gap-4 pt-2" *ngIf="selectedNoticeType">
+          <div class="form-check" *ngIf=" selectedNoticeType.smsActiveCount > 0">
             <input class="form-check-input" type="checkbox" id="sms" formControlName="sendSms" />
-            <label class="form-check-label" for="sms">Send SMS</label>
+            <label class="form-check-label" for="sms">Send SMS</label> ( Active Templates: {{
+            selectedNoticeType.smsActiveCount }} )
           </div>
-          <div class="form-check" *ngIf="!selectedNoticeType || selectedNoticeType.whatsappMapCount > 0">
+          <div class="form-check" *ngIf=" selectedNoticeType.whatsappActiveCount > 0">
             <input class="form-check-input" type="checkbox" id="whatsapp" formControlName="sendWhatsapp" />
-            <label class="form-check-label" for="whatsapp">Send WhatsApp</label>
+            <label class="form-check-label" for="whatsapp">Send WhatsApp</label> ( Active Templates: {{
+            selectedNoticeType.whatsappActiveCount }} )
           </div>
         </div>
 

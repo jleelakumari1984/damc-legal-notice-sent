@@ -75,10 +75,10 @@ public class DownloadController {
     }
 
     private boolean isAttachmentInItem(ScheduledNoticeItemEntity item, String fileName) {
-        if (item.getAttachements() == null || item.getAttachements().isBlank()) {
+        if (item.getAttachments() == null || item.getAttachments().isBlank()) {
             return false;
         }
-        return java.util.Arrays.stream(item.getAttachements().split(";"))
+        return java.util.Arrays.stream(item.getAttachments().split(";"))
                 .map(String::trim)
                 .anyMatch(fileName::equals);
     }

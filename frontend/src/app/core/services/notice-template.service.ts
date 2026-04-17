@@ -3,26 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { SmsPendingTemplate, SmsPendingTemplateRequest, SmsTemplate, SmsTemplateRequest, SmsUserTemplateRequest, WhatsappPendingTemplate, WhatsappPendingTemplateRequest, WhatsappTemplate, WhatsappTemplateRequest, WhatsappUserTemplateRequest } from '../models/notices.model';
+import { SmsPendingTemplateResponse, SmsPendingTemplateFilter, SmsTemplate, SmsUserTemplateRequest, WhatsappPendingTemplateResponse, WhatsappPendingTemplateFilter, WhatsappTemplate, WhatsappUserTemplateRequest, WhatsappRejectTemplateRequest, WhatsappApproveTemplateRequest, SmsRejectTemplateRequest, SmsApproveTemplateRequest } from '../models/notices.model';
 import { PaginatedRequest, PaginatedResponse } from '../models/datatable.model';
-
-export interface ApproveTemplateRequest {
-  peid?: string;
-  senderId?: string;
-  routeId?: string;
-  templateContent: string;
-  templateId?: string;
-  channel?: string;
-  dcs?: number;
-  flashSms?: number;
-  templateName?: string;
-  templateLang?: string;
-  templatePath?: string;
-}
-
-export interface RejectTemplateRequest {
-  rejectionReason: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class NoticeTemplateService {
@@ -32,8 +14,11 @@ export class NoticeTemplateService {
 
   // ── SMS Templates ────────────────────────────────────────────────────────────
 
-  getSmsTemplates(noticeId: number): Observable<SmsTemplate[]> {
-    const params = new HttpParams().set('noticeId', noticeId.toString());
+  getSmsTemplates(noticeId: number, status: boolean | null): Observable<SmsTemplate[]> {
+    let params = new HttpParams().set('noticeId', noticeId.toString());
+    if (status !== null) {
+      params = params.set('status', status.toString());
+    }
     return this.http.get<SmsTemplate[]>(`${this.api}/sms/list`, { params });
   }
 
@@ -45,22 +30,25 @@ export class NoticeTemplateService {
     return this.http.put<SmsTemplate>(`${this.api}/sms/${id}`, request);
   }
 
-  getPendingSmsTemplates(request: PaginatedRequest<SmsPendingTemplateRequest>): Observable<PaginatedResponse<SmsPendingTemplate[]>> {
-    return this.http.post<PaginatedResponse<SmsPendingTemplate[]>>(`${this.api}/sms/pending`, request);
+  getPendingSmsTemplates(request: PaginatedRequest<SmsPendingTemplateFilter>): Observable<PaginatedResponse<SmsPendingTemplateResponse[]>> {
+    return this.http.post<PaginatedResponse<SmsPendingTemplateResponse[]>>(`${this.api}/sms/pending`, request);
   }
 
-  approveSmsTemplate(id: number, request: ApproveTemplateRequest): Observable<SmsTemplate> {
+  approveSmsTemplate(id: number, request: SmsApproveTemplateRequest): Observable<SmsTemplate> {
     return this.http.patch<SmsTemplate>(`${this.api}/sms/approve/${id}`, request);
   }
 
-  rejectSmsTemplate(id: number, request: RejectTemplateRequest): Observable<SmsTemplate> {
+  rejectSmsTemplate(id: number, request: SmsRejectTemplateRequest): Observable<SmsTemplate> {
     return this.http.patch<SmsTemplate>(`${this.api}/sms/reject/${id}`, request);
   }
 
   // ── WhatsApp Templates ───────────────────────────────────────────────────────
 
-  getWhatsappTemplates(noticeId: number): Observable<WhatsappTemplate[]> {
-    const params = new HttpParams().set('noticeId', noticeId.toString());
+  getWhatsappTemplates(noticeId: number, status: boolean | null): Observable<WhatsappTemplate[]> {
+    let params = new HttpParams().set('noticeId', noticeId.toString());
+    if (status !== null) {
+      params = params.set('status', status.toString());
+    }
     return this.http.get<WhatsappTemplate[]>(`${this.api}/whatsapp/list`, { params });
   }
 
@@ -72,15 +60,15 @@ export class NoticeTemplateService {
     return this.http.put<WhatsappTemplate>(`${this.api}/whatsapp/${id}`, request);
   }
 
-  getPendingWhatsappTemplates(request: PaginatedRequest<WhatsappPendingTemplateRequest>): Observable<PaginatedResponse<WhatsappPendingTemplate[]>> {
-    return this.http.post<PaginatedResponse<WhatsappPendingTemplate[]>>(`${this.api}/whatsapp/pending`, request);
+  getPendingWhatsappTemplates(request: PaginatedRequest<WhatsappPendingTemplateFilter>): Observable<PaginatedResponse<WhatsappPendingTemplateResponse[]>> {
+    return this.http.post<PaginatedResponse<WhatsappPendingTemplateResponse[]>>(`${this.api}/whatsapp/pending`, request);
   }
 
-  approveWhatsappTemplate(id: number, request: ApproveTemplateRequest): Observable<WhatsappTemplate> {
+  approveWhatsappTemplate(id: number, request: WhatsappApproveTemplateRequest): Observable<WhatsappTemplate> {
     return this.http.patch<WhatsappTemplate>(`${this.api}/whatsapp/approve/${id}`, request);
   }
 
-  rejectWhatsappTemplate(id: number, request: RejectTemplateRequest): Observable<WhatsappTemplate> {
+  rejectWhatsappTemplate(id: number, request: WhatsappRejectTemplateRequest): Observable<WhatsappTemplate> {
     return this.http.patch<WhatsappTemplate>(`${this.api}/whatsapp/reject/${id}`, request);
   }
 

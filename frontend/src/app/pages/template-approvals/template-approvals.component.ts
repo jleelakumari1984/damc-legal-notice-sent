@@ -62,6 +62,7 @@ export class TemplateApprovalsComponent implements AfterViewInit, OnInit, OnDest
   }
 
   reloadBoth(): void {
+    this.showApproval = false;
     this.dtHelper.reload(this.SMS_TABLE_ID);
     this.dtHelper.reload(this.WA_TABLE_ID);
   }

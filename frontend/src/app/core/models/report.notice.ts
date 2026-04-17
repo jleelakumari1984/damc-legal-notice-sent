@@ -3,6 +3,7 @@ import { WhatsappLog } from "./whatsapp.model";
 
 export interface NoticeReportFilter {
     noticeName?: string;
+    userId?: number;
     status?: string;
     fromDate?: Date;
     toDate?: Date;
@@ -33,7 +34,7 @@ export interface NoticeReportItem {
     status: string;
     failureReason: string;
     processedAt: string;
-    attachements: string;
+    attachments: string;
 }
 
 
@@ -44,7 +45,7 @@ export interface NoticeReportItemDetail {
     failureReason: string;
     processedAt: string;
     excelData: Record<string, unknown>;
-    attachements: string;
+    attachments: string;
     smsLogs: SmsLog[];
     whatsappLogs: WhatsappLog[];
 }

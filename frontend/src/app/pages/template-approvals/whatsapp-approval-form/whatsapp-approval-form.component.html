@@ -36,18 +36,17 @@
           [class.is-invalid]="approveForm.get('templateLang')?.invalid && approveForm.get('templateLang')?.touched">
         <div class="invalid-feedback">Required.</div>
       </div>
-      <div class="col-md-3">
-        <label class="form-label">Template Path</label>
-        <input class="form-control" formControlName="templatePath">
-      </div>
       <div class="col-12">
         <label class="form-label">Template Content <span class="text-danger">*</span></label>
         <div *ngIf="excelFields.length > 0" class="mb-2">
           <small class="text-muted d-block mb-1">Click a field to insert into template:</small>
           <span *ngFor="let f of excelFields" class="badge bg-secondary me-1 mb-1" style="cursor:pointer"
-            (click)="insertField(f.excelFieldName)" title="Insert {{'{{'}}{{f.excelFieldName}}{{'}}'}}">
+            (click)="insertField(f.dbFieldName)" title="Insert {{'{{'}}{{f.excelFieldName}}{{'}}'}}">
             {{ f.excelFieldName }}
           </span>
+        </div>
+        <div *ngIf="excelFields.length === 0" class="mb-2">
+          <small class="text-muted">No excel fields available for this notice type.</small>
         </div>
         <textarea #approveContentArea class="form-control" formControlName="templateContent" rows="4"
           [class.is-invalid]="approveForm.get('templateContent')?.invalid && approveForm.get('templateContent')?.touched">

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 import { NoticeTemplateService } from '../../../core/services/notice-template.service';
-import { WhatsappTemplate, NoticeType, WhatsappPendingTemplate } from '../../../core/models/notices.model';
+import { WhatsappTemplate, NoticeType, WhatsappPendingTemplateResponse } from '../../../core/models/notices.model';
 import { WhatsappTemplateFormUserComponent } from './whatsapp-template-form-user/whatsapp-template-form-user.component';
 import { WhatsappTemplateViewComponent } from './whatsapp-template-view/whatsapp-template-view.component';
 import { StorageService } from '../../../core/services/storage.service';
@@ -20,6 +20,7 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(WhatsappApprovalFormComponent) whatsappApprovalForm!: WhatsappApprovalFormComponent;
 
   @Input() selectedNotice: NoticeType | null = null;
+  @Input() isActiveStatus: boolean | null = null;
   @Output() onClose = new EventEmitter<boolean>();
   changeTemplate = false;
   editTemplate: WhatsappTemplate | null = null;
@@ -59,6 +60,7 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
   private initTable(): void {
     if (!this.selectedNotice) return;
     const dt = new WhatsappTemplatesDatatable({
+      getStatus: () => this.isActiveStatus,
       noticeId: this.selectedNotice.id,
       isSuperAdmin: this.isSuperAdmin,
       service: this.service,
@@ -75,12 +77,15 @@ export class WhatsappTemplateComponent implements OnInit, OnChanges, OnDestroy {
     setTimeout(() => this.dtHelper.initTable(this.tableId, dt));
   }
   openApprovalForm(t: WhatsappTemplate, isReject: boolean): void {
-    const template: WhatsappPendingTemplate = {
+    const template: WhatsappPendingTemplateResponse = {
       id: t.id,
       noticeId: t.noticeId,
       noticeName: this.selectedNotice?.name ?? '',
       userName: '',
       userTemplateContent: t.userTemplateContent,
+      templateContent: t.templateContent,
+      messageLength: t.messageLength,
+      numberOfMessage: t.numberOfMessage,
       createdAt: t.createdAt
     };
     this.showApproval = true;

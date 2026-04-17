@@ -24,6 +24,9 @@ public class NoticeSmsApproveDto {
     private String channel;
 
     private Integer dcs;
+
     private Integer flashSms;
- 
+    
+    @NotNull
+    private String templateContent;
 }

@@ -7,6 +7,8 @@ import { TemplateApprovedStatus, WhatsappTemplate } from '../../core/models/noti
 declare const $: any;
 
 export interface WhatsappTemplatesDatatableOptions {
+  getStatus: () => boolean | null;
+
   noticeId: number;
   isSuperAdmin: boolean;
   service: NoticeTemplateService;
@@ -27,7 +29,7 @@ export class WhatsappTemplatesDatatable extends DataTable {
   }
 
   build(): object {
-    const { noticeId, isSuperAdmin, service, storageService, callbacks } = this.options;
+    const { noticeId, isSuperAdmin, service, storageService, callbacks, getStatus } = this.options;
 
     const adminColumns = [
       {
@@ -61,6 +63,9 @@ export class WhatsappTemplatesDatatable extends DataTable {
         }
       },
       {
+        data: 'numberOfMessage', title: 'Number of Messages',
+        render: (d: number, t: string) => (t === 'sort' || t === 'type') ? d : d
+      }, {
         data: 'createdAt', title: 'Created At',
         render: (d: string, t: string) => (t === 'sort' || t === 'type') ? d : formatDateTime(d)
       },
@@ -118,6 +123,10 @@ export class WhatsappTemplatesDatatable extends DataTable {
         }
       },
       {
+        data: 'numberOfMessage', title: 'Number of Messages',
+        render: (d: number, t: string) => { if (!d) { d = 1 } return (t === 'sort' || t === 'type') ? d : d }
+      },
+      {
         data: 'createdAt', title: 'Created At',
         render: (d: string, t: string) => (t === 'sort' || t === 'type') ? d : formatDateTime(d)
       },
@@ -146,7 +155,7 @@ export class WhatsappTemplatesDatatable extends DataTable {
     return {
       ...BASE_DT_OPTIONS,
       ajax: (_dtParams: any, callback: (data: object) => void) => {
-        service.getWhatsappTemplates(noticeId).subscribe({
+        service.getWhatsappTemplates(noticeId, getStatus ? getStatus() : null).subscribe({
           next: (data) => callback({ data }),
           error: () => {
             callbacks.onError('Failed to load WhatsApp templates.');

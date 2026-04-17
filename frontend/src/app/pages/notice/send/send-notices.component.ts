@@ -19,7 +19,9 @@ declare const $: any;
 })
 export class SendNoticesComponent implements AfterViewInit {
   noticeTypes: NoticeType[] = [];
+  filterActive = true;
   selectedNoticeType: NoticeType | null = null;
+
   rows: ValidationRow[] = [];
   selectedFile: File | null = null;
   successMessage = '';
@@ -36,6 +38,20 @@ export class SendNoticesComponent implements AfterViewInit {
   sampleSuccess = '';
   sampleError = '';
 
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly service: SendNoticesService,
+    private readonly datatableHelper: DatatableHelper,
+    private readonly noticeService: NoticeService
+  ) {
+    this.loadNoticeTypes();
+  }
+
+  get filteredNoticeTypes(): NoticeType[] {
+    return this.noticeTypes
+    // if (!this.filterActive) return this.noticeTypes;
+    //    return this.noticeTypes.filter(t => t.smsActiveCount > 0 || t.whatsappActiveCount > 0);
+  }
   parseExcelData(json: string): Record<string, unknown> {
     try {
       const parsed = JSON.parse(json);
@@ -52,14 +68,6 @@ export class SendNoticesComponent implements AfterViewInit {
     scheduleDate: [new Date().toISOString().split('T')[0]]
   });
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly service: SendNoticesService,
-    private readonly datatableHelper: DatatableHelper,
-    private readonly noticeService: NoticeService
-  ) {
-    this.loadNoticeTypes();
-  }
 
   ngAfterViewInit(): void {
     $('.datepicker').datepicker({
@@ -72,6 +80,12 @@ export class SendNoticesComponent implements AfterViewInit {
   onNoticeTypeChange(event: Event): void {
     const id = Number((event.target as HTMLSelectElement).value);
     this.selectedNoticeType = this.noticeTypes.find(t => t.id === id) ?? null;
+    if (this.selectedNoticeType) {
+      this.form.patchValue({
+        sendSms: this.selectedNoticeType.smsActiveCount > 0,
+        sendWhatsapp: this.selectedNoticeType.whatsappActiveCount > 0
+      });
+    }
   }
 
   onFileChange(event: Event): void {
@@ -90,7 +104,7 @@ export class SendNoticesComponent implements AfterViewInit {
     this.preview = null;
     if (this.selectedFile) {
       this.previewLoading = true;
-      this.service.previewExcel(this.selectedFile).subscribe({
+      this.service.previewExcel(this.selectedNoticeType?.id, this.selectedFile).subscribe({
         next: (data) => {
           this.preview = data;
           this.previewLoading = false;
@@ -175,7 +189,7 @@ export class SendNoticesComponent implements AfterViewInit {
   }
 
   private loadNoticeTypes(): void {
-    this.noticeService.getNoticeTypes().subscribe({
+    this.noticeService.getMyNoticeTypes().subscribe({
       next: (types) => {
         this.noticeTypes = types.data;
       },

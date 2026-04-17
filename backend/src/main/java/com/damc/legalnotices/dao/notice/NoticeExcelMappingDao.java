@@ -17,7 +17,9 @@ public class NoticeExcelMappingDao {
 
     private String dbFieldName;
 
-    private Integer isKey;
+    private Integer isAgreement;
+    
+    private Integer isCustomerName;
 
     private Integer isMobile;
 

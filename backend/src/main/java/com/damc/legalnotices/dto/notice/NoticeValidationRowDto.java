@@ -7,5 +7,6 @@ import lombok.Getter;
 @Builder
 public class NoticeValidationRowDto {
     private String agreementNumber;
+    private String customerName;
     private String excelData;
 }

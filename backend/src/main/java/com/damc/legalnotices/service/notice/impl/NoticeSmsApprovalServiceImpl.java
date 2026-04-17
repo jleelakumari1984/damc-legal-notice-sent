@@ -1,7 +1,9 @@
 package com.damc.legalnotices.service.notice.impl;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 
+import com.damc.legalnotices.config.LocationProperties;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.notice.NoticeSmsApproveDto;
@@ -10,6 +12,7 @@ import com.damc.legalnotices.entity.master.MasterProcessSmsConfigDetailEntity;
 import com.damc.legalnotices.enums.TemplateApproveStatus;
 import com.damc.legalnotices.repository.master.MasterProcessSmsConfigDetailRepository;
 import com.damc.legalnotices.service.notice.NoticeSmsApprovalService;
+import com.damc.legalnotices.util.FileUtil;
 import com.damc.legalnotices.util.converter.NoticeMappingEntityDaoConverter;
 
 import lombok.RequiredArgsConstructor;
@@ -21,11 +24,17 @@ public class NoticeSmsApprovalServiceImpl implements NoticeSmsApprovalService {
 
     private final MasterProcessSmsConfigDetailRepository smsConfigRepository;
     private final NoticeMappingEntityDaoConverter entityDaoConverter;
+    private final LocationProperties appConfig;
+    private final FileUtil fileUtil;
 
     @Override
-    public SmsTemplateDao approve(LoginUserDao sessionUser, Long id, NoticeSmsApproveDto dto) {
+    public SmsTemplateDao approve(LoginUserDao sessionUser, Long id, NoticeSmsApproveDto dto) throws Exception {
         MasterProcessSmsConfigDetailEntity entity = smsConfigRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("SMS config not found with id: " + id));
+
+        Path userTemplatePath = Path.of(appConfig.getTemplateLocation(), entity.getTemplatePath() + ".html");
+        fileUtil.writeString(userTemplatePath, dto.getTemplateContent());
+
         entity.setPeid(dto.getPeid());
         entity.setSenderId(dto.getSenderId());
         entity.setRouteId(dto.getRouteId());
@@ -37,6 +46,7 @@ public class NoticeSmsApprovalServiceImpl implements NoticeSmsApprovalService {
         entity.setApprovedBy(sessionUser.getId());
         entity.setApprovedAt(LocalDateTime.now());
         entity.setUpdatedBy(sessionUser.getId());
+        entity.setUpdatedAt(LocalDateTime.now());
         return entityDaoConverter.toSmsTemplateDao(smsConfigRepository.save(entity), sessionUser);
     }
 

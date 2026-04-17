@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NoticeWhatsappConfigDto {
+public class NoticeWhatsAppConfigDto {
 
     @NotNull(message = "noticeId is required")
     private Long noticeId;

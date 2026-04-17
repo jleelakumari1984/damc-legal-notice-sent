@@ -1,7 +1,17 @@
 <div class="py-4" [class.d-none]="showApproval">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="brand-title mb-0">SMS Templates of <span class="fw-bold text-danger">{{ selectedNotice?.name }}</span></h3>
+    <h3 class="brand-title mb-0">SMS Templates of <span class="fw-bold text-danger">{{ selectedNotice?.name }}</span>
+    </h3>
     <div class="d-flex gap-2">
+      <div>
+        <span class="text-muted">Status:</span>
+        <select class="form-select form-select-sm d-inline-block w-auto ms-1" [(ngModel)]="isActiveStatus"
+          (change)="statusChanged();">
+          <option [value]="true">Active</option>
+          <option [value]="false">Inactive</option>
+        </select>
+
+      </div>
       <button class="btn btn-brand btn-sm" (click)="openAddForm()" *ngIf="selectedNotice">
         + Add Template
       </button>
@@ -29,7 +39,8 @@
     </div>
   </div>
 </div>
-<app-sms-approval-form *ngIf="isSuperAdmin" [inline]="showApproval" (done)="onApproved()" (cancelled)="onApprovalCancelled()"></app-sms-approval-form>
+<app-sms-approval-form *ngIf="isSuperAdmin" [inline]="showApproval" (done)="onApproved()"
+  (cancelled)="onApprovalCancelled()"></app-sms-approval-form>
 
 <app-sms-template-form-user [editTemplate]="editTemplate" [noticeType]="selectedNotice"
   (saved)="onSaved($event)"></app-sms-template-form-user>

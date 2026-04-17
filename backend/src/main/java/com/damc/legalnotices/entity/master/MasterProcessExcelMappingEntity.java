@@ -37,8 +37,11 @@ public class MasterProcessExcelMappingEntity {
     @Column(name = "db_field_name")
     private String dbFieldName;
 
-    @Column(name = "is_key")
-    private Integer isKey;
+    @Column(name = "is_agreement")
+    private Integer isAgreement;
+
+    @Column(name = "is_customer_name")
+    private Integer isCustomerName;
 
     @Column(name = "is_mobile")
     private Integer isMobile;

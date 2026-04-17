@@ -5,6 +5,7 @@ import com.damc.legalnotices.dao.notice.NoticeValidationDao;
 import com.damc.legalnotices.dao.notice.NoticeTemplateReportDao;
 import com.damc.legalnotices.dto.DatatableDto;
 import com.damc.legalnotices.dto.notice.NoticeNameCheckDto;
+import com.damc.legalnotices.dto.notice.NoticeScheduleRequestDto;
 import com.damc.legalnotices.dto.notice.NoticeTypeDto;
 import com.damc.legalnotices.dto.notice.NoticeTypesRequest;
 import com.damc.legalnotices.service.BaseService;
@@ -18,14 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -40,14 +40,16 @@ public class NoticeController {
     private final NoticeService noticeService;
     private final NoticeScheduleService noticeScheduleService;
 
-    @GetMapping("/types")
-    public ResponseEntity<DataTableDao<List<NoticeTemplateReportDao>>> getNoticeTypes() {
-        return ResponseEntity.ok(noticeService.getNoticeTypes(baseService.getSessionUser(), null));
+    @PostMapping("/types/list")
+    public ResponseEntity<DataTableDao<List<NoticeTemplateReportDao>>> getListNoticeTypes(
+            @Valid @RequestBody DatatableDto<NoticeTypesRequest> request) {
+        return ResponseEntity.ok(noticeService.getNoticeTypes(baseService.getSessionUser(), request));
     }
 
-    @PostMapping("/types")
-    public ResponseEntity<DataTableDao<List<NoticeTemplateReportDao>>> postNoticeTypes(
+    @PostMapping("/types/list/me")
+    public ResponseEntity<DataTableDao<List<NoticeTemplateReportDao>>> getListNoticeTypesMe(
             @Valid @RequestBody DatatableDto<NoticeTypesRequest> request) {
+        request.getFilter().setUserId(baseService.getSessionUser().getId());
         return ResponseEntity.ok(noticeService.getNoticeTypes(baseService.getSessionUser(), request));
     }
 
@@ -77,17 +79,12 @@ public class NoticeController {
     }
 
     @PostMapping(value = "/schedule", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<NoticeValidationDao> schedule(@RequestParam("noticeSno") Long noticeSno,
-            @RequestParam("sendSms") Boolean sendSms,
-            @RequestParam("sendWhatsapp") Boolean sendWhatsapp,
-            @RequestParam("zipFile") MultipartFile zipFile) {
+    public ResponseEntity<NoticeValidationDao> schedule(@Valid @ModelAttribute NoticeScheduleRequestDto request) {
         log.info("Schedule notice request by user: {}, noticeSno: {}, sendSms: {}, sendWhatsapp: {}, file: {}",
-                baseService.getSessionUser().getDisplayName(), noticeSno, sendSms, sendWhatsapp,
-                zipFile != null ? zipFile.getOriginalFilename() : "null");
+                baseService.getSessionUser().getDisplayName(), request.getNoticeSno(), request.getSendSms(),
+                request.getSendWhatsapp(),
+                request.getZipFile() != null ? request.getZipFile().getOriginalFilename() : "null");
         return ResponseEntity.ok(noticeScheduleService.scheduleNotice(baseService.getSessionUser(),
-                noticeSno,
-                sendSms,
-                sendWhatsapp,
-                zipFile));
+                request));
     }
 }

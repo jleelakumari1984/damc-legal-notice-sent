@@ -1,7 +1,10 @@
 package com.damc.legalnotices.service.excel.impl;
 
+import com.damc.legalnotices.dao.excel.ExcelPreviewDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
+import com.damc.legalnotices.entity.master.MasterProcessTemplateDetailEntity;
+import com.damc.legalnotices.repository.master.MasterProcessTemplateDetailRepository;
 import com.damc.legalnotices.service.excel.ExcelService;
 import com.damc.legalnotices.util.ExcelParserUtil;
 import com.damc.legalnotices.util.ZipExtractorUtil;
@@ -20,17 +23,29 @@ import java.nio.file.StandardCopyOption;
 @RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
+    private final MasterProcessTemplateDetailRepository noticeTemplateRepository;
+
     private final ZipExtractorUtil zipExtractorUtil;
     private final ExcelParserUtil excelParserUtil;
 
     @Override
-    public ExcelPreviewDto previewExcel(LoginUserDao  sessionUser, MultipartFile zipFile) {
+    public ExcelPreviewDao previewExcel(LoginUserDao sessionUser, ExcelPreviewDto request) {
+
+        MultipartFile zipFile = request.getZipFile();
         if (zipFile == null || zipFile.isEmpty()) {
             throw new IllegalArgumentException("File is required");
         }
         String original = zipFile.getOriginalFilename();
         if (!excelParserUtil.checkIsValidFileFormat(original)) {
             throw new IllegalArgumentException("Only ZIP (.zip) or Excel (.xlsx, .xls) files are allowed");
+        }
+
+        MasterProcessTemplateDetailEntity template = noticeTemplateRepository
+                .findByIdWithExcelMappings(request.getNoticeSno())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid notice type"));
+
+        if (template.getExcelMappings() == null || template.getExcelMappings().isEmpty()) {
+            throw new IllegalArgumentException("Notice type is not properly configured with Excel mappings");
         }
         if (!excelParserUtil.isZipFile(original)) {
             Path tempExcel = null;
@@ -65,9 +80,11 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
-    public ExcelPreviewDto parseExcelPreview(Path excelPath) {
+    public ExcelPreviewDao parseExcelPreview(Path excelPath) {
         try {
-            return excelParserUtil.parseAsPreview(excelPath);
+            ExcelPreviewDao previewDao = excelParserUtil.parseAsPreview(excelPath);
+            
+            return previewDao;
         } catch (IOException ex) {
             throw new IllegalArgumentException("Failed to parse Excel file: " + ex.getMessage());
         }

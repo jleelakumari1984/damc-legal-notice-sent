@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { NoticeTemplateService, ApproveTemplateRequest, RejectTemplateRequest } from '../../../core/services/notice-template.service';
+import { NoticeTemplateService } from '../../../core/services/notice-template.service';
 import { NoticeExcelMappingsService } from '../../../core/services/notice-excel-mappings.service';
-import { WhatsappPendingTemplate, NoticeExcelMappingResponse } from '../../../core/models/notices.model';
+import { WhatsappPendingTemplateResponse, NoticeExcelMappingResponse, WhatsappRejectTemplateRequest, WhatsappApproveTemplateRequest } from '../../../core/models/notices.model';
 
 declare const $: any;
 
@@ -18,7 +18,7 @@ export class WhatsappApprovalFormComponent {
 
   @ViewChild('approveContentArea') approveContentArea!: ElementRef<HTMLTextAreaElement>;
 
-  template: WhatsappPendingTemplate | null = null;
+  template: WhatsappPendingTemplateResponse | null = null;
   isReject = false;
   saving = false;
   errorMessage = '';
@@ -36,14 +36,13 @@ export class WhatsappApprovalFormComponent {
       templateName: ['', Validators.required],
       templateContent: ['', Validators.required],
       templateLang: ['en', Validators.required],
-      templatePath: ['']
     });
     this.rejectForm = this.fb.group({
       rejectionReason: ['', Validators.required]
     });
   }
 
-  open(template: WhatsappPendingTemplate, isReject: boolean, isInline: boolean): void {
+  open(template: WhatsappPendingTemplateResponse, isReject: boolean, isInline: boolean): void {
     this._load(template, isReject);
     this.inline = isInline;
     if (!this.inline) {
@@ -53,11 +52,11 @@ export class WhatsappApprovalFormComponent {
 
 
 
-  private _load(template: WhatsappPendingTemplate, isReject: boolean): void {
+  private _load(template: WhatsappPendingTemplateResponse, isReject: boolean): void {
     this.template = template;
     this.isReject = isReject;
     this.errorMessage = '';
-    this.approveForm.reset({ templateLang: 'en' });
+    this.approveForm.reset({ templateLang: 'en', templateContent: template.templateContent });
     this.rejectForm.reset();
     if (template.noticeId) {
       this.excelMappingsService.getByNoticeId(template.noticeId).subscribe({
@@ -103,7 +102,7 @@ export class WhatsappApprovalFormComponent {
 
     if (this.isReject) {
       if (this.rejectForm.invalid) { this.saving = false; return; }
-      const req: RejectTemplateRequest = { rejectionReason: this.rejectForm.value.rejectionReason.trim() };
+      const req: WhatsappRejectTemplateRequest = { rejectionReason: this.rejectForm.value.rejectionReason.trim() };
       this.service.rejectWhatsappTemplate(this.template.id, req).subscribe({
         next: () => { this.saving = false; if (!this.inline) { $(`#whatsappApprovalModal`).modal('hide'); } this.done.emit(); },
         error: () => { this.saving = false; this.errorMessage = 'Failed to reject template.'; }
@@ -111,11 +110,10 @@ export class WhatsappApprovalFormComponent {
     } else {
       if (this.approveForm.invalid) { this.saving = false; return; }
       const v = this.approveForm.value;
-      const req: ApproveTemplateRequest = {
+      const req: WhatsappApproveTemplateRequest = {
         templateName: v.templateName.trim(),
         templateContent: v.templateContent.trim(),
         templateLang: v.templateLang.trim(),
-        templatePath: v.templatePath?.trim() || undefined
       };
       this.service.approveWhatsappTemplate(this.template.id, req).subscribe({
         next: () => { this.saving = false; if (!this.inline) { $(`#whatsappApprovalModal`).modal('hide'); } this.done.emit(); },

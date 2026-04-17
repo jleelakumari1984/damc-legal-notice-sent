@@ -14,4 +14,6 @@ public class WhatsAppUserTemplateDao {
     private Integer status;
     private Integer approveStatus;
     private LocalDateTime createdAt;
+    private Integer messageLength;
+    private Integer numberOfMessage;
 }

@@ -53,6 +53,9 @@ public class SendLoanMailDetailEntity {
     @Column(name = "message", columnDefinition = "longtext")
     private String message;
 
+    @Column(name = "number_of_message")
+    private Integer numberOfMessage;
+
     @Column(name = "send_at")
     private Instant sendAt;
 

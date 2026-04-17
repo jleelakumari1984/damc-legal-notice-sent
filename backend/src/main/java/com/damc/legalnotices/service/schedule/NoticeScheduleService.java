@@ -2,23 +2,22 @@ package com.damc.legalnotices.service.schedule;
 
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
+ 
 
-import com.damc.legalnotices.dao.excel.NoticeedExcelDao;
-import com.damc.legalnotices.dao.excel.NoticeedNoticeItemDao;
+import com.damc.legalnotices.dao.excel.NoticeExcelDao;
+import com.damc.legalnotices.dao.excel.ScheduledNoticeItemDao;
 import com.damc.legalnotices.dao.notice.NoticeValidationDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
+import com.damc.legalnotices.dto.notice.NoticeScheduleRequestDto;
 import com.damc.legalnotices.dto.notice.SendSampleNoticeDto;
 
 public interface NoticeScheduleService {
 
-        NoticeValidationDao scheduleNotice(LoginUserDao  sessionUser, Long noticeSno, Boolean sendSms,
-                        Boolean sendWhatsapp,
-                        MultipartFile zipFile);
+        NoticeValidationDao scheduleNotice(LoginUserDao sessionUser, NoticeScheduleRequestDto request);
 
-        List<NoticeedExcelDao> noticePendingExcelParsing();
+        List<NoticeExcelDao> noticePendingExcelParsing();
 
-        List<NoticeedNoticeItemDao> noticePendingNoticeItems();
+        List<ScheduledNoticeItemDao> noticePendingNoticeItems();
 
         void sendSampleNotice(LoginUserDao sessionUser, SendSampleNoticeDto request);
 }

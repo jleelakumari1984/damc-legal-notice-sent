@@ -39,8 +39,10 @@ public class SendLoanSmsDetailEntity {
 
     @Column(name = "type", length = 45)
     private String type;
+
     @Column(name = "schedule_sno")
     private Long scheduleSno;
+
     @Column(name = "process_sno")
     private Long processSno;
 
@@ -55,6 +57,9 @@ public class SendLoanSmsDetailEntity {
 
     @Column(name = "message", columnDefinition = "longtext")
     private String message;
+
+    @Column(name = "number_of_message")
+    private Integer numberOfMessage;
 
     @Column(name = "send_at")
     private Instant sendAt;

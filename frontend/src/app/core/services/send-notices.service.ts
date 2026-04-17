@@ -24,8 +24,9 @@ export class SendNoticesService {
     return this.http.post<ValidationResponse>(`${this.api}/schedule`, formData);
   }
 
-  previewExcel(file: File): Observable<ExcelPreview> {
+  previewExcel(noticeSno: number | undefined, file: File): Observable<ExcelPreview> {
     const formData = new FormData();
+    formData.append('noticeSno', noticeSno?.toString() ?? '');
     formData.append('zipFile', file);
     return this.http.post<ExcelPreview>(`${this.previewApi}/zip`, formData);
   }

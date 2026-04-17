@@ -13,13 +13,21 @@ export class NoticeService {
 
   constructor(private readonly http: HttpClient) { }
 
+  getMyNoticeTypes(request?: PaginatedRequest<NoticeReportFilter>): Observable<PaginatedResponse<NoticeType[]>> {
+    if (!request) {
+      request = {} as PaginatedRequest<NoticeReportFilter>;
+      request.filter = {};
+      request.allData = true;
+    }
+    return this.http.post<PaginatedResponse<NoticeType[]>>(`${this.api}/types/list/me`, request);
+  }
   getNoticeTypes(request?: PaginatedRequest<NoticeReportFilter>): Observable<PaginatedResponse<NoticeType[]>> {
     if (!request) {
       request = {} as PaginatedRequest<NoticeReportFilter>;
       request.filter = {};
       request.allData = true;
     }
-    return this.http.post<PaginatedResponse<NoticeType[]>>(`${this.api}/types`, request);
+    return this.http.post<PaginatedResponse<NoticeType[]>>(`${this.api}/types/list`, request);
   }
   getById(id: number): Observable<NoticeType> {
     return this.http.get<NoticeType>(`${this.api}/${id}`);

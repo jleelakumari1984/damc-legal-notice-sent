@@ -1,6 +1,6 @@
 package com.damc.legalnotices.util.validator;
 
-import com.damc.legalnotices.dto.notice.NoticeWhatsappConfigDto;
+import com.damc.legalnotices.dto.notice.NoticeWhatsAppConfigDto;
 import com.damc.legalnotices.errors.InvalidInputException;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public final class NoticeWhatsappMappingValidationUtil {
     private NoticeWhatsappMappingValidationUtil() {
     }
 
-    public static void validateAdminTemplate(NoticeWhatsappConfigDto request) {
+    public static void validateAdminTemplate(NoticeWhatsAppConfigDto request) {
         Map<String, List<String>> errorMap = new HashMap<>();
         if (request.getTemplateContent() == null || request.getTemplateContent().isBlank())
             errorMap.computeIfAbsent("templateContent", k -> new ArrayList<>()).add("Template content is required");
@@ -25,7 +25,7 @@ public final class NoticeWhatsappMappingValidationUtil {
             throw new InvalidInputException("Invalid WhatsApp admin template config", errorMap);
     }
 
-    public static void validateUserTemplate(NoticeWhatsappConfigDto request) {
+    public static void validateUserTemplate(NoticeWhatsAppConfigDto request) {
         Map<String, List<String>> errorMap = new HashMap<>();
         if (request.getUserTemplateContent() == null || request.getUserTemplateContent().isBlank())
             errorMap.computeIfAbsent("userTemplateContent", k -> new ArrayList<>())

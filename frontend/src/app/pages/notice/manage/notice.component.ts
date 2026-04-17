@@ -24,7 +24,7 @@ export class NoticeComponent implements AfterViewInit {
   actionType: string = 'display';
   deletingId: number | null = null;
   actionId: number | null = null;
-
+  isActiveStatus: boolean | null = null;
   private readonly tableId = "#noticesTable";
   private activeFilter: NoticeReportFilter = {};
   successMessage = '';
@@ -34,7 +34,9 @@ export class NoticeComponent implements AfterViewInit {
     private readonly service: NoticeService,
     private readonly datatableHelper: DatatableHelper,
     private readonly storageService: StorageService
-  ) { }
+  ) {
+    this.activeFilter.userId = this.storageService.getUser()?.id;
+  }
 
   ngAfterViewInit(): void {
     this.initTable();
@@ -46,8 +48,8 @@ export class NoticeComponent implements AfterViewInit {
       storageService: this.storageService,
       getFilters: () => this.activeFilter,
       callbacks: {
-        onSmsConfig: (notice) => this.openSmsConfig(notice),
-        onWhatsappConfig: (notice) => this.openWhatsappConfig(notice),
+        onSmsConfig: (notice, active) => this.openSmsConfig(notice, active),
+        onWhatsappConfig: (notice, active) => this.openWhatsappConfig(notice, active),
         onExcelConfig: (notice) => this.openExcelConfig(notice),
         onError: (msg) => this.errorMessage = msg
       }
@@ -70,9 +72,10 @@ export class NoticeComponent implements AfterViewInit {
     this.noticeForm.open();
   }
 
-  openSmsConfig(notice: NoticeType): void {
+  openSmsConfig(notice: NoticeType, isActiveStatus: boolean): void {
     this.actionType = 'sms';
     this.editNotice = notice;
+    this.isActiveStatus = isActiveStatus;
     this.clearMessages();
   }
 
@@ -82,9 +85,10 @@ export class NoticeComponent implements AfterViewInit {
     this.datatableHelper.reload(this.tableId);
   }
 
-  openWhatsappConfig(notice: NoticeType): void {
+  openWhatsappConfig(notice: NoticeType, isActiveStatus: boolean): void {
     this.actionType = 'whatsapp';
     this.editNotice = notice;
+    this.isActiveStatus = isActiveStatus;
     this.clearMessages();
   }
 

@@ -5,22 +5,15 @@ import com.damc.legalnotices.dao.notice.SmsPendingTemplateDao;
 import com.damc.legalnotices.dao.notice.SmsTemplateDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dto.DatatableDto;
-import com.damc.legalnotices.dto.notice.NoticeSmsConfigDto;
 import com.damc.legalnotices.dto.notice.NoticeSmsPendingDto;
 
 import java.util.List;
 
 public interface NoticeSmsMappingAdminService {
 
-    List<SmsTemplateDao> getByNoticeId(LoginUserDao sessionUser, Long noticeId);
+    List<SmsTemplateDao> getByNoticeId(LoginUserDao sessionUser, Long noticeId, Boolean status);
 
     SmsTemplateDao getById(LoginUserDao sessionUser, Long id);
-
-    SmsTemplateDao create(LoginUserDao sessionUser, NoticeSmsConfigDto request) throws Exception;
-
-    SmsTemplateDao update(LoginUserDao sessionUser, Long id, NoticeSmsConfigDto request) throws Exception;
-
-    void delete(LoginUserDao sessionUser, Long id);
 
     DataTableDao<List<SmsPendingTemplateDao>> getPendingTemplates(LoginUserDao sessionUser,
             DatatableDto<NoticeSmsPendingDto> request);

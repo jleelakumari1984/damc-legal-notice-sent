@@ -15,14 +15,17 @@ public class NoticeExcelMappingDto {
     @NotBlank(message = "excelFieldName is required")
     private String excelFieldName;
 
-    @NotBlank(message = "dbFieldName is required")
-    private String dbFieldName;
+    private Integer isAgreement;
 
-    private Integer isKey;
+    private Integer isCustomerName;
 
     private Integer isMobile;
 
     private Integer isMandatory;
 
     private Integer isAttachment;
+
+    public String getDbFieldName() {
+        return excelFieldName.toLowerCase().replaceAll("\\s+", "_").replaceAll("[^a-z0-9_]", "");
+    }
 }

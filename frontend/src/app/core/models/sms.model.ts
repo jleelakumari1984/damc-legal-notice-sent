@@ -15,7 +15,7 @@ export interface SmsLogResponse {
   items: SmsLog[];
 }
 
-export interface SmsLogRequest  {
+export interface SmsLogFilter  {
   status: string;
 }
  

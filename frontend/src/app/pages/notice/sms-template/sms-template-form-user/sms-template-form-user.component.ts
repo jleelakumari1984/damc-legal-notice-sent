@@ -91,7 +91,18 @@ export class SmsTemplateFormUserComponent implements OnInit, OnChanges {
     this.submittedForApproval = false;
     $('#smsUserTemplateModal').modal('hide');
   }
-
+  checkValidFields(content: string): string[] {
+    const regex = /{{(.*?)}}/g;
+    let match;
+    const invalidFields: string[] = [];
+    while ((match = regex.exec(content)) !== null) {
+      const fieldName = match[1].trim();
+      if (!this.excelFields.some(f => f.dbFieldName === fieldName)) {
+        invalidFields.push(fieldName);
+      }
+    }
+    return invalidFields;
+  }
   submit(): void {
     if (this.form.invalid || !this.noticeType || this.isApproved) return;
     const v = this.form.value;
@@ -100,6 +111,11 @@ export class SmsTemplateFormUserComponent implements OnInit, OnChanges {
       userTemplateContent: v.userTemplateContent.trim(),
       status: 0
     };
+    const invalidFields = this.checkValidFields(request.userTemplateContent);
+    if (invalidFields.length > 0) {
+      this.errorMessage = `Invalid template fields: ${invalidFields.join(', ')}`;
+      return;
+    }
     this.saving = true;
     this.errorMessage = '';
     const call$ = this.editTemplate

@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Getter
 @Builder
-public class NoticeedNoticeItemDao {
+public class ScheduledNoticeItemDao {
     private Long scheduledNoticeId;
     private Long scheduledNoticeItemId;
     private String agreementNumber;

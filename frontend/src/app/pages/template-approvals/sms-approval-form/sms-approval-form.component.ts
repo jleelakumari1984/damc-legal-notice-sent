@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { NoticeTemplateService, ApproveTemplateRequest, RejectTemplateRequest } from '../../../core/services/notice-template.service';
+import { NoticeTemplateService, } from '../../../core/services/notice-template.service';
 import { NoticeExcelMappingsService } from '../../../core/services/notice-excel-mappings.service';
-import { SmsPendingTemplate, SmsTemplate, NoticeExcelMappingResponse } from '../../../core/models/notices.model';
+import { SmsPendingTemplateResponse, SmsTemplate, NoticeExcelMappingResponse, SmsRejectTemplateRequest, SmsApproveTemplateRequest } from '../../../core/models/notices.model';
 
 declare const $: any;
 
@@ -18,7 +18,7 @@ export class SmsApprovalFormComponent {
 
   @ViewChild('approveContentArea') approveContentArea!: ElementRef<HTMLTextAreaElement>;
 
-  template: SmsPendingTemplate | null = null;
+  template: SmsPendingTemplateResponse | null = null;
   isReject = false;
   saving = false;
   errorMessage = '';
@@ -47,18 +47,18 @@ export class SmsApprovalFormComponent {
     });
   }
 
-  open(template: SmsPendingTemplate, isReject: boolean, isInline: boolean): void {
+  open(template: SmsPendingTemplateResponse, isReject: boolean, isInline: boolean): void {
     this._load(template, isReject);
     this.inline = isInline;
     if (!isInline) {
       $('#smsApprovalModal').modal('show');
     }
   }
-  private _load(template: SmsPendingTemplate, isReject: boolean): void {
+  private _load(template: SmsPendingTemplateResponse, isReject: boolean): void {
     this.template = template;
     this.isReject = isReject;
     this.errorMessage = '';
-    this.approveForm.reset({ dcs: 0, flashSms: 0 });
+    this.approveForm.reset({ dcs: 0, flashSms: 0, templateContent: template.templateContent });
     this.rejectForm.reset();
     //console.log('Template noticeId:', template.noticeId);
     if (template.noticeId) {
@@ -72,7 +72,8 @@ export class SmsApprovalFormComponent {
   }
 
   insertField(fieldName: string): void {
-    const tag = `{{${fieldName}}}`;
+    //[[${customer_name}]]
+    const tag = '{{' + fieldName + '}}}';
     const el = this.approveContentArea?.nativeElement;
     if (!el) {
       const current = this.approveForm.get('templateContent')?.value ?? '';
@@ -105,7 +106,7 @@ export class SmsApprovalFormComponent {
 
     if (this.isReject) {
       if (this.rejectForm.invalid) { this.saving = false; return; }
-      const req: RejectTemplateRequest = { rejectionReason: this.rejectForm.value.rejectionReason.trim() };
+      const req: SmsRejectTemplateRequest = { rejectionReason: this.rejectForm.value.rejectionReason.trim() };
       this.service.rejectSmsTemplate(this.template.id, req).subscribe({
         next: () => { this.saving = false; if (!this.inline) { $('#smsApprovalModal').modal('hide'); } this.done.emit(); },
         error: () => { this.saving = false; this.errorMessage = 'Failed to reject template.'; }
@@ -113,7 +114,7 @@ export class SmsApprovalFormComponent {
     } else {
       if (this.approveForm.invalid) { this.saving = false; return; }
       const v = this.approveForm.value;
-      const req: ApproveTemplateRequest = {
+      const req: SmsApproveTemplateRequest = {
         peid: v.peid?.trim() || undefined,
         senderId: v.senderId.trim(),
         routeId: v.routeId?.trim() || undefined,

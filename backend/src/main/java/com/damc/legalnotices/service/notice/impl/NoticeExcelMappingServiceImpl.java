@@ -46,7 +46,8 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
         entity.setProcess(notice);
         entity.setExcelFieldName(request.getExcelFieldName());
         entity.setDbFieldName(request.getDbFieldName());
-        entity.setIsKey(request.getIsKey());
+        entity.setIsAgreement(request.getIsAgreement());
+        entity.setIsCustomerName(request.getIsCustomerName());
         entity.setIsMobile(request.getIsMobile());
         entity.setIsMandatory(request.getIsMandatory());
         entity.setIsAttachment(request.getIsAttachment());
@@ -65,7 +66,8 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
         entity.setProcess(notice);
         entity.setExcelFieldName(request.getExcelFieldName());
         entity.setDbFieldName(request.getDbFieldName());
-        entity.setIsKey(request.getIsKey());
+        entity.setIsAgreement(request.getIsAgreement());
+        entity.setIsCustomerName(request.getIsCustomerName());
         entity.setIsMobile(request.getIsMobile());
         entity.setIsMandatory(request.getIsMandatory());
         entity.setIsAttachment(request.getIsAttachment());
@@ -88,7 +90,8 @@ public class NoticeExcelMappingServiceImpl implements NoticeExcelMappingService 
                 .noticeId(entity.getProcess() != null ? entity.getProcess().getId() : null)
                 .excelFieldName(entity.getExcelFieldName())
                 .dbFieldName(entity.getDbFieldName())
-                .isKey(entity.getIsKey())
+                .isAgreement(entity.getIsAgreement())
+                .isCustomerName(entity.getIsCustomerName())
                 .isMobile(entity.getIsMobile())
                 .isMandatory(entity.getIsMandatory())
                 .isAttachment(entity.getIsAttachment())

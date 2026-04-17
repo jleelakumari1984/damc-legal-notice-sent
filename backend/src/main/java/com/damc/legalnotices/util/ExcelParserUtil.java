@@ -17,9 +17,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 import com.damc.legalnotices.config.LocationProperties;
+import com.damc.legalnotices.dao.excel.ExcelPreviewDao;
+import com.damc.legalnotices.dao.excel.ExcelPreviewRowDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
-import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
-import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
 import com.damc.legalnotices.errors.StopParsingException;
 
 import lombok.AllArgsConstructor;
@@ -49,12 +49,13 @@ public class ExcelParserUtil {
     private final DataFormatter dataFormatter = new DataFormatter();
     private final LocationProperties storageProperties;
     private final ZipExtractorUtil zipExtractorUtil;
+    private final FileUtil fileUtil;
 
-    private Path getUserBasePath(LoginUserDao  sessionUser) {
+    private Path getUserBasePath(LoginUserDao sessionUser) {
         return Paths.get(storageProperties.getUploadDir(), sessionUser.getId() + "");
     }
 
-    public Path saveZipFile(LoginUserDao  sessionUser, MultipartFile zipFile) {
+    public Path saveZipFile(LoginUserDao sessionUser, MultipartFile zipFile) {
         try {
             String original = zipFile.getOriginalFilename();
             if (original == null || !original.toLowerCase().endsWith(".zip")) {
@@ -63,7 +64,7 @@ public class ExcelParserUtil {
             String randomName = UUID.randomUUID().toString();
             Path uploadDir = Paths.get(getUserBasePath(sessionUser).toString(), randomName)
                     .toAbsolutePath().normalize();
-            Files.createDirectories(uploadDir);
+            fileUtil.createDirectoriesIfNotExists(uploadDir);
             String fileName = randomName + "_" + original;
             Path targetPath = uploadDir.resolve(fileName);
             Files.copy(zipFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
@@ -73,7 +74,7 @@ public class ExcelParserUtil {
         }
     }
 
-    public Path saveExcelFile(LoginUserDao  sessionUser, MultipartFile excelFile) {
+    public Path saveExcelFile(LoginUserDao sessionUser, MultipartFile excelFile) {
         try {
             String original = excelFile.getOriginalFilename();
             if (original == null) {
@@ -86,7 +87,7 @@ public class ExcelParserUtil {
             String randomName = UUID.randomUUID().toString();
             Path uploadDir = Paths.get(getUserBasePath(sessionUser).toString(), randomName).toAbsolutePath()
                     .normalize();
-            Files.createDirectories(uploadDir);
+            fileUtil.createDirectoriesIfNotExists(uploadDir);
             String fileName = randomName + "_" + original;
             Path targetPath = uploadDir.resolve(fileName);
             Files.copy(excelFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
@@ -100,6 +101,7 @@ public class ExcelParserUtil {
         try {
             Path targetDir = Paths.get(zipPath.getParent().toString(), "extracted")
                     .resolve(UUID.randomUUID().toString());
+            fileUtil.createDirectoriesIfNotExists(targetDir);
             zipExtractorUtil.extract(zipPath, targetDir);
             return targetDir;
         } catch (IOException ex) {
@@ -122,11 +124,11 @@ public class ExcelParserUtil {
         }
     }
 
-    public ExcelPreviewDto parseAsPreview(Path excelPath) throws IOException {
+    public ExcelPreviewDao parseAsPreview(Path excelPath) throws IOException {
         return parseAsPreview(excelPath, storageProperties.getPreviewMaxRows());
     }
 
-    private ExcelPreviewDto parseAsPreview(Path excelPath, int maxRows) throws IOException {
+    private ExcelPreviewDao parseAsPreview(Path excelPath, int maxRows) throws IOException {
         log.info("Parsing Excel file: {} with max rows: {}", excelPath.getFileName().toString(), maxRows);
         String name = excelPath.getFileName().toString().toLowerCase();
         if (name.endsWith(".xls")) {
@@ -135,7 +137,7 @@ public class ExcelParserUtil {
         return parseXlsxStreaming(excelPath, maxRows);
     }
 
-    private ExcelPreviewDto parseXlsxStreaming(Path excelPath, int maxRows) throws IOException {
+    private ExcelPreviewDao parseXlsxStreaming(Path excelPath, int maxRows) throws IOException {
         StreamingSheetHandler handler = new StreamingSheetHandler(maxRows);
         try (OPCPackage pkg = OPCPackage.open(excelPath.toFile(), PackageAccess.READ)) {
             XSSFReader xssfReader = new XSSFReader(pkg);
@@ -188,19 +190,19 @@ public class ExcelParserUtil {
         return 0;
     }
 
-    private ExcelPreviewDto parseWithDom(Path excelPath, int maxRows) throws IOException {
+    private ExcelPreviewDao parseWithDom(Path excelPath, int maxRows) throws IOException {
         try (InputStream is = Files.newInputStream(excelPath);
                 Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null || sheet.getPhysicalNumberOfRows() == 0) {
-                return ExcelPreviewDto.builder().columnNames(new ArrayList<>()).rows(new ArrayList<>()).build();
+                return ExcelPreviewDao.builder().columnNames(new ArrayList<>()).rows(new ArrayList<>()).build();
             }
             Row headerRow = sheet.getRow(0);
             List<String> columnNames = new ArrayList<>();
             for (Cell cell : headerRow) {
                 columnNames.add(dataFormatter.formatCellValue(cell).trim());
             }
-            List<ExcelPreviewRowDto> rows = new ArrayList<>();
+            List<ExcelPreviewRowDao> rows = new ArrayList<>();
             int lastRow = (maxRows > 0) ? Math.min(sheet.getLastRowNum(), maxRows) : sheet.getLastRowNum();
             for (int i = 1; i <= lastRow; i++) {
                 Row row = sheet.getRow(i);
@@ -211,9 +213,9 @@ public class ExcelParserUtil {
                     Cell cell = row.getCell(j);
                     data.put(columnNames.get(j), cell == null ? "" : dataFormatter.formatCellValue(cell));
                 }
-                rows.add(ExcelPreviewRowDto.builder().data(data).rowNum(i).build());
+                rows.add(ExcelPreviewRowDao.builder().data(data).rowNum(i).build());
             }
-            return ExcelPreviewDto.builder()
+            return ExcelPreviewDao.builder()
                     .columnNames(columnNames)
                     .rows(rows)
                     .build();

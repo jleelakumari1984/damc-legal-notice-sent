@@ -1,7 +1,7 @@
 import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeTemplateService } from '../../core/services/notice-template.service';
-import { WhatsappPendingTemplate, WhatsappPendingTemplateRequest, WhatsappTemplate } from '../../core/models/notices.model';
+import { WhatsappPendingTemplateResponse, WhatsappPendingTemplateFilter, WhatsappTemplate } from '../../core/models/notices.model';
 import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
@@ -9,8 +9,8 @@ declare const $: any;
 export interface WhatsappPendingDatatableOptions {
     service: NoticeTemplateService;
     callbacks: {
-        onApprove: (template: WhatsappPendingTemplate) => void;
-        onReject: (template: WhatsappPendingTemplate) => void;
+        onApprove: (template: WhatsappPendingTemplateResponse) => void;
+        onReject: (template: WhatsappPendingTemplateResponse) => void;
         onError: (message: string) => void;
     };
 }
@@ -62,7 +62,7 @@ export class WhatsappPendingDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: PaginatedRequest<WhatsappPendingTemplateRequest> = {
+                var request: PaginatedRequest<WhatsappPendingTemplateFilter> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,
@@ -75,7 +75,7 @@ export class WhatsappPendingDatatable extends DataTable {
                         callback({ draw: users.draw, recordsTotal: users.recordsTotal, recordsFiltered: users.recordsFiltered, data: users.data });
                     },
                     error: () => {
-                        var msg = 'ailed to load pending WhatsApp templates';
+                        var msg = 'Failed to load pending WhatsApp templates';
                         callbacks.onError(msg);
                         callback({ draw: request.dtDraw, recordsTotal: 0, recordsFiltered: 0, data: [] });
                     }
@@ -83,7 +83,7 @@ export class WhatsappPendingDatatable extends DataTable {
             },
 
             columns,
-            createdRow: (row: HTMLElement, data: WhatsappPendingTemplate) => {
+            createdRow: (row: HTMLElement, data: WhatsappPendingTemplateResponse) => {
                 $(row).find('.dt-btn-approve').on('click', () => callbacks.onApprove(data));
                 $(row).find('.dt-btn-reject').on('click', () => callbacks.onReject(data));
             }

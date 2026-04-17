@@ -2,7 +2,7 @@ import { environment } from '../../../environments/environment';
 import { BASE_DT_OPTIONS, esc, formatDateTime, statusBadgeClass } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeReportsService } from '../../core/services/notice-reports.service';
-import { WhatsappLogRequest } from '../../core/models/whatsapp.model';
+import { WhatsappLogFilter } from '../../core/models/whatsapp.model';
 import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
@@ -51,7 +51,7 @@ export class WhatsappLogsDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: PaginatedRequest<WhatsappLogRequest> = {
+                var request: PaginatedRequest<WhatsappLogFilter> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,

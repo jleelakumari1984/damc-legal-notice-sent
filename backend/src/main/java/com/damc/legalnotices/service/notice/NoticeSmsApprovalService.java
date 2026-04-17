@@ -7,7 +7,7 @@ import com.damc.legalnotices.dto.notice.NoticeSmsRejectDto;
 
 public interface NoticeSmsApprovalService {
 
-    SmsTemplateDao approve(LoginUserDao sessionUser, Long id, NoticeSmsApproveDto dto);
+    SmsTemplateDao approve(LoginUserDao sessionUser, Long id, NoticeSmsApproveDto dto) throws Exception;
 
     SmsTemplateDao toggleStatus(LoginUserDao sessionUser, Long id);
 

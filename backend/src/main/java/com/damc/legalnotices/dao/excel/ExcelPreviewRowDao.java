@@ -1,4 +1,4 @@
-package com.damc.legalnotices.dto.excel;
+package com.damc.legalnotices.dao.excel;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @Builder
-public class ExcelPreviewRowDto {
+public class ExcelPreviewRowDao {
     private Map<String, Object> data;
     private int rowNum;
 

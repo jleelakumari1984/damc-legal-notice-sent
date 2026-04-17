@@ -41,9 +41,10 @@ public class NoticeSmsMappingController {
     private final NoticeSmsApprovalService approvalService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<SmsTemplateDao>> getByNoticeId(@RequestParam Long noticeId) {
+    public ResponseEntity<List<SmsTemplateDao>> getByNoticeId(@RequestParam Long noticeId,
+            @RequestParam Boolean status) {
 
-        return ResponseEntity.ok(adminService.getByNoticeId(baseService.getSessionUser(), noticeId));
+        return ResponseEntity.ok(adminService.getByNoticeId(baseService.getSessionUser(), noticeId, status));
     }
 
     @GetMapping("/{id}")
@@ -71,7 +72,7 @@ public class NoticeSmsMappingController {
 
     @PatchMapping("/approve/{id}")
     public ResponseEntity<SmsTemplateDao> approve(@PathVariable Long id,
-            @Valid @RequestBody NoticeSmsApproveDto request) {
+            @Valid @RequestBody NoticeSmsApproveDto request) throws Exception {
         return ResponseEntity.ok(approvalService.approve(baseService.getSessionUser(), id, request));
     }
 

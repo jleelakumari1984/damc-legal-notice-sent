@@ -50,6 +50,18 @@
                 }
               ]
             },
+            "staging": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "baseHref": "/",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stag.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "sourceMap": true

@@ -1,11 +1,3 @@
-export interface ProcessExcelMapping {
-    id: number;
-    excelFieldName: string;
-    isMandatory: number;
-    isAttachment: number;
-    isKey: number;
-}
-
 
 export interface ValidationRow {
     agreementNumber: string;

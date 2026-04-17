@@ -55,6 +55,9 @@ public class SendNonLoanSmsDetailEntity {
   @Column(name = "message", columnDefinition = "longtext")
   private String message;
 
+  @Column(name = "message_count")
+  private Integer messageCount;
+
   @Column(name = "send_at")
   private Instant sendAt;
 

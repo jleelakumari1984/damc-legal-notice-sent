@@ -50,13 +50,16 @@ public class SendNonLoanMailDetailEntity {
     @Column(name = "message", columnDefinition = "longtext")
     private String message;
 
+    @Column(name = "number_of_message")
+    private Integer numberOfMessage;
+
     @Column(name = "send_at")
     private Instant sendAt;
 
     @Column(name = "send_status")
     private Integer sendStatus;
 
-    @Column(name = "send_response", columnDefinition = "tinytext")
+    @Column(name = "send_response", columnDefinition = "longtext")
     private String sendResponse;
 
     @Column(name = "created_by", updatable = false)

@@ -57,13 +57,19 @@ export class ExcelMappingsDatatable extends DataTable {
         { data: 'excelFieldName', title: 'Excel Field Name', render: (d: string) => esc(d) },
         { data: 'dbFieldName', title: 'DB Field Name', render: (d: string) => esc(d) },
         {
-          data: 'isKey', title: 'Key',
+          data: 'isAgreement', title: 'Agreement',
           render: (d: number, t: string) => {
             if (t !== 'display') return d;
             return `<span class="badge ${flagBadge(d)}">${flagLabel(d)}</span>`;
           }
         },
         {
+          data: 'isCustomerName', title: 'Customer Name',
+          render: (d: number, t: string) => {
+            if (t !== 'display') return d;
+            return `<span class="badge ${flagBadge(d)}">${flagLabel(d)}</span>`;
+          }
+        }, {
           data: 'isMobile', title: 'Mobile',
           render: (d: number, t: string) => {
             if (t !== 'display') return d;

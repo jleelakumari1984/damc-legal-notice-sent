@@ -34,7 +34,10 @@ public class ScheduledNoticeItemEntity {
     @Column(name = "agreement_number", nullable = false, length = 255)
     private String agreementNumber;
 
-    @Column(name = "excel_data", columnDefinition = "TEXT")
+    @Column(name = "customer_name", nullable = false, length = 255)
+    private String customerName;
+
+    @Column(name = "excel_data", columnDefinition = "longtext")
     private String excelData;
 
     @Column(name = "identifier", nullable = false)
@@ -50,6 +53,6 @@ public class ScheduledNoticeItemEntity {
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
 
-    @Column(name = "attachements")
-    private String attachements;
+    @Column(name = "attachments")
+    private String attachments;
 }

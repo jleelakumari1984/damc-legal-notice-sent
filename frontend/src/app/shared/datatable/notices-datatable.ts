@@ -12,8 +12,8 @@ export interface NoticesTableOptions {
   storageService: StorageService;
   getFilters?: () => NoticeReportFilter;
   callbacks: {
-    onSmsConfig: (notice: any) => void;
-    onWhatsappConfig: (notice: any) => void;
+    onSmsConfig: (notice: any, active: boolean) => void;
+    onWhatsappConfig: (notice: any, active: boolean) => void;
     onExcelConfig: (notice: any) => void;
     onError: (message: string) => void;
   };
@@ -93,20 +93,36 @@ export class NoticesDatatable extends DataTable {
             t === 'display' ? `<button class="btn btn-primary btn-sm me-1 dt-btn-excel" title="Configure Excel Headers"><span class="fw-semibold">${esc(d)}</span></button>` : d
         },
         {
-          data: 'smsMapCount', title: 'Active SMS Templates', className: 'text-nowrap',
-          render: (d: string, t: string) =>
-            t === 'display' ? `<button class="btn btn-primary btn-sm me-1 dt-btn-sms" title="Configure SMS Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+          data: 'smsActiveCount', title: ' SMS Templates', className: 'text-nowrap',
+          render: (d: string, t: string, row: any) => {
+            if (t === 'display') {
+              return `
+              <button class="btn btn-success btn-sm me-1 dt-btn-active-sms" title="Active SMS Template"><span class="fw-semibold">${esc(row.smsActiveCount)}</span></button>
+              <button class="btn btn-danger btn-sm me-1 dt-btn-inactive-sms" title="Inactive SMS Template"><span class="fw-semibold">${esc(row.smsInactiveCount)}</span></button>
+              `
+            }
+
+            return d;
+          }
         },
         {
-          data: 'whatsappMapCount', title: 'Active WhatsApp Templates', className: 'text-nowrap',
-          render: (d: string, t: string) =>
-            t === 'display' ? `<button class="btn btn-success btn-sm me-1 dt-btn-whatsapp" title="Configure WhatsApp Text"><span class="fw-semibold">${esc(d)}</span></button>` : d
+          data: 'whatsappActiveCount', title: ' WhatsApp Templates', className: 'text-nowrap',
+          render: (d: string, t: string, row: any) => {
+            if (t === 'display') {
+              return `
+              <button class="btn btn-success btn-sm me-1 dt-btn-active-whatsapp" title="Active WhatsApp Template"><span class="fw-semibold">${esc(row.whatsappActiveCount)}</span></button>
+              <button class="btn btn-danger btn-sm me-1 dt-btn-inactive-whatsapp" title="Inactive WhatsApp Template"><span class="fw-semibold">${esc(row.whatsappInactiveCount)}</span></button>
+              `
+            }
+
+            return d;
+          }
         },
         {
           data: 'createdAt', title: 'Created At', className: 'text-nowrap',
           render: (d: string, t: string) => (t === 'sort' || t === 'type') ? d : formatDateTime(d)
         }, /*  {
-            data: 'mailMapCount', title: 'Mapped Mail Templates', className: 'text-nowrap',
+            data: 'mailActiveCount', title: 'Mapped Mail Templates', className: 'text-nowrap',
             render: (d: string, t: string) =>
               t === 'display' ? `<span class="fw-semibold">${esc(d)}</span>` : d
           },
@@ -124,8 +140,10 @@ export class NoticesDatatable extends DataTable {
         }*/
       ],
       createdRow: (row: HTMLElement, data: any) => {
-        $(row).find('.dt-btn-sms').on('click', () => callbacks.onSmsConfig(data));
-        $(row).find('.dt-btn-whatsapp').on('click', () => callbacks.onWhatsappConfig(data));
+        $(row).find('.dt-btn-active-sms').on('click', () => callbacks.onSmsConfig(data,true));
+        $(row).find('.dt-btn-inactive-sms').on('click', () => callbacks.onSmsConfig(data,false));
+        $(row).find('.dt-btn-active-whatsapp').on('click', () => callbacks.onWhatsappConfig(data,true));
+        $(row).find('.dt-btn-inactive-whatsapp').on('click', () => callbacks.onWhatsappConfig(data,false));
         $(row).find('.dt-btn-excel').on('click', () => callbacks.onExcelConfig(data));
       }
     };

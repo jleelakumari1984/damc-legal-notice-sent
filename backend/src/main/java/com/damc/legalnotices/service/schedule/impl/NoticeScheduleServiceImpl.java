@@ -16,15 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.damc.legalnotices.config.LocationProperties;
-import com.damc.legalnotices.dao.excel.NoticeedExcelDao;
-import com.damc.legalnotices.dao.excel.NoticeedNoticeItemDao;
+import com.damc.legalnotices.dao.excel.ExcelPreviewDao;
+import com.damc.legalnotices.dao.excel.ExcelPreviewRowDao;
+import com.damc.legalnotices.dao.excel.NoticeExcelDao;
+import com.damc.legalnotices.dao.excel.ScheduledNoticeItemDao;
 import com.damc.legalnotices.dao.notice.NoticeExcelMappingDao;
 import com.damc.legalnotices.dao.notice.NoticeValidationDao;
 import com.damc.legalnotices.dao.user.LoginUserDao;
 import com.damc.legalnotices.dao.user.UserSmsCredentialDao;
 import com.damc.legalnotices.dao.user.UserWhatsAppCredentialDao;
-import com.damc.legalnotices.dto.excel.ExcelPreviewDto;
-import com.damc.legalnotices.dto.excel.ExcelPreviewRowDto;
+import com.damc.legalnotices.dto.notice.NoticeScheduleRequestDto;
 import com.damc.legalnotices.dto.notice.NoticeValidationFileDto;
 import com.damc.legalnotices.dto.notice.NoticeValidationRowDto;
 import com.damc.legalnotices.dto.notice.SendSampleNoticeDto;
@@ -78,10 +79,12 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     @Override
     @Transactional
-    public NoticeValidationDao scheduleNotice(LoginUserDao sessionUser, Long noticeSno,
-            Boolean sendSms,
-            Boolean sendWhatsapp,
-            MultipartFile zipFile) {
+    public NoticeValidationDao scheduleNotice(LoginUserDao sessionUser, NoticeScheduleRequestDto request) {
+        Long noticeSno = request.getNoticeSno();
+        Boolean sendSms = request.getSendSms();
+        Boolean sendWhatsapp = request.getSendWhatsapp();
+        MultipartFile zipFile = request.getZipFile();
+
         if (zipFile == null || zipFile.isEmpty()) {
             throw new IllegalArgumentException("File is required");
         }
@@ -151,17 +154,22 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     private NoticeValidationFileDto storeExcelData(Path extractedPath, Path directExcelPath,
             MasterProcessTemplateDetailEntity template, ScheduledNoticeEntity scheduledNotice) {
-        List<NoticeExcelMappingDao> keyColumns = template.getExcelMappings().stream()
-                .filter(mapping -> mapping.getIsKey() == 1)
+        NoticeExcelMappingDao keyColumns = template.getExcelMappings().stream()
+                .filter(mapping -> mapping.getIsAgreement() == 1)
                 .map(entityDaoConverter::toNoticeExcelMappingDao)
-                .toList();
-
+                .findFirst()
+                .orElse(null);
+        NoticeExcelMappingDao customerNameColumns = template.getExcelMappings().stream()
+                .filter(mapping -> mapping.getIsCustomerName() == 1)
+                .map(entityDaoConverter::toNoticeExcelMappingDao)
+                .findFirst()
+                .orElse(null);
         List<NoticeExcelMappingDao> attachmentColumns = template.getExcelMappings().stream()
                 .filter(mapping -> mapping.getIsAttachment() == 1)
                 .map(entityDaoConverter::toNoticeExcelMappingDao)
                 .toList();
         Path excelPath = directExcelPath != null ? directExcelPath : excelParserUtil.findExcel(extractedPath);
-        ExcelPreviewDto excelPreview;
+        ExcelPreviewDao excelPreview;
         try {
             excelPreview = excelParserUtil.parseAsPreview(excelPath);
         } catch (IOException ex) {
@@ -171,7 +179,9 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
             throw new IllegalArgumentException("Excel has no valid agreement rows");
         }
         List<NoticeValidationRowDto> validationRows = new ArrayList<>();
-        for (ExcelPreviewRowDto row : excelPreview.getRows()) {
+        for (ExcelPreviewRowDao row : excelPreview.getRows()) {
+            String agreementNumber = row.getKeyColumnData(List.of(keyColumns), null);
+            String customerName = row.getKeyColumnData(List.of(customerNameColumns), null);
             String excelData;
             try {
                 excelData = objectMapper.writeValueAsString(row.getData());
@@ -181,14 +191,16 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
             ScheduledNoticeItemEntity item = new ScheduledNoticeItemEntity();
             item.setScheduledNotice(scheduledNotice);
-            item.setAgreementNumber(row.getKeyColumnData(keyColumns, null));
-            item.setAttachements(row.getKeyColumnData(attachmentColumns, ";"));
+            item.setAgreementNumber(agreementNumber);
+            item.setCustomerName(customerName);
+            item.setAttachments(row.getKeyColumnData(attachmentColumns, ";"));
             item.setExcelData(excelData);
             item.setStatus(NoticeScheduleStatus.UPLOADED);
             scheduledNoticeItemRepository.save(item);
 
             validationRows.add(NoticeValidationRowDto.builder()
-                    .agreementNumber(row.getKeyColumnData(keyColumns, null))
+                    .agreementNumber(agreementNumber)
+                    .customerName(customerName)
                     .excelData(excelData)
                     .build());
         }
@@ -200,7 +212,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     @Override
     @Transactional
-    public List<NoticeedExcelDao> noticePendingExcelParsing() {
+    public List<NoticeExcelDao> noticePendingExcelParsing() {
         long identifier = System.currentTimeMillis();
 
         // Atomically claim up to 50 EXCELUPLOADED rows with this identifier
@@ -214,9 +226,9 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
         log.info("Claimed {} notices for Excel parsing with identifier {}", claimed, identifier);
 
         List<ScheduledNoticeEntity> notices = scheduledNoticeRepository.findByIdentifier(identifier);
-        List<NoticeedExcelDao> result = new ArrayList<>();
+        List<NoticeExcelDao> result = new ArrayList<>();
         for (ScheduledNoticeEntity notice : notices) {
-            NoticeedExcelDao excelDao = NoticeedExcelDao.builder()
+            NoticeExcelDao excelDao = NoticeExcelDao.builder()
                     .scheduledNoticeId(notice.getId())
                     .ExcelName(notice.getOriginalFileName()).build();
             try {
@@ -255,7 +267,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
 
     @Override
     @Transactional
-    public List<NoticeedNoticeItemDao> noticePendingNoticeItems() {
+    public List<ScheduledNoticeItemDao> noticePendingNoticeItems() {
         long identifier = System.currentTimeMillis();
         int claimed = scheduledNoticeItemRepository.claimPendingItems(identifier,
                 NoticeScheduleStatus.NOTICEING.name(),
@@ -265,7 +277,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
             return Collections.emptyList();
         }
         List<ScheduledNoticeItemEntity> notices = scheduledNoticeItemRepository.findByIdentifier(identifier);
-        List<NoticeedNoticeItemDao> result = new ArrayList<>();
+        List<ScheduledNoticeItemDao> result = new ArrayList<>();
 
         Map<ScheduledNoticeEntity, List<ScheduledNoticeItemEntity>> itemsByNotice = notices.stream()
                 .collect(Collectors.groupingBy(ScheduledNoticeItemEntity::getScheduledNotice));
@@ -363,7 +375,7 @@ public class NoticeScheduleServiceImpl implements NoticeScheduleService {
                         item.setFailureReason(ex.getMessage());
                         item.setProcessedAt(LocalDateTime.now());
                     }
-                    NoticeedNoticeItemDao noticeItemDao = NoticeedNoticeItemDao.builder()
+                    ScheduledNoticeItemDao noticeItemDao = ScheduledNoticeItemDao.builder()
                             .scheduledNoticeId(notice.getId())
                             .excelData(noticeScheduleUtil.getExcelData(item))
                             .failureReason(item.getFailureReason())

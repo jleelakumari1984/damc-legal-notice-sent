@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NoticeWhatsappPendingDto  {
+public class NoticeWhatsAppPendingDto  {
     private Long userId;
 
    

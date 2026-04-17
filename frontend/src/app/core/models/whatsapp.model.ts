@@ -14,7 +14,7 @@ export interface WhatsappLogResponse {
   items: WhatsappLog[];
 }
 
-export interface WhatsappLogRequest  {
+export interface WhatsappLogFilter  {
   status: string;
 }
  

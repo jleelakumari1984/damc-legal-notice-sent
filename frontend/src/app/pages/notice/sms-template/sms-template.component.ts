@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 import { NoticeTemplateService } from '../../../core/services/notice-template.service';
-import { SmsTemplate, NoticeType, SmsPendingTemplate } from '../../../core/models/notices.model';
+import { SmsTemplate, NoticeType, SmsPendingTemplateResponse } from '../../../core/models/notices.model';
 import { SmsTemplateFormUserComponent } from './sms-template-form-user/sms-template-form-user.component';
 import { SmsTemplateViewComponent } from './sms-template-view/sms-template-view.component';
 import { StorageService } from '../../../core/services/storage.service';
@@ -20,6 +20,7 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(SmsApprovalFormComponent) smsApprovalForm!: SmsApprovalFormComponent;
 
   @Input() selectedNotice: NoticeType | null = null;
+  @Input() isActiveStatus: boolean | null = null;
   @Output() onClose = new EventEmitter<boolean>();
 
   changeTemplate = false;
@@ -60,6 +61,7 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
   private initTable(): void {
     if (!this.selectedNotice) return;
     const dt = new SmsTemplatesDatatable({
+      getStatus: () => this.isActiveStatus,
       noticeId: this.selectedNotice.id,
       isSuperAdmin: this.isSuperAdmin,
       service: this.service,
@@ -77,16 +79,19 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
     setTimeout(() => this.dtHelper.initTable(this.tableId, dt));
   }
   openApprovalForm(t: SmsTemplate, isReject: boolean): void {
-    const template: SmsPendingTemplate = {
+    const template: SmsPendingTemplateResponse = {
       id: t.id,
       noticeId: t.noticeId,
       noticeName: this.selectedNotice?.name ?? '',
       userName: '',
       userTemplateContent: t.userTemplateContent,
+      templateContent: t.templateContent,
+      messageLength: t.messageLength,
+      numberOfMessage: t.numberOfMessage,
       createdAt: t.createdAt
     };
     this.showApproval = true;
-    this.smsApprovalForm.open(template, isReject,true);
+    this.smsApprovalForm.open(template, isReject, true);
   }
   reloadTable(): void {
     this.dtHelper.reload(this.tableId);
@@ -102,6 +107,9 @@ export class SmsTemplateComponent implements OnInit, OnChanges, OnDestroy {
     this.editTemplate = template;
     this.clearMessages();
     this.userForm?.open();
+  }
+  statusChanged(): void {
+
   }
   onApproved(): void {
     this.showApproval = false;

@@ -2,7 +2,7 @@ package com.damc.legalnotices.util.converter;
 
 import com.damc.legalnotices.config.LocationProperties;
 import com.damc.legalnotices.util.TemplateUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,12 @@ class NoticeMappingEntityDaoConverterTest {
     Path tempDir;
 
     private NoticeMappingEntityDaoConverter converter;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         LocationProperties props = mock(LocationProperties.class);
         when(props.getTemplateLocation()).thenReturn(tempDir.toString());
-        var templateUtil = new TemplateUtil(props, objectMapper);
+        var templateUtil = mock(TemplateUtil.class);
         converter = new NoticeMappingEntityDaoConverter(templateUtil);
     }
 

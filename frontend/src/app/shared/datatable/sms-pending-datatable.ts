@@ -1,7 +1,7 @@
 import { BASE_DT_OPTIONS, esc, formatDateTime } from './datatable.utils';
 import { DataTable } from './base-datatable';
 import { NoticeTemplateService } from '../../core/services/notice-template.service';
-import { SmsPendingTemplate, SmsPendingTemplateRequest, SmsTemplate } from '../../core/models/notices.model';
+import { SmsPendingTemplateResponse, SmsPendingTemplateFilter, SmsTemplate } from '../../core/models/notices.model';
 import { PaginatedRequest } from '../../core/models/datatable.model';
 
 declare const $: any;
@@ -9,8 +9,8 @@ declare const $: any;
 export interface SmsPendingDatatableOptions {
     service: NoticeTemplateService;
     callbacks: {
-        onApprove: (template: SmsPendingTemplate) => void;
-        onReject: (template: SmsPendingTemplate) => void;
+        onApprove: (template: SmsPendingTemplateResponse) => void;
+        onReject: (template: SmsPendingTemplateResponse) => void;
         onError: (message: string) => void;
     };
 }
@@ -63,7 +63,7 @@ export class SmsPendingDatatable extends DataTable {
                         sortField = dtParams.columns[colIndex].data || sortField;
                     }
                 }
-                var request: PaginatedRequest<SmsPendingTemplateRequest> = {
+                var request: PaginatedRequest<SmsPendingTemplateFilter> = {
                     sortColumn: sortField,
                     sortDirection: sortDir,
                     dtStart: start,
@@ -83,7 +83,7 @@ export class SmsPendingDatatable extends DataTable {
                 });
             },
             columns,
-            createdRow: (row: HTMLElement, data: SmsPendingTemplate) => {
+            createdRow: (row: HTMLElement, data: SmsPendingTemplateResponse) => {
                 $(row).find('.dt-btn-approve').on('click', () => callbacks.onApprove(data));
                 $(row).find('.dt-btn-reject').on('click', () => callbacks.onReject(data));
             }

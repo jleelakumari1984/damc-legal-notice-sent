@@ -25,9 +25,13 @@ export interface NoticeType {
     description: string;
     createdUserName: string;
     excelMapCount: number;
-    smsMapCount: number;
-    whatsappMapCount: number;
-    mailMapCount: number;
+    smsActiveCount: number;
+    smsInactiveCount: number;
+    whatsappActiveCount: number;
+    whatsappInactiveCount: number;
+    mailActiveCount: number;
+    mailInactiveCount: number;
+
 }
 
 
@@ -36,7 +40,8 @@ export interface NoticeExcelMappingResponse {
     noticeId: number;
     excelFieldName: string;
     dbFieldName: string;
-    isKey: number;
+    isAgreement: number;
+    isCustomerName: number;
     isMobile: number;
     isMandatory: number;
     isAttachment: number;
@@ -46,11 +51,12 @@ export interface NoticeExcelMappingResponse {
 export interface NoticeExcelMappingRequest {
     noticeId: number;
     excelFieldName: string;
-    dbFieldName: string;
-    isKey: number;
-    isMobile: number;
+    isAgreement: number;
+    isCustomerName: number;
+     isMobile: number;
     isMandatory: number;
     isAttachment: number;
+    isCustomer: number;
 }
 
 export interface SmsTemplate {
@@ -61,6 +67,8 @@ export interface SmsTemplate {
     routeId: string;
     userTemplateContent: string;
     templateContent: string;
+    messageLength: number;
+    numberOfMessage: number;
     templateId: string;
     channel: string;
     dcs: number;
@@ -88,24 +96,30 @@ export interface SmsTemplateRequest extends SmsUserTemplateRequest {
     dcs: number;
     flashSms: number;
 }
-export interface SmsPendingTemplateRequest {
+export interface SmsPendingTemplateFilter {
 }
-export interface SmsPendingTemplate {
+export interface SmsPendingTemplateResponse {
     id: number;
     noticeId: number;
     noticeName: string;
     userName: string;
     userTemplateContent: string;
+    templateContent: string;
+    messageLength: number;
+    numberOfMessage: number;
     createdAt: Date;
 }
-export interface WhatsappPendingTemplateRequest {
+export interface WhatsappPendingTemplateFilter {
 }
-export interface WhatsappPendingTemplate {
+export interface WhatsappPendingTemplateResponse {
     id: number;
     noticeId: number;
     noticeName: string;
     userName: string;
     userTemplateContent: string;
+    templateContent: string;
+    messageLength: number;
+    numberOfMessage: number;
     createdAt: Date;
 }
 export interface WhatsappTemplate {
@@ -115,6 +129,8 @@ export interface WhatsappTemplate {
     templatePath: string;
     userTemplateContent: string;
     templateContent: string;
+    messageLength: number;
+    numberOfMessage: number;
     templateLang: string;
     status: number;
     approveStatus: number;
@@ -139,4 +155,32 @@ export enum TemplateApprovedStatus {
     PENDING = 0,
     APPROVED = 1,
     REJECT = 3
+}
+
+
+
+export interface SmsApproveTemplateRequest {
+    peid: string;
+    senderId: string;
+    routeId: string;
+    templateContent: string;
+    templateId: string;
+    channel: string;
+    dcs: number;
+    flashSms: number;
+}
+
+export interface SmsRejectTemplateRequest {
+    rejectionReason: string;
+}
+
+
+export interface WhatsappApproveTemplateRequest {
+    templateName: string;
+    templateContent: string;
+    templateLang: string;
+}
+
+export interface WhatsappRejectTemplateRequest {
+    rejectionReason: string;
 }

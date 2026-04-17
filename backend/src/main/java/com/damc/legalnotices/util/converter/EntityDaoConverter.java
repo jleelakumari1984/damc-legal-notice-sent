@@ -57,12 +57,18 @@ public class EntityDaoConverter {
                                 .createdUserName(e.getCreatedUserName())
                                 .excelMapCount(e.getExcelMapCount() == null ? 0
                                                 : e.getExcelMapCount())
-                                .smsMapCount(e.getSmsMapCount() == null ? 0
-                                                : e.getSmsMapCount())
-                                .whatsappMapCount(e.getWhatsappMapCount() == null ? 0
-                                                : e.getWhatsappMapCount())
-                                .mailMapCount(e.getMailMapCount() == null ? 0
-                                                : e.getMailMapCount())
+                                .smsActiveCount(e.getSmsActiveCount() == null ? 0
+                                                : e.getSmsActiveCount())
+                                .smsInactiveCount(e.getSmsInactiveCount() == null ? 0
+                                                : e.getSmsInactiveCount())
+                                .whatsappActiveCount(e.getWhatsappActiveCount() == null ? 0
+                                                : e.getWhatsappActiveCount())
+                                .whatsappInactiveCount(e.getWhatsappInactiveCount() == null ? 0
+                                                : e.getWhatsappInactiveCount())
+                                .mailActiveCount(e.getMailActiveCount() == null ? 0
+                                                : e.getMailActiveCount())
+                                .mailInactiveCount(e.getMailInactiveCount() == null ? 0
+                                                : e.getMailInactiveCount())
                                 .build();
         }
 
@@ -73,7 +79,8 @@ public class EntityDaoConverter {
                                 .dbFieldName(noticeexcelmapping1.getDbFieldName())
                                 .isMandatory(noticeexcelmapping1.getIsMandatory())
                                 .isAttachment(noticeexcelmapping1.getIsAttachment())
-                                .isKey(noticeexcelmapping1.getIsKey())
+                                .isAgreement(noticeexcelmapping1.getIsAgreement())
+                                .isCustomerName(noticeexcelmapping1.getIsCustomerName())
                                 .build();
         }
 

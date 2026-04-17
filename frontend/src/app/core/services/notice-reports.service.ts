@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NoticeReportDetail, NoticeReportFilter, NoticeReportItemDetail, NoticeReportSummary } from '../models/report.notice';
-import { SmsLogResponse, SmsLogRequest, } from '../models/sms.model';
-import { WhatsappLogResponse, WhatsappLogRequest } from '../models/whatsapp.model';
+import { SmsLogResponse, SmsLogFilter, } from '../models/sms.model';
+import { WhatsappLogResponse, WhatsappLogFilter } from '../models/whatsapp.model';
 import { PaginatedRequest, PaginatedResponse } from '../models/datatable.model';
 
 @Injectable({ providedIn: 'root' })
@@ -25,37 +25,37 @@ export class NoticeReportsService {
     return this.http.get<NoticeReportItemDetail>(`${this.api}/items/${itemId}`);
   }
 
-  getSmsLogs(reportId: number, request: PaginatedRequest<SmsLogRequest>): Observable<PaginatedResponse<SmsLogResponse>> {
+  getSmsLogs(reportId: number, request: PaginatedRequest<SmsLogFilter>): Observable<PaginatedResponse<SmsLogResponse>> {
     if (request.filter?.status === 'error') {
       return this.getErrorSmsLogs(reportId, request);
     }
     return this.http.post<PaginatedResponse<SmsLogResponse>>(`${this.api}/sms-logs/${reportId}`, request);
   }
-  getErrorSmsLogs(reportId: number, request: PaginatedRequest<SmsLogRequest>): Observable<PaginatedResponse<SmsLogResponse>> {
+  getErrorSmsLogs(reportId: number, request: PaginatedRequest<SmsLogFilter>): Observable<PaginatedResponse<SmsLogResponse>> {
     return this.http.post<PaginatedResponse<SmsLogResponse>>(`${this.api}/error-sms-logs/${reportId}`, request);
   }
-  getWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogRequest>): Observable<PaginatedResponse<WhatsappLogResponse>> {
+  getWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogFilter>): Observable<PaginatedResponse<WhatsappLogResponse>> {
     if (request.filter?.status === 'error') {
       return this.getErrorWhatsappLogs(reportId, request);
     }
     return this.http.post<PaginatedResponse<WhatsappLogResponse>>(`${this.api}/whats-app-logs/${reportId}`, request);
   }
-  getErrorWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogRequest>): Observable<PaginatedResponse<WhatsappLogResponse>> {
+  getErrorWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogFilter>): Observable<PaginatedResponse<WhatsappLogResponse>> {
     return this.http.post<PaginatedResponse<WhatsappLogResponse>>(`${this.api}/error-whats-app-logs/${reportId}`, request);
   }
 
-  exportSmsLogs(reportId: number, request: PaginatedRequest<SmsLogRequest>): Observable<Blob> {
+  exportSmsLogs(reportId: number, request: PaginatedRequest<SmsLogFilter>): Observable<Blob> {
     return this.http.post(`${this.api}/download-sms-logs/${reportId}`, request, {
       responseType: 'blob'
     });
   }
-  exportErrorSmsLogs(reportId: number, request: PaginatedRequest<SmsLogRequest>): Observable<Blob> {
+  exportErrorSmsLogs(reportId: number, request: PaginatedRequest<SmsLogFilter>): Observable<Blob> {
     return this.http.post(`${this.api}/download-error-sms-logs/${reportId}`, request, {
       responseType: 'blob'
     });
   }
 
-  exportWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogRequest>): Observable<Blob> {
+  exportWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogFilter>): Observable<Blob> {
     if (request.filter?.status === 'error') {
       return this.exportErrorWhatsappLogs(reportId, request);
     }
@@ -63,7 +63,7 @@ export class NoticeReportsService {
       responseType: 'blob'
     });
   }
-  exportErrorWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogRequest>): Observable<Blob> {
+  exportErrorWhatsappLogs(reportId: number, request: PaginatedRequest<WhatsappLogFilter>): Observable<Blob> {
     return this.http.post(`${this.api}/download-error-whats-app-logs/${reportId}`, request, {
       responseType: 'blob'
     });

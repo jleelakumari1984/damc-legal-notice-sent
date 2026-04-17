@@ -35,8 +35,11 @@ public class MasterProcessWhatsappConfigDetailEntity {
     @JoinColumn(name = "process_sno")
     private MasterProcessTemplateDetailEntity process;
 
-    @Column(name = "sent_level")
-    private Integer sentLevel;
+    @Column(name = "message_length")
+    private Integer messageLength;
+
+    @Column(name = "number_of_message")
+    private Integer numberOfMessage;
 
     @Column(name = "template_name")
     private String templateName;
