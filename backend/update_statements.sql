@@ -48,4 +48,10 @@ ADD COLUMN `customer_name` VARCHAR(45) NULL AFTER `agreement_number`,
 CHANGE COLUMN `attachements` `attachments` VARCHAR(255) NULL DEFAULT NULL ;
 
 
- 
+ ALTER TABLE `master_process_mail_config_details` 
+CHANGE COLUMN `number_of_message` `number_of_message` INT NOT NULL DEFAULT 1 ;
+ ALTER TABLE `master_process_sms_config_details` 
+CHANGE COLUMN `number_of_message` `number_of_message` INT NOT NULL DEFAULT 1 ;
+
+ ALTER TABLE `master_process_whatsapp_config_details` 
+CHANGE COLUMN `number_of_message` `number_of_message` INT NOT NULL DEFAULT 1 ;

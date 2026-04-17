@@ -14,10 +14,13 @@ public class NoticeTemplateReportDao {
     private LocalDateTime createdAt;
     private String createdUserName;
     private Long excelMapCount;
+    private Long smsMessageCount;
     private Long smsActiveCount;
     private Long smsInactiveCount;
+    private Long whatsappMessageCount;
     private Long whatsappActiveCount;
     private Long whatsappInactiveCount;
+    private Long mailMessageCount;
     private Long mailActiveCount;
     private Long mailInactiveCount;
 }

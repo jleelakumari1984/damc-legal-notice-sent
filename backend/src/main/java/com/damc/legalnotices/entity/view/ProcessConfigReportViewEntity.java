@@ -41,12 +41,17 @@ public class ProcessConfigReportViewEntity {
     @Column(name = "excel_map_count")
     private Long excelMapCount;
 
+    @Column(name = "sms_message_count")
+    private Long smsMessageCount;
+
     @Column(name = "sms_active_count")
     private Long smsActiveCount;
 
     @Column(name = "sms_inactive_count")
     private Long smsInactiveCount;
 
+    @Column(name = "whatsapp_message_count")
+    private Long whatsappMessageCount;
     @Column(name = "whatsapp_active_count")
     private Long whatsappActiveCount;
 
@@ -58,4 +63,8 @@ public class ProcessConfigReportViewEntity {
 
     @Column(name = "mail_inactive_count")
     private Long mailInactiveCount;
+
+    @Column(name = "mail_message_count")
+    private Long mailMessageCount;
+
 }

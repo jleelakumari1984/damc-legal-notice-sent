@@ -9,11 +9,46 @@
       </div>
       <div class="modal-body">
         <div class="row g-3">
+
+          <!-- Notice Name -->
           <div class="col-12">
-            <label class="form-label">Notice Name</label>
-            <input class="form-control" [(ngModel)]="name" placeholder="Search by name..."
-              (keyup.enter)="apply()">
+            <label class="form-label" for="nf-noticeName">Notice Name</label>
+            <input id="nf-noticeName" class="form-control" [(ngModel)]="noticeName"
+              placeholder="Search by notice name..." (keyup.enter)="apply()">
           </div>
+
+          <!-- Status – select2 -->
+          <div class="col-12">
+            <label class="form-label" for="nf-status">Status</label>
+            <select id="nf-status" class="form-select">
+              <option value="">All statuses</option>
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <!-- User – select2 -->
+          <div class="col-12">
+            <label class="form-label" for="nf-userId">User</label>
+            <select id="nf-userId" class="form-select">
+              <option value="">All users</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ u.displayName }}</option>
+            </select>
+          </div>
+
+          <!-- From Date – flatpickr datetime -->
+          <div class="col-md-6">
+            <label class="form-label" for="nf-fromDate">From Date &amp; Time</label>
+            <input id="nf-fromDate" type="text" class="form-control"
+              placeholder="YYYY-MM-DD HH:MM" autocomplete="off">
+          </div>
+
+          <!-- To Date – flatpickr datetime -->
+          <div class="col-md-6">
+            <label class="form-label" for="nf-toDate">To Date &amp; Time</label>
+            <input id="nf-toDate" type="text" class="form-control"
+              placeholder="YYYY-MM-DD HH:MM" autocomplete="off">
+          </div>
+
         </div>
       </div>
       <div class="modal-footer">

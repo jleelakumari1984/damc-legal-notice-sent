@@ -57,14 +57,19 @@ public class EntityDaoConverter {
                                 .createdUserName(e.getCreatedUserName())
                                 .excelMapCount(e.getExcelMapCount() == null ? 0
                                                 : e.getExcelMapCount())
+                                .smsMessageCount(e.getSmsMessageCount() == null ? 0 : e.getSmsMessageCount())
                                 .smsActiveCount(e.getSmsActiveCount() == null ? 0
                                                 : e.getSmsActiveCount())
                                 .smsInactiveCount(e.getSmsInactiveCount() == null ? 0
                                                 : e.getSmsInactiveCount())
+                                .smsMessageCount(e.getSmsMessageCount() == null ? 0 : e.getSmsMessageCount())
+                                .whatsappMessageCount(
+                                                e.getWhatsappMessageCount() == null ? 0 : e.getWhatsappMessageCount())
                                 .whatsappActiveCount(e.getWhatsappActiveCount() == null ? 0
                                                 : e.getWhatsappActiveCount())
                                 .whatsappInactiveCount(e.getWhatsappInactiveCount() == null ? 0
                                                 : e.getWhatsappInactiveCount())
+                                .mailMessageCount(e.getMailMessageCount() == null ? 0 : e.getMailMessageCount())
                                 .mailActiveCount(e.getMailActiveCount() == null ? 0
                                                 : e.getMailActiveCount())
                                 .mailInactiveCount(e.getMailInactiveCount() == null ? 0
