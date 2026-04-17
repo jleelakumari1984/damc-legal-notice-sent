@@ -1,0 +1,82 @@
+package com.notices.domain.entity.notification;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.notices.domain.entity.master.MasterProcessSmsConfigDetailEntity;
+import com.notices.domain.entity.master.MasterProcessTemplateDetailEntity;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "send_error_sms_details")
+public class SendErrorSmsDetailEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "process_sno", insertable = false, updatable = false)
+    private MasterProcessTemplateDetailEntity process;
+
+    @ManyToOne
+    @JoinColumn(name = "sms_template_sno", insertable = false, updatable = false)
+    private MasterProcessSmsConfigDetailEntity smsConfig;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sno")
+    private Long id;
+
+    @Column(name = "type", length = 45)
+    private String type;
+
+    @Column(name = "schedule_sno")
+    private Long scheduleSno;
+
+    @Column(name = "process_sno")
+    private Long processSno;
+
+    @Column(name = "sms_template_sno")
+    private Long smsTemplateSno;
+
+    @Column(name = "loan_no")
+    private Long loanNo;
+
+    @Column(name = "send_to", length = 15)
+    private String sendTo;
+
+    @Column(name = "message", columnDefinition = "longtext")
+    private String message;
+
+    @Column(name = "send_at")
+    private Instant sendAt;
+
+    @Column(name = "error_message", columnDefinition = "longtext")
+    private String errorMessage;
+
+    @Column(name = "created_by", updatable = false)
+    private Long createdBy;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+}

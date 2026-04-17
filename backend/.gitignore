@@ -23,4 +23,7 @@ Thumbs.db
 .env.*
 
 # Runtime storage (generated uploads/extracts)
-data/
+api/data/
+api/resources/
+
+*application.properties

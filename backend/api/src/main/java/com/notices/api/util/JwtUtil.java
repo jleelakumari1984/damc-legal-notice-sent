@@ -1,0 +1,75 @@
+package com.notices.api.util;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.notices.domain.dao.user.LoginUserDao;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.function.Function;
+
+@Component
+public class JwtUtil {
+
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${app.jwt.expiration-ms}")
+    private long jwtExpirationMs;
+
+    public String generateToken(LoginUserDao userDao) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .subject(userDao.getLoginName())
+                .issuedAt(now)
+                .claim("canSwitchSession",
+                        userDao.getCanSwitchSession() == null ? false : userDao.getCanSwitchSession())
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean isTokenValid(String token, LoginUserDao userDao) {
+        String username = extractUsername(token);
+
+        return username.equals(userDao.getLoginName()) && !isTokenExpired(token);
+    }
+
+    public boolean canSwitchSession(String token) {
+        Boolean canSwitch = extractClaim(token, claims -> claims.get("canSwitchSession", Boolean.class));
+        return canSwitch != null && canSwitch;
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()));
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+}

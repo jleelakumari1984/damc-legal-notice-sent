@@ -26,3 +26,5 @@ replay_pid*
 # External backend configuration
 config/application.properties
 !config/application.properties.example
+backend/api/application.properties
+backend_src/

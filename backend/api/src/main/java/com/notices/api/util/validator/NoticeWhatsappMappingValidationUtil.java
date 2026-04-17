@@ -1,0 +1,36 @@
+package com.notices.api.util.validator;
+
+import com.notices.api.errors.InvalidInputException;
+import com.notices.domain.dto.notice.NoticeWhatsAppConfigDto;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class NoticeWhatsappMappingValidationUtil {
+
+    private NoticeWhatsappMappingValidationUtil() {
+    }
+
+    public static void validateAdminTemplate(NoticeWhatsAppConfigDto request) {
+        Map<String, List<String>> errorMap = new HashMap<>();
+        if (request.getTemplateContent() == null || request.getTemplateContent().isBlank())
+            errorMap.computeIfAbsent("templateContent", k -> new ArrayList<>()).add("Template content is required");
+        if (request.getTemplateName() == null || request.getTemplateName().isBlank())
+            errorMap.computeIfAbsent("templateName", k -> new ArrayList<>()).add("Template name is required");
+        if (request.getTemplateLang() == null || request.getTemplateLang().isBlank())
+            errorMap.computeIfAbsent("templateLang", k -> new ArrayList<>()).add("Template language is required");
+        if (!errorMap.isEmpty())
+            throw new InvalidInputException("Invalid WhatsApp admin template config", errorMap);
+    }
+
+    public static void validateUserTemplate(NoticeWhatsAppConfigDto request) {
+        Map<String, List<String>> errorMap = new HashMap<>();
+        if (request.getUserTemplateContent() == null || request.getUserTemplateContent().isBlank())
+            errorMap.computeIfAbsent("userTemplateContent", k -> new ArrayList<>())
+                    .add("User template content is required");
+        if (!errorMap.isEmpty())
+            throw new InvalidInputException("Invalid WhatsApp user template config", errorMap);
+    }
+}

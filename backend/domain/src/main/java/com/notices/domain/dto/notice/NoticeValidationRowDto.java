@@ -1,0 +1,12 @@
+package com.notices.domain.dto.notice;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class NoticeValidationRowDto {
+    private String agreementNumber;
+    private String customerName;
+    private String excelData;
+}
